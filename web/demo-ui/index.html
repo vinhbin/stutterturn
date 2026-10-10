@@ -6,149 +6,109 @@
 <title>StutterTurn Demo</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body data-theme="auto">
-
-<!-- Shown ONLY while the labeled development preview fixture is active. -->
-<div id="preview-banner" class="preview-banner" hidden role="alert">
-  DEVELOPMENT PREVIEW — synthetic fixture events. Not live agent output. Not benchmark
-  evidence. No audio is playing and no recording is involved.
+<body>
+<a class="skip-link" href="#main-content">Skip to console</a>
+<div id="preview-banner" class="preview-banner" hidden>
+  DEVELOPMENT PREVIEW — synthetic fixture events. No audio. Not benchmark evidence.
 </div>
-
 <header class="page-header">
   <h1>StutterTurn demo surface</h1>
-  <p class="subtitle">Turn-taking comparison rig — passive shell until the agent contract lands.</p>
-  <div id="connection-chip" class="chip chip-blocked" role="status">LIVE INTEGRATION: BLOCKED</div>
+  <p class="subtitle">Turn-taking comparison console · one source, one configuration, one fresh run.</p>
+  <div id="connection-chip" class="chip chip-blocked">LIVE INTEGRATION: BLOCKED</div>
 </header>
-
-<main>
-
-  <!-- Global status / error / disconnection messages -->
-  <div id="status-banner" class="status-banner warn" role="status" aria-live="polite">
-    Live integration is <strong>BLOCKED</strong>: <code>agent/CONTRACT.md</code> has not been
-    published (owner: Guttuu). No endpoints are invented here. Use the labeled development
-    preview to exercise the display, or wait for the contract.
+<main id="main-content" tabindex="-1">
+  <div id="status-banner" class="status-banner warn" role="status" aria-atomic="true">
+    Connect a backend or enable the labeled development preview.
   </div>
-
-  <!-- Configuration -->
+  <section class="panel" aria-labelledby="connection-heading">
+    <h2 id="connection-heading">Backend connection</h2>
+    <div class="connection-controls">
+      <label for="backend-url">Backend URL</label>
+      <input id="backend-url" type="url" value="http://127.0.0.1:8765" spellcheck="false" autocomplete="off">
+      <button id="btn-connect" type="button">Connect</button>
+      <button id="btn-disconnect" type="button" disabled>Disconnect</button>
+    </div>
+    <p class="note">Uses the proposed v0.1 contract. A connection alone does not verify a real audio interaction.</p>
+  </section>
   <section class="panel" aria-labelledby="config-heading">
     <h2 id="config-heading">Configuration</h2>
-    <p class="note">Configuration changes apply <strong>only to a fresh run</strong>. The rig
-      never switches model weights mid-call. If the model gate fails, the comparison falls back
-      to STOCK vs PATIENT labeling — a candidate model is never presented as available unless a
-      real artifact exists.</p>
-    <fieldset id="config-group">
-      <legend class="visually-hidden">Select configuration for the next fresh run</legend>
-      <!-- Radios are populated by app.js from the adapter's configuration list -->
-    </fieldset>
+    <p class="note">Changes apply only to a fresh run. Availability and model IDs come from the backend.
+      PATIENT is a waiting configuration; an unavailable candidate cannot be selected.</p>
+    <fieldset id="config-group"><legend class="visually-hidden">Select configuration for the next fresh run</legend></fieldset>
   </section>
-
-  <!-- Run controls + status -->
+  <section class="panel" aria-labelledby="source-heading">
+    <h2 id="source-heading">Source recording</h2>
+    <label for="source-select">Source for next run</label>
+    <select id="source-select" disabled aria-describedby="source-note"><option value="">No backend sources available</option></select>
+    <p class="note" id="source-note">The source list comes from the connected backend.</p>
+    <p class="provenance" id="source-label">No source recording loaded. No audio plays in this console.</p>
+  </section>
   <section class="panel" aria-labelledby="run-heading">
     <h2 id="run-heading">Run</h2>
     <div class="run-controls">
-      <button id="btn-start" type="button" accesskey="s">Start fresh run <kbd>S</kbd></button>
+      <button id="btn-start" type="button">Start fresh run <kbd>S</kbd></button>
       <button id="btn-stop" type="button" disabled>Stop <kbd>X</kbd></button>
       <button id="btn-reset" type="button" class="danger">Reset <kbd>R</kbd></button>
     </div>
     <dl class="run-meta">
-      <div><dt>Run status</dt><dd id="run-phase">idle</dd></div>
+      <div><dt>Run status</dt><dd id="run-phase" role="status" aria-atomic="true">idle</dd></div>
       <div><dt>Run ID</dt><dd id="run-id">—</dd></div>
       <div><dt>Run configuration</dt><dd id="run-config">—</dd></div>
-      <div><dt>Event source</dt><dd id="run-source">blocked (no backend contract)</dd></div>
+      <div><dt>Event source</dt><dd id="run-source">Backend not connected</dd></div>
     </dl>
-    <p class="note" id="start-note">Start is disabled while live integration is blocked.
-      Enable the development preview below to exercise the display with labeled synthetic
-      events.</p>
+    <p class="note" id="start-note">Start is disabled until a configuration and source are available.</p>
+    <details class="run-details"><summary>Run metadata</summary><dl id="metadata-body" class="run-meta metadata"></dl></details>
   </section>
-
-  <!-- Source recording provenance — always visible, never fabricated -->
-  <section class="panel" aria-labelledby="source-heading">
-    <h2 id="source-heading">Source recording</h2>
-    <p class="provenance" id="source-label">
-      No source recording loaded. Recording identity/provenance must come from the agent
-      backend per the (pending) contract. This demo only ever plays <strong>real, labeled
-      SEP-28k recordings</strong> of people who stutter — nobody imitates stuttering, ever.
-    </p>
-  </section>
-
-  <!-- Turn state -->
   <section class="panel" aria-labelledby="state-heading">
     <h2 id="state-heading">Caller / agent state</h2>
-    <div class="current-state">
-      <span class="label">Current:</span>
-      <span id="current-state" class="state-badge state-none" role="status">no run</span>
-    </div>
-    <div id="state-strip" class="state-strip" role="img"
-         aria-label="Turn-state timeline for the current run">
-      <span class="strip-empty">No state events yet.</span>
-    </div>
+    <div class="current-state"><span class="label">Current:</span><span id="current-state" class="state-badge state-none">no run</span></div>
+    <div id="state-strip" class="state-strip" role="img" aria-label="No state events yet."><span class="strip-empty">No state events yet.</span></div>
     <p class="legend">
-      <span class="state-badge state-speaking">speaking</span>
-      <span class="state-badge state-silence">silence</span>
-      <span class="state-badge state-holding">holding</span>
-      <span class="state-badge state-agent">agent</span>
+      <span class="state-badge state-speaking">speaking</span><span class="state-badge state-silence">silence</span>
+      <span class="state-badge state-holding">holding</span><span class="state-badge state-agent">agent</span>
     </p>
+    <p id="run-alert" class="run-alert" role="status" aria-atomic="true"></p>
   </section>
-
-  <!-- Timing events -->
   <section class="panel" aria-labelledby="events-heading">
     <h2 id="events-heading">Observed timing events</h2>
-    <p class="note">An <strong>internal completion decision</strong> is the turn model's output;
-      an <strong>audible response</strong> is what the caller actually hears. They are different
-      moments and are reported separately.</p>
+    <p class="note" id="audio-note">Audio timestamps are backend-reported; speaker playback is unverified. No audio plays in this console.</p>
     <dl class="run-meta timing-summary">
-      <div><dt>First internal completion decision</dt><dd id="first-decision">—</dd></div>
-      <div><dt>First audible agent response</dt><dd id="first-audible">—</dd></div>
-      <div><dt>Decision → audible gap</dt><dd id="decision-gap">—</dd></div>
+      <div><dt>First turn-complete decision</dt><dd id="first-decision">—</dd></div>
+      <div><dt>First agent audio (reported)</dt><dd id="first-audible">—</dd></div>
+      <div><dt>Decision → reported audio gap</dt><dd id="decision-gap">—</dd></div>
     </dl>
     <div id="event-scroll" class="event-scroll" tabindex="-1" role="region" aria-labelledby="events-heading">
-    <table id="event-table">
-      <caption id="event-caption">Events for the current run. A fresh run clears this table.</caption>
-      <thead>
-        <tr><th scope="col">Run</th><th scope="col">t (s)</th><th scope="col">Kind</th>
-            <th scope="col">Detail</th><th scope="col">prob</th><th scope="col">model</th></tr>
-      </thead>
-      <tbody id="event-body">
-        <tr class="empty-row"><td colspan="6">No events. Start a fresh run.</td></tr>
-      </tbody>
-    </table>
+      <table id="event-table">
+        <caption id="event-caption">Events for the current run. A fresh run clears this table.</caption>
+        <thead><tr><th scope="col">Run</th><th scope="col">t (s)</th><th scope="col">Event</th><th scope="col">Detail</th><th scope="col">prob</th><th scope="col">model</th></tr></thead>
+        <tbody id="event-body"><tr class="empty-row"><td colspan="6">No events. Start a fresh run.</td></tr></tbody>
+      </table>
     </div>
   </section>
-
-  <!-- Integration status -->
+  <section class="panel" aria-labelledby="summary-heading">
+    <h2 id="summary-heading">Final run summary</h2>
+    <p class="note" id="summary-note">No final summary received.</p>
+    <dl id="summary-body" class="run-meta summary-grid"></dl>
+  </section>
   <section class="panel" aria-labelledby="integration-heading">
     <h2 id="integration-heading">Integration status</h2>
     <ul class="integration-list">
-      <li><code>agent/CONTRACT.md</code> (Guttuu) — <strong id="agent-contract-status">missing
-        → live run control and event stream BLOCKED</strong></li>
-      <li><code>model/CONTRACT.md</code> (Niko) — <strong id="model-contract-status">missing
-        → STUTTERTURN candidate arm unavailable</strong></li>
+      <li>Agent: <strong id="agent-contract-status">Proposed v0.1 contract; real replay acceptance pending.</strong></li>
+      <li>Model: <strong id="model-contract-status">Candidate availability comes from the backend.</strong></li>
     </ul>
-    <p class="note">Proposed event schema from PLAN.md (<strong>PROPOSED, not an implemented
-      service</strong>): <code>{t, state: speaking|silence|holding|agent, prob, model}</code>
-      over websocket. Run identity, time origin, decision-vs-audible timing and cancellation
-      events still need agreement — see <code>README.md</code> in this directory.</p>
-    <div class="preview-controls">
-      <label>
-        <input type="checkbox" id="preview-toggle">
-        Enable development preview (labeled synthetic fixture — never evidence) <kbd>P</kbd>
-      </label>
-    </div>
+    <div class="preview-controls"><label><input type="checkbox" id="preview-toggle"> Enable development preview (synthetic fixture — never evidence) <kbd>P</kbd></label></div>
+    <p class="note">Switching preview mode cancels any pending or active run.</p>
   </section>
-
   <footer class="page-footer">
     <h2>Keyboard controls</h2>
     <ul class="kbd-list">
       <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> — move between controls</li>
-      <li><kbd>&larr;</kbd> <kbd>&rarr;</kbd> — change configuration (radio group); <kbd>1</kbd>–<kbd>3</kbd> jump directly</li>
-      <li><kbd>S</kbd> start fresh run · <kbd>X</kbd> stop · <kbd>R</kbd> reset (one tap) · <kbd>P</kbd> toggle preview</li>
+      <li><kbd>←</kbd> <kbd>→</kbd> — change configuration within its radio group</li>
+      <li><kbd>S</kbd> start · <kbd>X</kbd> stop · <kbd>R</kbd> reset · <kbd>P</kbd> preview · <kbd>1</kbd>–<kbd>9</kbd> choose configuration</li>
     </ul>
-    <p class="note">Owned by Vinh (<code>web/demo-ui/</code> only). Kareem: embed or link this
-      page per <code>web/demo-ui/README.md</code>.</p>
+    <p class="note">Letter and number shortcuts pause while a text input, selector or editable field has focus.</p>
   </footer>
-
 </main>
-
 <script src="adapter.js"></script>
 <script src="app.js"></script>
 </body>
