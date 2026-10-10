@@ -30,3 +30,20 @@ Reset: one tap, under 60 s. Connectivity fallback: recorded video of the same ri
 - [ ] Technologies/datasets: Smart Turn v3.2 (BSD-2), SEP-28k (CC BY-NC, Lea et al. 2021, audio not redistributed), Gemini, ElevenLabs, Vultr, Tiger Data, Pipecat.
 - [ ] Disclosures: pre-event planning; AI assistance (Claude) on the benchmark and code, team-directed and reviewed; the morning pivot from a prior concept.
 - [ ] All README/pitch numbers reconciled against saved results; submit by 8:30, confirm received.
+
+## Likely judge questions (have these ready)
+
+**"How did you get the 58% number?"**
+Apple's SEP-28k dataset: real podcast clips from people who stutter, each labeled by three human annotators. We took 200 clips marked as blocks, found the silent gap inside each block and the moment the speaker resumes — the resume proves the speaker was not done. We fed the audio up to 0.2 s into that gap to stock Smart Turn v3.2 with its production preprocessing; it declared the turn over on 116 of 200 (58%; 68% with repeated checks). Three controls prove the harness works: mid-word cuts → "done" 31%, real sentence ends → 70%, blocks → 58% — the ordering is correct. Fluent axis: median 0.1 s to fire after real end-of-speech. Everything reproduces from `benchmark/`.
+
+**"Why should we believe the ground truth?"**
+The ground truth isn't our opinion — it's the recording itself: the person audibly keeps talking after the gap, and three human annotators labeled the block. Known limits, stated openly: all testable gaps were under 1.6 s (3-second clips), audio is wideband not phone-line, and our team's human listen-through of the eval clips is part of the build plan.
+
+**"Did you test the real clinic agents, like the ones answering 160,000 calls a month?"**
+No — and deliberately. Probing a live patient phone line with recorded audio would be testing a medical system without consent. Instead we test the platforms those agents are built on, using our own agents: we ran 40 live sessions against an agent we built on ElevenLabs (their stock handled short blocks well — 5–10% on our 20-clip test, credited on our page), and the same harness extends to Gemini Live and agent vendors like Retell/Vapi via our own sandbox agents. For closed vendors with no sandbox (e.g., Hippocratic AI), the open benchmark is the mechanism: method, data recipe and harness are published — run it on your own stack and report your number.
+
+**"Isn't this just a longer timeout?"**
+We measured that exact alternative: a 0.8 s timeout still interrupts 20% of blocks and delays every caller by 0.8 s; long enough to stop interrupting means 1.5–3 s of dead air for everyone. The trade-off is in the model, so the fix is in the model — same speed for fluent callers, fewer interruptions on blocks, shown on one toggle.
+
+**"Hasn't Apple already solved this?"**
+For Siri, partially — and it's closed. Their published work cut Siri's cut-offs by ~79%, shipped as Siri-only settings. Nothing exists for the open agent stack that answers real phone lines. We use Apple's own dataset where Apple stopped, and we publish what they didn't: an open model and a public benchmark.
