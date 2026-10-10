@@ -47,7 +47,8 @@ async def sources(request):
     out = []
     for f in engine.list_sources():
         info = engine.sf.info(os.path.join(engine.AUDIO, f))
-        out.append({"source_id": f, "file": f"benchmark/audio/{f}",
+        # `file` is the bare name the client sends back in `start` (lives in benchmark/audio/).
+        out.append({"source_id": f, "file": f,
                     "duration_s": round(info.frames / info.samplerate, 3),
                     "category": cats.get(f, "unknown"), "rights_note": RIGHTS})
     return jres(out)

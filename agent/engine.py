@@ -60,9 +60,14 @@ def _sha256(path):
 
 
 def _commit():
+    """Short HEAD SHA, with "-dirty" if agent/ has uncommitted changes (so a log
+    never names a commit that differs from the code that produced it)."""
     try:
-        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
-                              capture_output=True, text=True, check=True).stdout.strip()
+        sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
+                             capture_output=True, text=True, check=True).stdout.strip()
+        dirty = subprocess.run(["git", "status", "--porcelain", "--", "agent/"], cwd=ROOT,
+                               capture_output=True, text=True, check=True).stdout.strip()
+        return sha + ("-dirty" if dirty else "")
     except Exception:
         return "unknown"
 
