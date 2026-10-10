@@ -27,7 +27,10 @@ def main():
     ap.add_argument("--work", required=True)
     ap.add_argument("--runs", nargs="+", required=True)
     ap.add_argument("--out", default="prescreen.json")
+    ap.add_argument("--v2", action="store_true",
+                    help="training-v2 rule: also M3s >= step0 - 0.020 and M3-crop >= step0 - 0.020")
     a = ap.parse_args()
+    extra = [("dev_stu_completed_decide", "M3s"), ("dev_eow_crop_decide", "M3-crop")] if a.v2 else []
     out_path = os.path.join(a.work, a.out)
     if os.path.exists(out_path):
         sys.exit(f"REFUSING: {out_path} exists")
@@ -37,8 +40,9 @@ def main():
         src = "metrics_reval.jsonl" if os.path.exists(os.path.join(run_dir, "metrics_reval.jsonl")) \
             else "metrics.jsonl"
         recs = [json.loads(l) for l in open(os.path.join(run_dir, src))]
-        if M3 not in recs[0]:
-            sys.exit(f"{run}/{src} lacks in-loop M3; run revalidate.py first")
+        for key in [M3] + [k for k, _ in extra]:
+            if key not in recs[0]:
+                sys.exit(f"{run}/{src} lacks in-loop {key}; run revalidate.py first")
         base = next(r for r in recs if r["step"] == 0)
         for r in recs:
             if r["kind"] != "checkpoint":
@@ -47,6 +51,11 @@ def main():
             d_m3 = r[M3] - base[M3]
             d_rec = r["guard_recall"] - base["guard_recall"]
             ok = d_flu <= 0.010 + 1e-9 and d_m3 >= -0.020 - 1e-9 and d_rec >= -0.010 - 1e-9
+            ext = {}
+            for key, _ in extra:
+                d = r[key] - base[key]
+                ext[key], ext["base_" + key], ext["d_" + key] = r[key], base[key], round(d, 4)
+                ok = ok and d >= -0.020 - 1e-9
             rows.append({"run": run, "ckpt": r["ckpt"], "epoch": r["epoch"], "step": r["step"],
                          "metrics_source": src,
                          "dev_stutter_premature": r["dev_stutter_premature"],
@@ -54,13 +63,19 @@ def main():
                          "d_dev_fluent_premature": round(d_flu, 4),
                          M3: r[M3], "base_" + M3: base[M3], "d_" + M3: round(d_m3, 4),
                          "d_guard_recall": round(d_rec, 4), "guard_specificity": r["guard_specificity"],
-                         "meets_constraints": ok})
+                         **ext, "meets_constraints": ok})
     eligible = sorted([r for r in rows if r["meets_constraints"]],
                       key=lambda r: (r["dev_stutter_premature"], r["epoch"], r["run"]))
     top2 = eligible[:2]
-    out = {"rule": "lowest in-loop dev stutter premature among checkpoints with d_dev_fluent_premature "
-                   "<= +0.010, d_dev_eow_first_check_decide >= -0.020 and d_guard_recall >= -0.010 vs "
-                   "step 0; ties -> earlier (training-v1.md rev 265ab02)",
+    rule = ("lowest in-loop dev stutter premature among checkpoints with d_dev_fluent_premature "
+            "<= +0.010, d_dev_eow_first_check_decide >= -0.020 and d_guard_recall >= -0.010 vs "
+            "step 0; ties -> earlier (training-v1.md rev 265ab02)")
+    if a.v2:
+        rule = ("lowest in-loop dev stutter premature among checkpoints with d_dev_fluent_premature "
+                "<= +0.010, d_dev_eow_first_check_decide >= -0.020, d_dev_stu_completed_decide (M3s) "
+                ">= -0.020, d_dev_eow_crop_decide (M3-crop) >= -0.020 and d_guard_recall >= -0.010 vs "
+                "step 0; ties -> earlier (training-v2.md section 4)")
+    out = {"rule": rule,
            "ranking": rows, "eligible_order": [f"{r['run']}/{r['ckpt']}" for r in eligible],
            "top2": [f"{r['run']}/{r['ckpt']}" for r in top2], "code_commit": C.git_commit()}
     C.write_json(out_path, out)
@@ -68,7 +83,8 @@ def main():
         print(f"{'OK ' if r['meets_constraints'] else 'no '} {r['run']}/{r['ckpt']:16s} "
               f"stu={r['dev_stutter_premature']:.4f} (base {r['base_dev_stutter_premature']:.4f}) "
               f"dflu={r['d_dev_fluent_premature']:+.4f} m3={r[M3]:.4f} (base {r['base_' + M3]:.4f}, "
-              f"d {r['d_' + M3]:+.4f}) drec={r['d_guard_recall']:+.4f}")
+              f"d {r['d_' + M3]:+.4f}) drec={r['d_guard_recall']:+.4f}"
+              + "".join(f" {lab}={r[k]:.4f}(d {r['d_' + k]:+.4f})" for k, lab in extra))
     print("TOP 2:", out["top2"] or "none eligible")
 
 
