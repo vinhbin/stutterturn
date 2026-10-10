@@ -26,7 +26,7 @@
       <ol>
         <li><strong>Connect a replay backend.</strong> The source list and available configurations come from that connection. The browser does not record a microphone.</li>
         <li><strong>Choose one source and run stock.</strong> Inspect when the model makes a turn decision and whether reported audio follows.</li>
-        <li><strong>Keep the source, choose patient, and start fresh.</strong> Patient changes the silence gate from 0.2 s to 1.0 s. It uses the same model. The trained candidate is not available in this handoff.</li>
+        <li><strong>Keep the source, choose patient, and start fresh.</strong> Patient changes the silence gate from 0.2 s to 1.0 s. It uses the same model. No trained candidate exists yet; the console lists one only when the backend supplies it.</li>
         <li><strong>Check provenance before describing the result.</strong> Development preview and mock runs are synthetic. The console plays no audio; backend audio receipt does not verify speaker playback.</li>
       </ol>
     </details>
@@ -40,7 +40,7 @@
         <div class="evidence-heading"><h3>5 clips · 2 configurations · 10 logs</h3><span class="revision">2026-10-10 · Handoff 3ed3786<br>Saved logs executed on a229787</span></div>
         <p>Stock and patient replay the same five SEP-28k recordings with the same model. Patient increases the silence gate from 0.2 s to 1.0 s. This handoff does not include a trained candidate.</p>
         <dl class="handoff-observations">
-          <div><dt>Observed</dt><dd>Two early stock turn decisions were cancelled before any response audio was received. These are not observed audio overlaps.</dd></div>
+          <div><dt>Observed</dt><dd>Two early stock turn decisions were cancelled before that reply's audio arrived. These are not observed audio overlaps.</dd></div>
           <div><dt>Still unverified</dt><dd>Human review of the energy-derived labels, completed-turn delay, and actual speaker playback. The recordings are replayed input, not a live microphone or phone call.</dd></div>
         </dl>
         <p class="evidence-limit">This is an engineering prototype. These logs do not establish improved interruption rates or model efficacy.</p>
