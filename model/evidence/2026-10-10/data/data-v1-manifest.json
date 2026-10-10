@@ -1,0 +1,77 @@
+{
+ "spec": "model/specs/training-v1.md",
+ "code_commit": "ef26e3792bc9a2b3d6098a0d98ca8edc50cfb527",
+ "train_csv_sha256": "d724f47f72d5c4f748cb0ad3fb2b1c145a29328b1890c7aac0933211fbd0446b",
+ "items_manifest_sha256": "a114387fe1eb30d870c134c7bb259045adfbfc5a7919a14cbc4595a335beeeba",
+ "jsonl_sha256": {
+  "stutter_neg.jsonl": "37e6669331a83b81dec9a3331683164b440c5d99cf5fc6446aaa27e60f031b7b",
+  "orig_replay.jsonl": "faea50601c7cde076487a85e4f7c88a0970608023fde486fc72b2755f1512031",
+  "guard.jsonl": "2c184c129996df9fa2594919eb35611f842ef7f6c5db027154fe859f7a001237"
+ },
+ "stutter_neg": {
+  "clips_ok": 941,
+  "samples": 6190,
+  "weight_total": 941.0001,
+  "clip_outcomes": {
+   "ok": 941,
+   "no_resume": 349,
+   "gap_but_no_pre_speech": 385,
+   "no_gap": 24,
+   "empty_on_mirror": 24
+  },
+  "blocks_in_train": 1723,
+  "annotated_dev_test_keys": 0,
+  "offsets_s": [
+   0.2,
+   0.25,
+   0.3,
+   0.35,
+   0.4,
+   0.45,
+   0.5,
+   0.55,
+   0.6
+  ]
+ },
+ "orig_replay": {
+  "repo": "pipecat-ai/smart-turn-data-v3.2-train",
+  "revision": "f8c95d284595defb6b88a715c356cbc5c31b7ad1",
+  "shards_read": 8,
+  "english_rows_per_shard": [
+   804,
+   753,
+   804,
+   808,
+   807,
+   775,
+   773,
+   799
+  ],
+  "cap": 6000,
+  "selected_before_dedupe": 6000,
+  "dedupe_dropped": 0,
+  "n": 6000,
+  "endpoint_true": 2987,
+  "synthetic": 2014,
+  "midfiller": 854,
+  "endfiller": 404
+ },
+ "guard": {
+  "repo": "pipecat-ai/smart-turn-data-v3.2-test",
+  "revision": "dfc179241fee65b0efe81ca37786f41ce26f38ec",
+  "shards_read": 4,
+  "english_rows_per_shard": [
+   789,
+   794,
+   780,
+   769
+  ],
+  "cap": 3000,
+  "n": 3000,
+  "endpoint_true": 1484,
+  "synthetic": 948,
+  "midfiller": 413,
+  "endfiller": 195
+ },
+ "language_filter": "eng"
+}

@@ -1,0 +1,35 @@
+{
+ "run_id": "R4",
+ "lr": 3e-05,
+ "p_stutter": 0.4,
+ "epochs": 2.0,
+ "batch": 32,
+ "optimizer": "AdamW",
+ "weight_decay": 0.01,
+ "grad_clip": 1.0,
+ "warmup_frac": 0.1,
+ "schedule": "linear warmup then linear decay",
+ "seed": 0,
+ "freeze_but_last2": true,
+ "pos_weight": 2.347841,
+ "replay_pos_frac": 0.497833,
+ "samples_per_epoch": 2353,
+ "steps_per_epoch": 74,
+ "total_steps": 148,
+ "warmup_steps": 15,
+ "checkpoint_steps": [
+  37,
+  74,
+  111,
+  148
+ ],
+ "max_minutes": 60.0,
+ "train_manifest_sha256": "c7be96d8a5d12c2027279092c73a191f922a28e21212f98798b2c24c21f46591",
+ "init": "stock-fp32 via haan",
+ "init_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+ "determinism": {
+  "cudnn.deterministic": true,
+  "cudnn.benchmark": false,
+  "note": "CUDA/MPS are not bit-deterministic"
+ }
+}

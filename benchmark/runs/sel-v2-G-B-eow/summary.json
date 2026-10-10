@@ -1,0 +1,22 @@
+[
+ {
+  "split": "dev",
+  "group": "fluent",
+  "kind": "completed",
+  "label_source": "energy_vad",
+  "n": 680,
+  "decided_by_model_n": 325,
+  "decided_by_fallback_n": 0,
+  "censored_n": 355,
+  "delay_s_median": 0.2,
+  "delay_s_p90": 0.2,
+  "delay_s_max": 0.2,
+  "input_start_fallback_n": 2,
+  "n_nonfallback": 678,
+  "infer_ms": {
+   "n": 680,
+   "mean": 16.31,
+   "p95": 19.22
+  }
+ }
+]

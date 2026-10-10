@@ -1,0 +1,37 @@
+{
+ "run_id": "sel-v3-C-eow-th0.64",
+ "created_utc": "2026-10-10T23:09:57+00:00",
+ "code_commit": "d9b6ae6414116885b76d134b6e94edf541f6a5de",
+ "code_dirty": true,
+ "runner_sha256": "f1d358714c39e1310be3fc9fd9e2c7ea434adb7c1c95ebfef79ab71bdf1830cb",
+ "preproc_version": "smartturn-v3-upstream-1",
+ "config": {
+  "config_id": "agent-v0.1-single-checks",
+  "threshold": 0.64,
+  "vad_stop_s": 0.2,
+  "schedule": "single",
+  "recheck_interval_s": null,
+  "fallback_timeout_s": 3.0,
+  "grid_step_s": 0.01,
+  "grid_scope": "checks"
+ },
+ "config_sha256": "1cf8b11b065a11c8b2abe8e0e7749aec91cd691d0cdd8fb75343d8a88e45ca83",
+ "env": {
+  "python": "3.12.15",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "onnxruntime": "1.29.0",
+  "transformers": "5.19.0",
+  "numpy": "2.2.6",
+  "soundfile": "0.14.0"
+ },
+ "model_id": "stock-fp32",
+ "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+ "items_path": "items\\v1\\dev_end_of_window.jsonl",
+ "items_sha256": "e30a456895cd61dd203fee319c864a9014097f720581a1fe87611cf6d7f52905",
+ "vad_model_sha256": null,
+ "rescored_from": "sel-v3-B-eow",
+ "model_calls": 0,
+ "cache_hits": 0,
+ "cache_misses": 0,
+ "wall_s": 0.03
+}

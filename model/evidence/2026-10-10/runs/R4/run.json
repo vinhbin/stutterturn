@@ -1,0 +1,27 @@
+{
+ "run_id": "R4",
+ "finished_utc": "2026-10-10T20:19:40+00:00",
+ "steps_done": 148,
+ "total_steps": 148,
+ "stopped_at_time_cap": false,
+ "wall_min": 0.57,
+ "code_commit": "ef26e3792bc9a2b3d6098a0d98ca8edc50cfb527",
+ "config_sha256": "99490bdd0a24ae62df86fe66b2eedd9d5f56c22e68bb4b7d9272b28d3e4a3121",
+ "env": {
+  "python": "3.12.15",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "device": "cuda",
+  "torch": "2.8.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "transformers": "5.19.0",
+  "onnx": "1.19.1",
+  "onnxruntime": "1.29.0",
+  "numpy": "2.2.6"
+ },
+ "checkpoints": [
+  "ckpt-e0.50.pt",
+  "ckpt-e1.00.pt",
+  "ckpt-e1.50.pt",
+  "ckpt-e2.00.pt"
+ ]
+}
