@@ -52,9 +52,10 @@ node web/demo-ui/dev/checks/site-checks.mjs
    human accepts the B cross-check. Worksheets and energy proxies do not pass
    this requirement.
 2. Guttuu/Niko complete the bounded selection work and publish a candidate only
-   if it passes. The v2 harness is pushed at `0d44829`; Niko explicitly approved
-   the input-length rule amendment at `c20fa8a`, resolving that check's blocker.
-   V1 failed selection. Keep the corrected comparison ready and record
+   if it passes. Guttuu now reports full v2 training and two prescreen survivors in
+   `a8f9607`; his branch is at `a78f21b`. The final selection decision and
+   artifact/hash handoff remain unpublished. V1 failed selection. Keep the
+   corrected comparison ready and record
    the actual scope decision by the existing 20:00 EDT stop.
 3. Guttuu's requested handoff is to listen locally and test audible output,
    stopping an active reply, cancellation and restart. Vinh is on remote desktop
@@ -80,9 +81,15 @@ The isolated execution worktree now also has its own ignored Python environment,
 all three pinned model/VAD assets and ten source clips. All 26 deterministic
 tests passed there, and whole-clip feature/probability parity passed on ten
 sources × stock INT8/FP32 with zero difference. This is preprocessing parity,
-not a completed model comparison. Niko subsequently pushed selection tooling at
-`f007c06`; Guttuu's latest published model handoff remains the v2 harness at
-`0d44829`, with no selected candidate/result yet.
+not a completed model comparison. Niko's selector and LF fixture repair are at
+`8f732d7`. Guttuu's `a8f9607` commit message reports V1?V4 training runs and
+prescreen survivors `V3/ckpt-e0.51` and `V2/ckpt-e2.00`; head `a78f21b` also
+incorporates main. These reports still need the selection/immutable artifact
+handoff before the demo can use an accepted candidate.
 
 Current status and links should be refreshed in PLAN as those outputs arrive;
-this dated handoff records what was actually checked.
+this dated handoff records what was actually checked. PR #23 was merged at
+`d8cdef4` while this follow-up was being prepared. PR #24 on
+`codex/stutterturn-runtime-handoff` carries the new runtime evidence and README
+updates, including Kareem's team/contribution credit. The README remains a
+working status document; the final submission rewrite is still future work.

@@ -43,8 +43,9 @@ or cleanup errors does not prove glitch-free physical playback.
 
 ## Guttuu's acceptance handoff
 
-Use PR #23's `codex/stutterturn-execution` branch in an isolated worktree. Keep
-training work intact. Engine/playback code is the same as tested `42b86d0`;
+PR #23 is merged. Use PR #24's `codex/stutterturn-runtime-handoff` branch in an
+isolated worktree for this evidence and checklist. Keep training work intact.
+Engine/playback code is the same as tested `42b86d0`;
 later evidence/document commits do not upgrade any runtime claim. Confirm
 `GET /v0/health` names your checked-out revision before capturing new evidence.
 Keep keys in the ignored `agent/.env`; do not send them in the issue or logs.
@@ -87,7 +88,7 @@ intentionally returns a visible cap error; do not raise it silently.
    If the provider is too slow to exercise audible cancellation, report that
    case as untested rather than claiming a pass.
 4. Return revision, device/API, settings, run IDs, what was actually heard,
-   pass/fail for each case, and remaining limits in issue #3. Any numeric acoustic
+   pass/fail for each case, and remaining limits in [issue #3's handoff](https://github.com/vinhbin/stutterturn/issues/3#issuecomment-6102347453). Any numeric acoustic
    latency claim needs a stated loopback/recording method and uncertainty.
 
 Separately, this worktree's own Python environment passed all 26 deterministic
