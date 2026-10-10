@@ -36,7 +36,7 @@ rounded:
 
 [The call console design](demo-ui/DESIGN.md) remains the visual authority. This document records its extension into [the landing page](index.html) and [judge view](judges/index.html), implemented by [site.css](site.css) and [site.js](site.js). It does not redefine the console's components or event semantics.
 
-The landing route uses **Persuade** mode: a large headline, a conceptual caller/agent sequence, a short comparison explanation, and pinned evidence lead to the judge view. The judge route uses **Operate** mode: brief presentation guidance surrounds the existing console, with the replay handoff below it. Both retain the warm near-black canvas, warm-white typography, flat rules, and semantic state colors.
+The landing route uses **Persuade** mode: one hero hierarchy (mono eyebrow, full-width headline, a single dek, console-key actions), an animated conceptual caller/agent loop in the console's own timeline language, the pinned evidence promoted directly beneath the hero, and a three-channel comparison leading to the judge view. The judge route uses **Operate** mode: brief presentation guidance surrounds the existing console, with the replay handoff below it. Both retain the warm near-black canvas, warm-white typography, flat rules, and semantic state colors.
 
 ## Colors
 
@@ -46,9 +46,9 @@ Green represents caller speech, neutral gray represents silence, amber represent
 
 ## Typography
 
-Archivo supplies the wordmark, headline, and section headings; system fonts carry body text; JetBrains Mono identifies revisions and console data. Both web fonts reuse the console's local Latin-subset WOFF2 assets and fallbacks.
+Archivo supplies the wordmark, headline, and section headings; system fonts carry body text; JetBrains Mono carries every data voice on the landing page — the eyebrow, loop timecode, ruler and lane labels, decision flags, state chips, evidence fact labels and values, channel numbers, and revisions. Both web fonts reuse the console's local Latin-subset WOFF2 assets and fallbacks, and both are preloaded.
 
-The landing headline uses a tight line height (0.98) and a large desktop scale (64–96px), with explicit responsive sizes. Body copy remains comfortably spaced; short instrumentation and provenance labels use smaller type. The judge title stays subordinate to the console's large state tally.
+The landing headline uses a tight line height (0.98) and a fluid desktop scale (clamp 64–96px) across the full shell width; the dek is a single Archivo paragraph beneath it. Body copy remains comfortably spaced; short instrumentation and provenance labels use smaller type. The judge title stays subordinate to the console's large state tally.
 
 ## Layout
 
@@ -60,15 +60,19 @@ The judge view uses a wider shell and compact introductory content. Its same-ori
 
 There are no shadows. Panel fills and single-pixel borders separate the conceptual figure, controls, and evidence rows. Warm-white focus outlines make keyboard location visible.
 
+Motion is restrained and fully gated. The landing page owns two moments: the hero concept loop (a 7.5 s CSS cycle — a 6 s left-to-right reveal wipe, playhead, holding pulse, decision-flag pops, and a 1.5 s completed hold) and a single opacity/translate scroll reveal on section entries. JavaScript starts the loop only while the figure is in view and never under `prefers-reduced-motion`; without JavaScript or with reduced motion, the base styles are the completed final frame and sections stay visible. Console-key buttons keep the console's 140 ms background transition and add a 1px press offset.
+
 ## Shapes
 
 The conceptual figure uses the console monitor's restrained rounded container. Actions have smaller corners; timeline bars are nearly square. Supporting prose uses open sections and rules rather than repeated cards.
 
 ## Components
 
-- **Primary action:** warm-white fill, dark text, a labeled destination, and a directional arrow. Its minimum height is 48px; the background transition lasts 140ms and respects reduced motion.
-- **Concept sequence:** aligned caller and agent tracks explain speaking, a pause, continued speech, holding, and a reply. A visible caption and accessible description identify it as illustrative, with no recorded timing or audio. On phones the lane labels stack above their tracks and the pause label moves inside its segment.
-- **Evidence:** definition lists and ruled observations separate recorded facts from limitations; mono revision text supports provenance. Links identify the pinned source.
+- **Console keys:** actions reuse the console transport's materials — primary is warm-white fill on dark text, the quiet key is the raised tone with the console's #70665d border and hover/active fills. Minimum height 48px, 140ms background transition, 1px press offset, reduced motion respected.
+- **Concept loop (signature):** caller and agent lanes in the console's timeline language — mono lane tags, a phase ruler with ticks, amber WAIT and warm-white COMPLETE decision flags, an amber holding label and bar that pulse while open, a cyan reply, a one-pixel playhead, a state chip row echoing the tally, and a mono loop timecode labeled CONCEPT LOOP. A visible ILLUSTRATIVE SEQUENCE chip and accessible description identify it as illustrative, with no recorded timing or audio; the caption keeps that wording verbatim. Reduced motion and no-JS render the completed final frame statically.
+- **Evidence:** the pinned handoff sits in a console-panel card directly after the hero. Mono uppercase fact labels with semantic status dots (speaking green for facts recorded in the handoff, holding amber for pending items), mono values, per-row hairlines, the unreduced human-review caveat, and a console-key link to the pinned source.
+- **Channels:** the three comparison steps run full width as numbered channels (01–03, mono numbers over ruled columns); the numbering reflects the real operating sequence.
+- **Footer:** brand line, repository/benchmark/console links, the SEP-28k CC BY-NC attribution, and the provenance line that nobody imitates stuttering — the recordings are real and labeled.
 - **Presenter guide:** native disclosure keeps instructions available without occupying the main operating area when closed.
 - **Embedded console:** the same controls, backend adapter, event renderer, status notices, and keyboard behavior as the full console; the site adds no second run model or simulated playback.
 
