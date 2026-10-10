@@ -1,0 +1,22 @@
+{"v":"0.1","type":"run_started","run_id":"20261010T185920Z-stock-2212","seq":0,"config":"stock","params":{"vad_stop_s":0.2,"vad_start_s":0.2,"threshold":0.5,"fallback_s":3.0,"frame_s":0.032,"trailing_silence_s":5.0},"model":"smart-turn-v3.2-cpu","model_sha256":"2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f","source":{"source_id":"HeStutters_4_32.wav","duration_s":3.0,"source_offset_s":0},"commit":"a229787","t0_wall":"2026-10-10T18:59:22.186Z","services":"on"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":1,"t":0.256,"kind":"info","name":"speech_start","prob":0.971}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":2,"t":0.256,"kind":"state","state":"speaking"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":3,"t":0.928,"kind":"info","name":"speech_stop"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":4,"t":0.928,"kind":"state","state":"silence"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":5,"t":1.12,"kind":"decision","name":"turn_complete","model":"smart-turn-v3.2-cpu","prob":0.9634,"threshold":0.5,"trigger":"smart_turn"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":6,"t":1.12,"kind":"info","name":"response_requested","detail":"gemini gemini-3.8-flash"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":7,"t":1.536,"kind":"info","name":"speech_start","prob":0.998}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":8,"t":1.536,"kind":"state","state":"speaking"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":9,"t":1.536,"kind":"info","name":"speaker_resumed"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":10,"t":1.536,"kind":"info","name":"cancelled","before_audible":true}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":11,"t":2.016,"kind":"info","name":"speech_stop"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":12,"t":2.016,"kind":"state","state":"silence"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":13,"t":2.208,"kind":"decision","name":"turn_incomplete","model":"smart-turn-v3.2-cpu","prob":0.0395,"threshold":0.5}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":14,"t":2.208,"kind":"state","state":"holding","prob":0.0395,"model":"smart-turn-v3.2-cpu"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":15,"t":4.992,"kind":"decision","name":"turn_complete","model":"smart-turn-v3.2-cpu","prob":null,"threshold":0.5,"trigger":"fallback_timeout"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":16,"t":4.992,"kind":"info","name":"response_requested","detail":"gemini gemini-3.8-flash"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":17,"t":7.735,"kind":"audible","name":"agent_audio_start","detail":"I'm here. How can I help you?"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":18,"t":7.735,"kind":"state","state":"agent"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":19,"t":9.453,"kind":"audible","name":"agent_audio_end"}
+{"v":"0.1","type":"event","run_id":"20261010T185920Z-stock-2212","seq":20,"t":9.453,"kind":"state","state":"silence"}
+{"v":"0.1","type":"run_ended","run_id":"20261010T185920Z-stock-2212","seq":21,"t":9.469,"reason":"completed","summary":{"first_turn_complete_t":1.12,"trigger":"smart_turn","first_agent_audio_t":7.735,"llm_latency_s":2.5,"tts_first_audio_s":0.235,"speaker_resumed_after_decision":true,"cancelled":true,"audible_interruption":false,"overlap_s":null,"no_response":false,"timeouts":[],"reply_text":"I'm here. How can I help you?","services":"on","chars_used":29,"turns":2},"log":"agent/runs/20261010T185920Z-stock-2212.jsonl"}
