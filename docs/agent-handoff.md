@@ -2,7 +2,7 @@
 
 Use this after reading [PLAN.md](../PLAN.md), especially the 2 PM/3 PM decisions. **Two independent builders plus one read-only reviewer** are enough. These are executable task boundaries, not an instruction to start model training, contact people, purchase services or claim a gate passed.
 
-**Current handoffs:** Builder A already has [PR #7](https://github.com/vinhbin/stutterturn/pull/7); Builder B has [PR #8](https://github.com/vinhbin/stutterturn/pull/8). Continue/review those branches instead of starting duplicate scaffolds. PLAN's F1–F4, I1–I2, P1 and E1 rows are the task-status authority. Neither open PR establishes live-agent or model acceptance.
+**Current handoffs:** [PR #7](https://github.com/vinhbin/stutterturn/pull/7) and [PR #8](https://github.com/vinhbin/stutterturn/pull/8) are merged into main at `8828693`. Start follow-up work from current main; do not rebuild the scaffold or pitch. PLAN's F1–F4, I1–I2, P1 and E1 rows remain the task-status authority. Neither merge establishes live-agent or model acceptance.
 
 ## All four teammates work in parallel
 

@@ -14,16 +14,9 @@ We are building a matched stock-versus-adapted comparison using real recorded sp
 
 ## Build status
 
-**[PLAN.md](PLAN.md#current-status--october-10-110-pm-edt-repository-check) is the current task-status authority.** Read its deliverable table for owners, acceptance checks and blockers. Issues #1–6 group the phase gates; a merged implementation does not automatically pass a gate.
+**[PLAN.md](PLAN.md#current-status) is the current task-status authority.** Read its deliverable table for owners, acceptance checks and blockers. Issues #1–6 group the phase gates; a merged implementation does not automatically pass a gate.
 
-At the October 10, 1:10 PM EDT repository check:
-
-- Main contains exploratory benchmark scripts and saved outputs. Human endpoint labels, split/comparator design and latency interpretation still need correction before efficacy conclusions.
-- [PR #7](https://github.com/vinhbin/stutterturn/pull/7) adds a passive demo UI with explicitly labeled preview events. Real runs are blocked until the agent contract and implementation are available.
-- [PR #8](https://github.com/vinhbin/stutterturn/pull/8) adds the claims ledger and revised pitch. Its readiness classifications require review against the corrected method before acceptance.
-- No trainable-checkpoint/export proof, complete stock/patient agent replay, candidate improvement or human-reviewed annotation handoff is yet published in the repository. Teammates may have unpushed work.
-
-This is an evidence snapshot; follow PLAN for updates rather than maintaining a second status table here.
+Main includes the reviewed passive demo UI and corrected claims/pitch documents from merged [PR #7](https://github.com/vinhbin/stutterturn/pull/7) and [PR #8](https://github.com/vinhbin/stutterturn/pull/8). The UI preview contains synthetic events. Follow PLAN for live-agent, model and annotation acceptance; these merges do not establish efficacy.
 
 ## What the first complete demonstration must show
 
@@ -38,11 +31,11 @@ Nobody imitates stuttering. A recorded backup must be labeled as a recording; sa
 - [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are model completion predictions under the original harness, **not a validated percentage of callers interrupted**.
 - [D-006 and D-007](docs/decision-log.md) record the methodological corrections. One-second observation/censoring does not establish a three-second fallback; energy-derived cut points do not establish semantic turn ends; repeated harness checks do not prove live-agent behavior.
 - [Required evaluation work](PLAN.md#evaluation-work-required-before-a-comparison-can-pass) includes reviewed endpoints, frozen development/final-test splits, matched model/data/configuration records, both caller groups, audible outcomes, and explicit nonresponse/censoring.
-- The claims ledger in PR #8 will be the single claim-status source once accepted. Headline numbers must link to applicable run evidence; do not promote targets or historical interpretations to measured outcomes.
+- The [claims ledger](docs/claims-ledger.md) is the single claim-status source. Headline numbers must link to applicable run evidence; do not promote targets or historical interpretations to measured outcomes.
 
 The existing benchmark setup is incomplete: `benchmark/requirements.txt` is not committed, and no clean reproduction or candidate run is claimed. Niko's handoff includes exact dependencies, checkpoint provenance and a verified command. See [benchmark context](benchmark/README.md).
 
-For the **UI scaffold only**, after checking out PR #7, its documented command is:
+For the **UI scaffold only**, from current main:
 
 ```bash
 python -m http.server 8010 --directory web/demo-ui
@@ -73,6 +66,6 @@ Open `http://localhost:8010/`. The preview is synthetic UI data without audio or
 | Vinh | A-batch human labels, integration decisions, demo UI, pitch/video/submission |
 | Kareem | B-batch human labels, judges page, README and evidence links |
 
-[PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work. `model/` and `agent/` are pending producer handoffs; `web/demo-ui/` is currently in PR #7.
+[PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work. `model/` and `agent/` are pending producer handoffs; `web/demo-ui/` is on main.
 
 Artifact licensing, publication, accessible demo links and final submission confirmation remain release checks in PLAN. Do not infer a commercial deployment license from research access.

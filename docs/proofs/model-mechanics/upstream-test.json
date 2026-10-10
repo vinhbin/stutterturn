@@ -1,0 +1,9 @@
+{
+  "tests": "1",
+  "failures": "0",
+  "errors": "0",
+  "skipped": "0",
+  "time": "10.574",
+  "test": "tests/test_convert.py::test_recovered_weights_reproduce_onnx_outputs",
+  "source_commit": "540f97de03f8eb938b871196752206f6d0698791"
+}

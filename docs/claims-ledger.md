@@ -241,7 +241,7 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 ### L-34 — Sponsor-usage claims (Gemini, Vultr, Tiger Data)
 
 - **Status:** target/unsupported today. Gemini Live arm **not run** (no API key — RESULTS §8); Vultr training/hosting **not built**; Tiger Data time series **not built**. ElevenLabs is the only sponsor integration with saved evidence (L-08/L-09).
-- **Rule:** enter and list only prizes backed by actual, disclosed use at submission time. README's sponsor table currently reads as present-tense ("doing real work") — flagged to Kareem/Vinh; README is outside this lane's write scope.
+- **Rule:** enter and list only prizes backed by actual, disclosed use at submission time. README now distinguishes intended core integrations from optional additions; verify actual usage again before submission.
 
 ## F. Scope limits — must-say list (all ready; deliver proactively)
 
@@ -264,6 +264,15 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 - Any target, plan or placeholder voiced in past tense as an achieved result.
 - First-person or community testimony we don't have; invented consent.
 - Multilingual support; long-block performance (anyone's); "fully open" weights.
+
+## H. Executed model mechanics
+
+### L-40 — Stock recovery, synthetic update and export
+
+- **Ready wording:** "We recovered the stock model's weights, performed one synthetic training update, and exported and reloaded an ONNX model with numerical parity. This verifies the training/export mechanics, not improvement on stuttered speech."
+- **Status:** ready within that exact scope; candidate adaptation, drop-in compatibility and efficacy remain targets above.
+- **Evidence:** [tested harness and reproduction](proofs/model-mechanics/README.md), [measured outputs and hashes](proofs/model-mechanics/evidence.json), and [upstream parity result](proofs/model-mechanics/upstream-test.json). Independently reviewed; the portable harness also ran successfully.
+- **Limits:** seeded random feature arrays, one synthetic step, FP32 CPU reconstruction/export; no real speech labels, preprocessing or live-agent acceptance. Synthetic updated weights must not become the demo candidate.
 
 ---
 
@@ -293,6 +302,6 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 1. **Two lines in the preserved pitch draft have no upgrade path:** "Many just hang up." and the 10-second version's "Voice agents hang up on people who stutter." Recommendation: replace even in the final pitch with the survey-backed L-16 wording. Your call — the draft is preserved untouched either way.
 2. **The 58/58 coincidence** (our exploratory 58% vs the survey's 58% of 53 respondents): decide whether both appear in one pitch; if so, each needs its denominator spoken (L-16 caution).
 3. **"Pharmacy refill lines…" (L-19):** source it or cut it.
-4. **README sponsor table vs build status** (L-34): present-tense sponsor claims with nothing built — coordinate with Kareem before submission.
+4. **Sponsor usage at submission** (L-34): README now labels intended/optional integrations; coordinate with Kareem to list only actual use in the final entry.
 5. **Whether the exploratory 58% headlines the public benchmark page** before the partition rebuild and listen-through land, or the page waits for rebuilt numbers.
 6. **Rehearsal:** the revised templates need timing with their actual interaction. No rehearsal is asserted; issue #4 requires three rehearsals with an unscripted participant before 10 PM.

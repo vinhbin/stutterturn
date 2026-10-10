@@ -1,0 +1,134 @@
+{
+  "scope": "synthetic mechanical recovery, backward/update, save/reload, and ONNX export proof only",
+  "excluded_claims": [
+    "stutter adaptation",
+    "real audio accuracy",
+    "demo acceptance",
+    "drop-in runtime acceptance"
+  ],
+  "utc_started": "2026-10-10T18:03:03.239102+00:00",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "source_commit": "540f97de03f8eb938b871196752206f6d0698791",
+  "model_revision": "f766f81d3cfdf7737ac64aad813d91bbfd56bf93",
+  "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+  "versions": {
+    "torch": "2.8.0+cpu",
+    "transformers": "5.19.0",
+    "onnx": "1.19.1",
+    "onnxruntime": "1.29.0",
+    "numpy": "2.2.6",
+    "pytest": "9.1.1",
+    "onnxscript": "0.7.2"
+  },
+  "cuda": null,
+  "reconstruction_parity": {
+    "shape": [
+      3,
+      80,
+      800
+    ],
+    "seed": 0,
+    "max_abs_probability_error": 1.1920928955078125e-07,
+    "required_lt": 1e-05,
+    "passed": true,
+    "ort": [
+      0.9885014295578003,
+      0.9892045259475708,
+      0.9886826276779175
+    ],
+    "torch": [
+      0.9885013103485107,
+      0.9892045855522156,
+      0.9886825680732727
+    ]
+  },
+  "synthetic_batch": {
+    "shape": [
+      2,
+      80,
+      800
+    ],
+    "targets": [
+      0.0,
+      1.0
+    ],
+    "loss": 2.120607614517212,
+    "optimizer": "SGD",
+    "learning_rate": 0.0001,
+    "steps": 1,
+    "all_trainable_gradients_finite": true,
+    "trainable_parameter_tensors": 78,
+    "nonzero_gradient_tensors": 78,
+    "gradient_l2_norm": 24.60141331325996,
+    "updated_parameter_tensors": 78,
+    "max_abs_update": 0.00020479410886764526,
+    "encoder_updated": true,
+    "classifier_updated": true
+  },
+  "save_reload": {
+    "max_abs_logit_error": 0.0,
+    "strict": true,
+    "weights_only": true,
+    "sha256": "a5c25236abcf2c6c473f251e974b93bcd315184216ac5ae83123d84cf248880e",
+    "passed": true
+  },
+  "export": {
+    "opset": 18,
+    "eval_mode": true,
+    "dynamic_batch": true,
+    "sigmoid_wrapper": true,
+    "input": "input_features",
+    "output": "logits",
+    "sha256": "9a00002e7847552ac2751295dd99892798f73ce502bac66c51a9d92ebc787d3c",
+    "onnx_checker_passed": true,
+    "provider": [
+      "CPUExecutionProvider"
+    ],
+    "parity": [
+      {
+        "batch_size": 1,
+        "shape": [
+          1,
+          1
+        ],
+        "max_abs_probability_error": 5.960464477539063e-08,
+        "required_lt": 1e-05,
+        "passed": true
+      },
+      {
+        "batch_size": 2,
+        "shape": [
+          2,
+          1
+        ],
+        "max_abs_probability_error": 5.960464477539063e-08,
+        "required_lt": 1e-05,
+        "passed": true
+      }
+    ]
+  },
+  "artifacts": {
+    "recovered-stock.pt": {
+      "sha256": "5241c9824c06f4de7340134e1e419828109aad398c0b6d0778b317c1de9bc252",
+      "bytes": 32030174
+    },
+    "synthetic-one-batch.pt": {
+      "sha256": "a5c25236abcf2c6c473f251e974b93bcd315184216ac5ae83123d84cf248880e",
+      "bytes": 32030514
+    },
+    "synthetic-one-batch.onnx": {
+      "sha256": "9a00002e7847552ac2751295dd99892798f73ce502bac66c51a9d92ebc787d3c",
+      "bytes": 32065795
+    }
+  },
+  "script": {
+    "filename": "run_mechanical_proof.py",
+    "sha256": "219a43cbcdcf7ee9ddededb904bb39eef969f104e37f7b9ae46c86cf1274c94a"
+  },
+  "result": {
+    "passed": true,
+    "runtime_seconds": 1.8062060000374913,
+    "utc_finished": "2026-10-10T18:03:05.012783+00:00"
+  }
+}
