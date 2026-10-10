@@ -290,7 +290,7 @@
       {
         "name": "site-navigation",
         "value": "160ms",
-        "purpose": "Progressive root view transition on overview/judge host only, under no-preference."
+        "purpose": "Progressive root view transition on overview/judge/live pages only, under no-preference."
       }
     ],
     "breakpoints": [
@@ -342,7 +342,7 @@
       "kind": "button",
       "refersTo": "button-primary",
       "description": "Landing navigation action.",
-      "html": "<button class=\"ds-primary\" type=\"button\">Open judge workspace</button>",
+      "html": "<button class=\"ds-primary\" type=\"button\">Open judge guide</button>",
       "css": ".ds-primary { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:11px 20px; border:1px solid var(--accent, #50d9f3); border-radius:6px; background:var(--accent, #50d9f3); color:var(--bg, #090e14); font:650 15px system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 140ms ease-out,border-color 140ms ease-out; } .ds-primary:hover:not(:disabled) { background:#98eafa; } .ds-primary:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:5px; } .ds-primary:active:not(:disabled) { transform:translateY(1px); } .ds-primary:disabled { background:var(--panel, #101923); color:var(--dim, #8d9bad); border-color:var(--border, #304154); cursor:not-allowed; } @media(prefers-reduced-motion:reduce) { .ds-primary { transition:none; } }"
     },
     {
@@ -412,7 +412,7 @@
   ],
   "narrative": {
     "northStar": "Dark studio console",
-    "overview": "Cool charcoal surfaces, ice cyan actions, and clear instrument labels give StutterTurn the character of a working studio. The user selected this direction on 2026-10-10, replacing the earlier warm brown and cream appearance. Controls have visible edges and clear state changes; generous landing-page type introduces the same visual language used in the denser operating console.\n\nThis is the shared visual authority for the [overview](index.html), [judge workspace](judges/index.html), and [call console](demo-ui/index.html). Its tokens come from [site.css](site.css) and [console styles](demo-ui/styles.css); the [console design document](demo-ui/DESIGN.md) specializes their operating layout and event semantics. [PRODUCT.md](../PRODUCT.md) records product constraints, and the [surface brief](../.impeccable/surfaces/studio-refresh.md) records this refresh's composition. The [root v2 sidecar](../.impeccable/design.json) holds component previews and extensions; its derived tonal ramps are preview aids, not additional production colors.",
+    "overview": "Cool charcoal surfaces, ice cyan actions, and clear instrument labels give StutterTurn the character of a working studio. The user selected this direction on 2026-10-10, replacing the earlier warm brown and cream appearance. Controls have visible edges and clear state changes; generous landing-page type introduces the same visual language used in the denser operating console.\n\nThis is the shared visual authority for the [overview](index.html), [judge guide](judge/index.html), [live workspace](live/index.html), and [call console](demo-ui/index.html). Its tokens come from [site.css](site.css) and [console styles](demo-ui/styles.css); the [console design document](demo-ui/DESIGN.md) specializes their operating layout and event semantics. [PRODUCT.md](../PRODUCT.md) records product constraints, and the [surface brief](../.impeccable/surfaces/studio-refresh.md) records this refresh's composition. The [root v2 sidecar](../.impeccable/design.json) holds component previews and extensions; its derived tonal ramps are preview aids, not additional production colors.",
     "keyCharacteristics": [
       "Cool charcoal layers and cyan controls with visible borders.",
       "Large Archivo headlines balanced by precise JetBrains Mono instrumentation.",

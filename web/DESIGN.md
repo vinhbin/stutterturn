@@ -121,7 +121,7 @@ components:
 
 Cool charcoal surfaces, ice cyan actions, and clear instrument labels give StutterTurn the character of a working studio. The user selected this direction on 2026-10-10, replacing the earlier warm brown and cream appearance. Controls have visible edges and clear state changes; generous landing-page type introduces the same visual language used in the denser operating console.
 
-This is the shared visual authority for the [overview](index.html), [judge workspace](judges/index.html), and [call console](demo-ui/index.html). Its tokens come from [site.css](site.css) and [console styles](demo-ui/styles.css); the [console design document](demo-ui/DESIGN.md) specializes their operating layout and event semantics. [PRODUCT.md](../PRODUCT.md) records product constraints, and the [surface brief](../.impeccable/surfaces/studio-refresh.md) records this refresh's composition. The [root v2 sidecar](../.impeccable/design.json) holds component previews and extensions; its derived tonal ramps are preview aids, not additional production colors.
+This is the shared visual authority for the [overview](index.html), [judge guide](judge/index.html), [live workspace](live/index.html), and [call console](demo-ui/index.html). Its tokens come from [site.css](site.css) and [console styles](demo-ui/styles.css); the [console design document](demo-ui/DESIGN.md) specializes their operating layout and event semantics. [PRODUCT.md](../PRODUCT.md) records product constraints, and the [surface brief](../.impeccable/surfaces/studio-refresh.md) records this refresh's composition. The [root v2 sidecar](../.impeccable/design.json) holds component previews and extensions; its derived tonal ramps are preview aids, not additional production colors.
 
 **Key Characteristics:**
 
@@ -178,15 +178,15 @@ The overview uses a centered shell capped at 1440px with 40px desktop gutters. I
 - The illustration retains a 520px minimum diagram width inside a horizontally scrollable, focusable region. Its visible scroll instruction appears at 640px and below.
 - A sequence container query at 620px stacks the figure heading and arranges playback controls into two columns. It responds to the figure's available width.
 
-The judge shell is capped at 1536px, with 32px desktop and 16px narrow-screen gutters. A compact introduction and native presenter-guide disclosure precede the dominant console. The console itself places source selection and transport above the monitor and right setup inspector; see its design document for breakpoints and scroll regions.
+The live workspace shell is capped at 1536px, with 32px desktop and 16px narrow-screen gutters. A compact operational introduction precedes the dominant console. The separate judge guide uses the same visual system for a guided evaluation, recorded evidence, architecture, and capability limits; it does not contain an iframe or run controls. Its primary action opens `/live/`. The legacy `/judges/` path redirects to `/judge/` and preserves query strings and fragments, with a visible fallback link without JavaScript. The console itself places source selection and transport above the monitor and right setup inspector; see its design document for breakpoints and scroll regions.
 
-[site.js](site.js) loads the same console in a same-origin iframe and adds the `embedded-console` class to its root. The console stylesheet owns the embedded layout, hides duplicate branding, retains connection status, and keeps its responsive rules active. A `ResizeObserver`, font readiness, and animation-frame batching keep frame height aligned with the content; the direct full-console link remains available.
+On `/live/`, [site.js](site.js) loads the same console in a same-origin iframe and adds the `embedded-console` class to its root. The console stylesheet owns the embedded layout, hides duplicate branding, retains connection status, and keeps its responsive rules active. A `ResizeObserver`, font readiness, and animation-frame batching keep frame height aligned with the content; the direct full-console link remains available.
 
 ## Elevation & Depth
 
 Depth comes from tonal surfaces and single-pixel rules. There are no shadows, decorative glass layers, or floating evidence cards. Cyan focus outlines are 2px with a 5px offset on site controls; the console uses a 3px offset.
 
-Site buttons change background over 140ms with ease-out and move down 1px while pressed. The illustration's JavaScript animation and the console's active holding pulse are described with their components. Cross-document view transitions appear only in [site.css](site.css), with a 160ms root transition inside `prefers-reduced-motion: no-preference`. They progressively enhance supported overview/judge navigation; the console has no view-transition rule. Reduced-motion styles remove CSS transitions and animations.
+Site buttons change background over 140ms with ease-out and move down 1px while pressed. The illustration's JavaScript animation and the console's active holding pulse are described with their components. Cross-document view transitions appear only in [site.css](site.css), with a 160ms root transition inside `prefers-reduced-motion: no-preference`. They progressively enhance supported overview/judge/live navigation; the console has no view-transition rule. Reduced-motion styles remove CSS transitions and animations.
 
 **The Flat Workspace Rule.** Separate working areas with tone, spacing, and borders; reserve bright color for an action or a labeled state.
 
@@ -216,7 +216,7 @@ The monitor, connection chip, synthetic banner, run record, summary, and indepen
 
 ### Evidence and presenter guidance
 
-Evidence uses readable body labels, precise revision text, quiet rules, and recorded/pending dots. The overview and judge page link to the exact [replay-v2 evidence](https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2); the judge page also links to the [event contract at the execution revision](https://github.com/vinhbin/stutterturn/blob/bcf50d1/agent/CONTRACT.md). The evidence artifact is pinned to `9805a06`; its five recordings and ten stock/patient logs were executed on `bcf50d1`.
+Evidence uses readable body labels, precise revision text, quiet rules, and recorded/pending dots. The overview and judge guide link to the exact [replay-v2 evidence](https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2); the judge page also links to the [event contract at the execution revision](https://github.com/vinhbin/stutterturn/blob/bcf50d1/agent/CONTRACT.md). The evidence artifact is pinned to `9805a06`; its five recordings and ten stock/patient logs were executed on `bcf50d1`.
 
 Keep the source revision, unreviewed-label caveat, and playback qualification with the evidence. The browser plays no audio. Candidate availability comes from the connected backend. A decision, reported audio receipt, verified speaker playback, and an efficacy claim are different facts. The presenter guide uses native disclosure to keep guidance accessible without crowding the workspace.
 

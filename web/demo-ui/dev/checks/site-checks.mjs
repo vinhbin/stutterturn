@@ -54,7 +54,7 @@ function serveSite() {
 }
 
 let passed = 0;
-const failures = [], pageErrors = [], unexpectedRequests = [];
+const failures = [], pageErrors = [], unexpectedRequests = [], unexpectedSockets = [];
 function assert(condition, message) { if (!condition) throw new Error(message); }
 async function test(name, fn) {
   try { await fn(); passed++; console.log('ok   ' + name); }
@@ -84,6 +84,10 @@ async function context(options = {}) {
     unexpectedRequests.push(route.request().url());
     return route.abort();
   });
+  await ctx.routeWebSocket('**/*', socket => {
+    unexpectedSockets.push(socket.url());
+    socket.close();
+  });
   return ctx;
 }
 async function settled(page, route = '/') {
@@ -112,6 +116,21 @@ async function contained(pageOrFrame) {
     html: document.documentElement.scrollWidth, body: document.body.scrollWidth }));
   assert(sizes.html <= sizes.viewport + 1 && sizes.body <= sizes.viewport + 1,
     'document overflow: ' + JSON.stringify(sizes));
+}
+async function routeLink(scope, pathname) {
+  const links = scope.locator('a[href]');
+  const index = await links.evaluateAll((elements, target) =>
+    elements.findIndex(element => new URL(element.href).pathname === target), pathname);
+  assert(index >= 0, 'link to ' + pathname + ' missing');
+  return links.nth(index);
+}
+async function navigateHeader(page, pathname) {
+  await (await routeLink(page.locator('.site-header nav'), pathname)).click();
+  await page.waitForURL(origin + pathname);
+  const current = page.locator('.site-header nav a[aria-current="page"]');
+  assert(await current.count() === 1, 'navigation must identify one current page');
+  assert(await current.evaluate(link => new URL(link.href).pathname) === pathname,
+    'navigation identifies the wrong current page');
 }
 
 try {
@@ -156,13 +175,63 @@ try {
     assert(/no audio/i.test(await page.locator('.figure-chip').textContent()), 'figure badge omitted no-audio disclosure');
     assert(await page.locator('audio, video').count() === 0, 'illustration unexpectedly contains media playback');
   });
-  await test('header navigation opens judge view and returns to the landing page', async () => {
-    await page.locator('.site-header nav a[href="judges/"]').click();
-    await page.waitForURL(origin + '/judges/');
-    assert(await page.locator('#console-frame').isVisible(), 'judge console missing');
-    await page.locator('.site-header nav a[href="../"]').click();
-    await page.waitForURL(origin + '/');
+  await test('header navigation distinguishes judge guide, live workspace and overview', async () => {
+    await navigateHeader(page, '/judge/');
+    assert(await page.locator('#console-frame, #btn-start').count() === 0, 'judge guide contains operational console controls');
+    await navigateHeader(page, '/live/');
+    assert(await page.locator('#console-frame').isVisible(), 'live console missing');
+    await navigateHeader(page, '/judge/');
+    await navigateHeader(page, '/');
     assert(await page.locator('.hero h1').isVisible(), 'landing hero missing after return');
+  });
+  await test('landing actions lead separately to the guide and live workspace', async () => {
+    const primary = page.locator('.hero-actions .button-primary');
+    const secondary = page.locator('.hero-actions .button-quiet');
+    assert(await primary.evaluate(link => new URL(link.href).pathname) === '/judge/', 'primary action bypasses the judge guide');
+    assert(await secondary.evaluate(link => new URL(link.href).pathname) === '/live/', 'secondary action does not open the live workspace');
+    await primary.click();
+    await page.waitForURL(origin + '/judge/');
+    assert(await page.locator('#guide-title').isVisible(), 'judge guide did not load from the primary action');
+  });
+  await test('judge guide explains evaluation and system flow without run controls', async () => {
+    assert(await page.locator('#console-frame, #btn-start').count() === 0, 'judge guide embeds operational run controls');
+    assert(await page.locator('.evaluation-steps > li').count() === 4, 'evaluation itinerary is incomplete');
+    const steps = await page.locator('#evaluation-steps').innerText();
+    for (const meaning of [/same source/i, /fresh run/i, /reported agent audio/i, /synthetic/i]) {
+      assert(meaning.test(steps), 'evaluation guidance omits ' + meaning);
+    }
+    assert(await page.locator('.architecture-flow > li').count() === 4, 'recorded-input system flow is incomplete');
+    const scope = await page.locator('.scope-columns').innerText();
+    for (const limit of [/human-reviewed/i, /candidate/i, /completed-turn response delay/i, /speaker playback/i]) {
+      assert(limit.test(scope), 'guide omits remaining proof for ' + limit);
+    }
+    const brokenAnchors = await page.locator('a[href^="#"]').evaluateAll(links => links
+      .filter(link => !document.getElementById(decodeURIComponent(link.hash.slice(1))))
+      .map(link => link.hash));
+    assert(brokenAnchors.length === 0, 'guide has missing anchor destinations: ' + brokenAnchors.join(', '));
+    assert(await (await routeLink(page.locator('.guide-next'), '/live/')).isVisible(), 'guide has no actionable live-workspace link');
+  });
+  await test('judge evidence remains a pinned recorded snapshot with playback limits', async () => {
+    const snapshot = page.locator('#replay-evidence');
+    const text = await snapshot.innerText();
+    assert(/replay v2/i.test(text) && /10 Oct 2026/.test(text), 'recorded snapshot identity or date missing');
+    assert(/bcf50d1/.test(text) && /9805a06/.test(text), 'execution and artifact revisions are not distinguished');
+    const rows = snapshot.locator('tbody tr');
+    assert(await rows.count() === 2, 'snapshot comparison does not contain exactly the two evaluated configurations');
+    assert(/Stock.*0\.2 s.*4 of 5/s.test(await rows.nth(0).innerText()), 'stock snapshot changed without revising its evidence check');
+    assert(/Patient.*1\.0 s.*0 of 5/s.test(await rows.nth(1).innerText()), 'patient snapshot changed without revising its evidence check');
+    assert(/not current backend status/i.test(text), 'recorded result is presented as current backend status');
+    assert(/not been human-reviewed/i.test(text) && /speaker playback is unverified/i.test(text) && /browser plays no audio/i.test(text),
+      'snapshot omits label or playback limitations');
+    const evidence = snapshot.locator('a[href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2"]');
+    assert(await evidence.isVisible(), 'snapshot does not link directly to the pinned v2 evidence');
+  });
+  await test('legacy judges route redirects to the guide and preserves the evidence fragment', async () => {
+    await page.goto(origin + '/judges/#replay-evidence');
+    await page.waitForURL(origin + '/judge/#replay-evidence');
+    assert(await page.locator('#guide-title').isVisible(), 'legacy redirect did not load the guided evaluation');
+    assert(await page.locator('#replay-evidence').isVisible(), 'preserved evidence fragment has no destination');
+    assert(await page.locator('#console-frame').count() === 0, 'legacy alias retained the previous embedded console');
   });
   await reduced.close();
 
@@ -219,15 +288,35 @@ try {
     assert(await fallback.locator('.sequence-transport').isHidden(), 'inert no-JS controls should remain hidden');
     const hiddenSections = await fallback.locator('main section').evaluateAll(sections => sections.filter(section => getComputedStyle(section).opacity === '0').length);
     assert(hiddenSections === 0, 'no-JS sections concealed by animation styles');
-    await fallback.locator('.site-header nav a[href="judges/"]').click();
-    await fallback.waitForURL(origin + '/judges/');
+    await navigateHeader(fallback, '/judge/');
+  });
+  await test('without JavaScript the guide and direct-console fallback remain usable', async () => {
+    assert(await fallback.locator('#guide-title').isVisible(), 'no-JS guide title hidden');
+    assert(await fallback.locator('.evaluation-steps > li').count() === 4, 'no-JS evaluation steps missing');
+    assert(await fallback.locator('#replay-evidence').isVisible(), 'no-JS evidence summary hidden');
+    assert(await fallback.locator('#console-frame, #btn-start').count() === 0, 'no-JS guide contains run controls');
+    await (await routeLink(fallback.locator('.guide-next'), '/live/')).click();
+    await fallback.waitForURL(origin + '/live/');
+    const direct = await routeLink(fallback.locator('.embed-fallback'), '/demo-ui/');
+    assert(await direct.isVisible(), 'no-JS direct-console link hidden');
+    await direct.click();
+    await fallback.waitForURL(origin + '/demo-ui/');
+  });
+  await test('legacy judges route offers a working guide link without JavaScript', async () => {
+    await fallback.goto(origin + '/judges/#replay-evidence');
+    assert(new URL(fallback.url()).pathname === '/judges/', 'legacy no-JS fallback unexpectedly redirects');
+    const link = await routeLink(fallback.locator('main'), '/judge/');
+    assert(await link.isVisible(), 'legacy no-JS guide link is hidden');
+    await link.click();
+    await fallback.waitForURL(origin + '/judge/');
+    assert(await fallback.locator('#guide-title').isVisible(), 'legacy fallback link did not open the guide');
   });
   await noJs.close();
 
   for (const width of [360, 390, 1280, 1440]) {
     const responsive = await context({ viewport: { width, height: width < 600 ? 844 : 900 } });
     const view = await responsive.newPage();
-    for (const route of ['/', '/judges/', '/demo-ui/']) {
+    for (const route of ['/', '/judge/', '/live/', '/demo-ui/']) {
       await test(width + 'px ' + route + ' contains content and navigation within the viewport', async () => {
         await settled(view, route);
         await contained(view);
@@ -316,11 +405,14 @@ try {
         await contained(view);
       });
     }
-    await test(width + 'px judge iframe fits its document after enabling preview', async () => {
-      await settled(view, '/judges/');
+    await test(width + 'px live iframe fits its document after enabling preview', async () => {
+      await settled(view, '/live/');
       const frame = view.frames().find(item => new URL(item.url()).pathname === '/demo-ui/');
       assert(frame, 'console iframe did not load');
       await frame.waitForSelector('html.embedded-console');
+      assert(await view.locator('#evaluation-steps, #replay-evidence').count() === 0, 'live route repeats the static evaluation guide');
+      assert(await frame.locator('#btn-start').isDisabled(), 'live workspace can run before an explicit connection or preview choice');
+      assert(await frame.locator('#preview-toggle').isChecked() === false, 'live workspace automatically enabled synthetic preview');
       await enablePreview(frame);
       await frame.locator('#btn-start').click();
       await frame.waitForFunction(() => document.getElementById('run-phase').textContent === 'running');
@@ -348,9 +440,10 @@ try {
     }
     await responsive.close();
   }
-  await test('site interactions produce no uncaught browser errors or external requests', async () => {
+  await test('site interactions produce no browser errors, external requests or backend connections', async () => {
     assert(pageErrors.length === 0, 'page errors: ' + pageErrors.join(' | '));
     assert(unexpectedRequests.length === 0, 'unexpected external requests: ' + unexpectedRequests.join(' | '));
+    assert(unexpectedSockets.length === 0, 'unexpected WebSocket connections: ' + unexpectedSockets.join(' | '));
   });
 } finally {
   await browser.close();

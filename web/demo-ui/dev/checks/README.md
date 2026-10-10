@@ -73,9 +73,10 @@ node web/demo-ui/dev/checks/site-checks.mjs
 Uses the same Playwright/Chromium installation and cache discovery as the browser
 suite above. It serves the full `web/` directory on an ephemeral loopback port;
 no Python server, agent backend, API credentials, or paid services are involved.
-External requests are blocked and fail the check. No screenshots are captured.
+External requests and WebSocket connections are blocked and fail the check.
+No screenshots are captured.
 
-The 38 checks cover:
+The 48 checks cover:
 
 - Reduced-motion initial state, explicit Play, keyboard Pause, and native range
   scrubbing to Pause/Continuing/Reply while playback is active.
@@ -84,8 +85,15 @@ The 38 checks cover:
   headless tab focus alone does not reliably produce a hidden document.
 - Complete, visible concept illustration and usable navigation without
   JavaScript; illustration/no-audio disclosures stay explicit.
-- Landing, judge view, and standalone console containment at 360, 390, 1280,
-  and 1440 pixels, including header navigation.
+- Distinct overview, judge guide, and live workspace navigation; the judge guide
+  provides evaluation steps and pinned evidence without embedding run controls.
+  The legacy `/judges/` link redirects to `/judge/`, retaining its fragment,
+  and offers a usable link without JavaScript.
+- The guide's dated replay-v2 facts, separate execution/artifact revisions, and
+  label/playback limitations. This checks the published snapshot against its
+  fixed expected values; it does not rerun or validate the experiment.
+- Landing, judge guide, live workspace, and standalone console containment at
+  360, 390, 1280, and 1440 pixels, including header navigation.
 - At 360/390 pixels: the visible setup jump moves keyboard focus to its target;
   the ledger caption stays outside horizontal scrolling, wraps inside the
   viewport, and describes the table; the left-aligned empty message is readable
@@ -94,16 +102,18 @@ The 38 checks cover:
 - The phone landing diagram keeps a 520px content width inside its own
   keyboard-scrollable region, displays scroll instructions, and preserves
   functional phase text at 11px or above without widening the page.
-- Judge iframe sizing after preview starts, embedded-console mode, synthetic
+- Live iframe sizing after preview starts, embedded-console mode, synthetic
   provenance, and the no-response-audio notice.
 - Enabled Start action within the first 900 vertical pixels on desktop after
-  preview is selected; no uncaught browser errors or external page requests.
+  preview is selected; no uncaught browser errors, external page requests, or
+  automatic backend connections.
 
 This suite checks behavior and layout containment, not exact colors or screenshot
 pixels. It does not establish real playback, voice-agent efficacy, or visual
 quality. Exit codes match the browser suite: 0 passed, 1 check failure, 2 missing
-Playwright/Chromium. The first studio-refresh run passed 30/30; the expanded
-review-fix suite passed 38/38 on October 10, 2026.
+Playwright/Chromium. On October 10, 2026, the first studio-refresh run passed
+30/30, the expanded review-fix suite passed 38/38, and the judge/live route-split
+suite passed 48/48.
 
 ## Recorded results
 

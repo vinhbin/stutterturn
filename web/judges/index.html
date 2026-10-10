@@ -4,50 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090e14">
-  <meta name="description" content="Compare recorded-source runs and inspect StutterTurn's replay evidence in the judge view.">
-  <title>StutterTurn — Judge view</title>
-  <link rel="preload" href="../demo-ui/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <title>StutterTurn — Judge guide</title>
+  <link rel="canonical" href="../judge/">
   <link rel="stylesheet" href="../site.css">
-  <script src="../site.js" defer></script>
+  <script src="redirect.js" defer></script>
 </head>
-<body class="judge-page">
-  <a class="skip-link" href="#judge-console">Skip to console</a>
-  <header class="site-header shell">
-    <a class="wordmark" href="../" aria-label="StutterTurn home"><svg class="brand-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M12 4v16m4-12 4 4-4 4"/></svg><span>StutterTurn<span class="brand-dot">.</span></span></a>
-    <nav aria-label="Main navigation"><a href="../">Overview</a><a href="./" aria-current="page">Judge workspace</a><a href="../demo-ui/">Full console <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></nav>
-  </header>
-  <main id="main" class="shell" tabindex="-1">
-    <section class="judge-intro" aria-labelledby="judge-title">
-      <div><h1 id="judge-title">One recording. Two fresh runs.</h1><p>Compare stock and patient on the same source. Watch the caller, turn decision, and reported agent audio on one timeline.</p></div>
-      <a class="text-link" href="#replay-evidence">Replay evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12m-5-5 5 5 5-5"/></svg></a>
-    </section>
-    <details class="presenter-guide">
-      <summary>Presenter guide</summary>
-      <ol>
-        <li><strong>Connect a replay backend.</strong> The source list and available configurations come from that connection. The browser does not record a microphone.</li>
-        <li><strong>Choose one source and run stock.</strong> Inspect when the model makes a turn decision and whether reported audio follows.</li>
-        <li><strong>Keep the source, choose patient, and start fresh.</strong> Patient changes the silence gate from 0.2 s to 1.0 s. It uses the same model. The trained candidate is not available in this handoff.</li>
-        <li><strong>Check provenance before describing the result.</strong> Development preview and mock runs are synthetic. The console plays no audio; backend audio receipt does not verify speaker playback.</li>
-      </ol>
-    </details>
-    <section id="judge-console" class="console-embed" aria-label="Interactive call console" tabindex="-1">
-      <iframe id="console-frame" src="../demo-ui/" title="StutterTurn interactive call console" loading="eager"></iframe>
-      <p class="embed-fallback">You can also <a href="../demo-ui/">open the full console in this tab</a>.</p>
-    </section>
-    <section id="replay-evidence" class="judge-evidence" aria-labelledby="replay-title">
-      <div class="section-intro"><h2 id="replay-title">The replay handoff</h2><p>The corrected recorded-source replay is pinned below so the demonstration can be checked against its source.</p></div>
-      <div class="evidence-content">
-        <div class="evidence-heading"><h3>5 clips · 2 configurations · 10 logs</h3><span class="revision">2026-10-10 · Replay v2<br>Saved logs executed on bcf50d1</span></div>
-        <p>Stock and patient replay the same five SEP-28k recordings with the same model. Patient increases the silence gate from 0.2 s to 1.0 s. This handoff does not include a trained candidate.</p>
-        <dl class="handoff-observations">
-          <div><dt>Observed</dt><dd>Stock decided complete before the energy-labeled resumption in four of these five clips; patient did not. No response-audio overlap was reported. These are exploratory observations, not interruption rates.</dd></div>
-          <div><dt>Still unverified</dt><dd>Human review of the energy-derived labels, completed-turn delay, and actual speaker playback. The recordings are replayed input, not a live microphone or phone call.</dd></div>
-        </dl>
-        <p class="evidence-limit">This is an engineering prototype. These logs do not establish improved interruption rates or model efficacy.</p>
-        <div class="evidence-links"><a class="text-link" href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2">Open replay evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a><a class="text-link" href="https://github.com/vinhbin/stutterturn/blob/bcf50d1/agent/CONTRACT.md">Inspect the event contract <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div>
-      </div>
-    </section>
+<body>
+  <main class="shell hero">
+    <h1>Judge guide</h1>
+    <p class="hero-context">The guided evaluation now has its own page.</p>
+    <p class="hero-actions"><a class="button button-primary" href="../judge/">Open the judge guide</a><a class="button button-quiet" href="../live/">Open live demo</a></p>
   </main>
-  <footer class="site-footer shell"><span>StutterTurn. <span class="footer-tagline">Let people finish.</span></span><a href="../">Back to the project</a></footer>
 </body>
 </html>
