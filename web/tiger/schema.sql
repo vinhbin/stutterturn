@@ -116,8 +116,8 @@ ORDER BY e.run_id, e.t, e.seq;
 -- latest turn_complete at or before agent_audio_start): an earlier decision
 -- cancelled by the speaker resuming produced no audio and must not be
 -- credited with one. first_audio_t includes Gemini + ElevenLabs latency
--- (reported separately from the run summary); it is when the first sample
--- was scheduled to play, not measured speaker output.
+-- (reported separately from the run summary); it is the reported
+-- agent_audio_start event, not verified speaker playback.
 CREATE OR REPLACE VIEW decision_to_audio_gap AS
 WITH first_audio AS (
     SELECT DISTINCT ON (run_id) run_id, t AS first_audio_t
@@ -143,7 +143,7 @@ JOIN runs r USING (run_id);
 
 -- Replies cancelled before any audio (current evidence only): the speaker
 -- resumed after a completion decision and the pending reply was dropped
--- before a single sample played. These are cancelled decisions, not
+-- before the first reported audio event. These are cancelled decisions, not
 -- observed audible interruptions.
 CREATE OR REPLACE VIEW cancelled_before_audio AS
 SELECT r.source_id, r.config, e.run_id,

@@ -233,6 +233,57 @@ try {
     assert(await page.locator('#replay-evidence').isVisible(), 'preserved evidence fragment has no destination');
     assert(await page.locator('#console-frame').count() === 0, 'legacy alias retained the previous embedded console');
   });
+  await test('judge chart renders all recorded runs with offline provenance and reported-audio limits', async () => {
+    const chart = page.locator('#tiger-chart');
+    assert(await chart.count() === 1, 'judge route has no run-log chart');
+    await chart.locator('.tgr-figure').first().waitFor();
+    assert(await chart.locator('.tgr-lane').count() === 10, 'timeline omitted recorded runs');
+    assert(await chart.locator('.tgr-gap-row').count() === 10, 'audio-gap chart omitted recorded runs');
+    assert(await chart.locator('.tgr-head .tgr-badge-live').count() === 0, 'offline snapshot claims database provenance');
+    for (const figure of await chart.locator('.tgr-figure').all()) {
+      assert(/local snapshot/i.test(await figure.innerText()), 'figure lacks offline provenance');
+    }
+    const text = await chart.innerText();
+    assert(/reported.*audio|audio.*reported/i.test(text) && /speaker playback.*unverified/i.test(text),
+      'chart overstates audio events as verified playback');
+    assert(/not.*live.*status/i.test(await page.locator('#run-log-evidence').innerText()),
+      'saved chart is not distinguished from live status');
+    assert(/0\.512 s/.test(text) && /9\.406 s/.test(text), 'per-run values do not match pinned evidence');
+    const clip = chart.locator('.tgr-figure').first().locator('.tgr-clip').filter({ hasText: 'HeStutters_4_32.wav' });
+    const modelMarks = clip.locator('.tgr-track .tgr-mark-complete');
+    assert(await modelMarks.count() === 1, 'later fallback is incorrectly marked as a model decision');
+  });
+  for (const scenario of ['unavailable', 'missing provenance', 'database snapshot']) {
+    await test('judge chart handles ' + scenario + ' without inventing live database status', async () => {
+      const data = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'snapshot.json'), 'utf8'));
+      const chartPage = await reduced.newPage();
+      await chartPage.route('**/tiger/snapshot.json', route => {
+        if (scenario === 'unavailable') return route.fulfill({ status: 404, body: '' });
+        if (scenario === 'missing provenance') delete data.offline_fallback;
+        else {
+          data.offline_fallback = false;
+          data.source_note = 'Generated from TigerData queries over committed run logs.';
+        }
+        return route.fulfill({ contentType: 'application/json', body: JSON.stringify(data) });
+      });
+      try {
+        await settled(chartPage, '/judge/');
+        const chart = chartPage.locator('#tiger-chart');
+        assert(await chart.count() === 1, 'judge route has no run-log chart');
+        if (scenario === 'database snapshot') {
+          await chart.locator('.tgr-badge-live').first().waitFor();
+          assert(/snapshot.*Tiger\s?Data|Tiger\s?Data.*snapshot/i.test(await chart.locator('.tgr-badge-live').first().innerText()),
+            'database export is presented as a live connection');
+          assert(await chart.locator('.tgr-lane').count() === 10, 'database snapshot did not render its runs');
+        } else {
+          await chart.locator('.tgr-error').waitFor();
+          assert(await chart.locator('.tgr-lane, .tgr-gap-row, .tgr-badge-live').count() === 0,
+            'unavailable evidence produced a chart or database claim');
+          assert(await chartPage.locator('#replay-evidence').isVisible(), 'chart failure hides the static evidence summary');
+        }
+      } finally { await chartPage.close(); }
+    });
+  }
   await reduced.close();
 
   const animated = await context({ reducedMotion: 'no-preference' });
@@ -294,6 +345,8 @@ try {
     assert(await fallback.locator('#guide-title').isVisible(), 'no-JS guide title hidden');
     assert(await fallback.locator('.evaluation-steps > li').count() === 4, 'no-JS evaluation steps missing');
     assert(await fallback.locator('#replay-evidence').isVisible(), 'no-JS evidence summary hidden');
+    assert(await fallback.locator('#tiger-chart a[href="../tiger/snapshot.json"]').isVisible(),
+      'no-JS chart fallback provides no direct evidence data');
     assert(await fallback.locator('#console-frame, #btn-start').count() === 0, 'no-JS guide contains run controls');
     await (await routeLink(fallback.locator('.guide-next'), '/live/')).click();
     await fallback.waitForURL(origin + '/live/');
@@ -319,6 +372,7 @@ try {
     for (const route of ['/', '/judge/', '/live/', '/demo-ui/']) {
       await test(width + 'px ' + route + ' contains content and navigation within the viewport', async () => {
         await settled(view, route);
+        if (route === '/judge/') await view.locator('#tiger-chart .tgr-figure').first().waitFor();
         await contained(view);
         const nav = view.locator('.site-header nav');
         if (await nav.count()) {
