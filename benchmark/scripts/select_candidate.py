@@ -56,6 +56,13 @@ LIMITS_V2 = [x for x in LIMITS if not x.startswith("There are no stuttered compl
     "Disclosure: training v2 was designed after v1 failed (dev_nothing_passes) on these same dev items; dev has "
     "served two pre-registered attempts. Test stays sealed; only the training-v1 §7.2 single test run is evidence.",
 ]
+# training-v3 (model/specs/training-v3.md §0): three attempts; test sealed under D-009.
+LIMITS_V3 = [x for x in LIMITS_V2 if not x.startswith("Disclosure: training v2")] + [
+    "Disclosure: training v3 was designed after v1 and v2 both failed (dev_nothing_passes) on these same dev "
+    "items; dev has served three pre-registered attempts. The test set stays sealed under D-009; a v3 pass is a "
+    "development decision only and does not authorize a test run.",
+]
+LIMITS_BY_SPEC = {"v1": LIMITS, "v2": LIMITS_V2, "v3": LIMITS_V3}
 
 
 def die(msg):
@@ -619,7 +626,7 @@ def render_md(ctx, dec, rows_s, base_s, comp_s, sel_s, a_s, report_only, shows):
     L.append("## Test plan (training-v1 §7.2)\n")
     L.append("```json\n" + json.dumps(dec["test_plan"], indent=1) + "\n```\n")
     L.append("## Limits\n")
-    L += [f"- {x}" for x in (LIMITS_V2 if ARGS_SPEC == "v2" else LIMITS)]
+    L += [f"- {x}" for x in LIMITS_BY_SPEC[ARGS_SPEC]]
     L.append("")
     return "\n".join(L)
 
@@ -642,7 +649,7 @@ def build_parser():
     ap.add_argument("--items-main")
     ap.add_argument("--items-eow")
     ap.add_argument("--selftest", action="store_true")
-    ap.add_argument("--training-spec", choices=["v1", "v2"], default="v1",
+    ap.add_argument("--training-spec", choices=["v1", "v2", "v3"], default="v1",
                     help="which training spec's limits/disclosure text to write")
     return ap
 
@@ -841,7 +848,7 @@ def main():
         },
         "run_ids": {"executed": ctx.executed, "reused": ctx.reused, "all_planned": [s["id"] for s in ctx.plan]},
         "model_calls_new": ctx.model_calls,
-        "metric_table": rows_s, "report_only": ro_s, "limits": LIMITS_V2 if ARGS_SPEC == "v2" else LIMITS, "training_spec": ARGS_SPEC,
+        "metric_table": rows_s, "report_only": ro_s, "limits": LIMITS_BY_SPEC[ARGS_SPEC], "training_spec": ARGS_SPEC,
         "rule": "training-v1 section 6; point estimates bind; CIs/p-values reported only",
     }
     json.dump(dec, open(os.path.join(out_dir, "decision.json"), "w"), indent=1)
