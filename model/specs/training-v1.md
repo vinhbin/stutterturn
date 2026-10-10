@@ -78,15 +78,16 @@ The claim must beat both of these on dev, not just stock INT8:
 | Checkpoints | every half epoch, plus at the end. Each one is kept and hashed. |
 | Seed | 0. Record it, along with torch determinism flags. MPS and CUDA aren't bit-deterministic; say so. |
 
-For scale: on Niko's M2 the review measured about 56 samples/s on MPS and 21–27/s on CPU, plus 8 ms of feature extraction per sample. That is about 35–50 min per run. Precompute features once per sample to remove the 8 ms.
+For scale: on the executing machine (RTX 4070 Laptop) check 5 measured 293 samples/s, and an epoch (§2d) is 2,353 samples, so a 2-epoch run takes under a minute. (The earlier 35–50 min estimate was for Niko's M2 and wrongly assumed a larger epoch.) Run time therefore doesn't constrain R3 and R4.
 
 **In-loop fast validation** runs in PyTorch, with no ONNX, at every checkpoint:
 - **dev stutter premature:** premature rate at `t = 0.20` on dev `stuttered/unfinished` items;
 - **dev fluent premature:** the same at `t = 0.20` on dev `fluent/unfinished` items;
 - **guard recall:** at threshold 0.5 on 2c positives;
-- **guard specificity:** on 2c negatives.
+- **guard specificity:** on 2c negatives;
+- **dev end-of-window first-check decide (in-loop M3), added 2026-10-10 16:30 before any pre-screen ran:** the rate of `p > 0.5` on `items/v1/dev_end_of_window.jsonl` (680 completed proxies), cut `round((silence_start_s + 0.20)·16000)` from the clip start, as for the dev items above. Every SEP-28k cut in training is labelled 0, so a "podcast audio ⇒ incomplete" shortcut shows up here and nowhere else in-loop. The guard set is Smart Turn audio and can't catch it. A 0.5-epoch scratch run already took in-loop dev stutter premature to 0.0085, which is consistent with that shortcut.
 
-Log these to `metrics.jsonl`. In-loop PyTorch probabilities match ORT within about 1e-5, so these metrics are good enough to **pre-screen**. Rank checkpoints by in-loop dev stutter premature among those meeting the in-loop M2/M4 constraints (§6), and send only the **top 2** through §5 export and §6. Record the full ranking. This step is pre-registered, so it isn't a free choice.
+Log these to `metrics.jsonl`. In-loop PyTorch probabilities match ORT within about 1e-5, so these metrics are good enough to **pre-screen**. Rank checkpoints by in-loop dev stutter premature among those meeting the in-loop M2, M3 and M4 constraints (§6: fluent premature ≤ step 0 + 0.010, end-of-window first-check decide ≥ step 0 − 0.020, guard recall ≥ step 0 − 0.010), and send only the **top 2** through §5 export and §6. Record the full ranking. This step is pre-registered, so it isn't a free choice.
 
 ## 5. Export (every checkpoint that §6 will evaluate)
 
