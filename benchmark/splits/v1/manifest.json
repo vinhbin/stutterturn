@@ -1,0 +1,88 @@
+{
+  "version": "v1",
+  "created_utc": "2026-10-10T19:03:48Z",
+  "code_commit": "85b354426ff8173ebdbdbf1e4f34e0be53303776",
+  "script": "benchmark/scripts/build_splits.py",
+  "script_sha256": "7139605e736c9b1b8bcad721809e676a9d818b6e906b86cd801325aeae09d9c2",
+  "labels_csv": "benchmark/data/SEP-28k_labels.csv",
+  "labels_sha256": "d83a782f6bcf3e31b3c951515d1cd0e51351fce76251944cbb8c87ec3af8b425",
+  "show_split": {
+    "WomenWhoStutter": "train",
+    "HeStutters": "train",
+    "IStutterSoWhat": "train",
+    "HVSA": "train",
+    "StutteringIsCool": "dev",
+    "MyStutteringLife": "dev",
+    "StrongVoices": "test",
+    "StutterTalk": "test"
+  },
+  "rules": {
+    "quality_gate_votes": 2,
+    "block_votes": 2,
+    "fluent_votes": 2
+  },
+  "exclusions": {
+    "quality_total": 1962,
+    "quality_by_reason": {
+      "Unsure": 24,
+      "PoorAudioQuality": 582,
+      "DifficultToUnderstand": 1038,
+      "Music": 298,
+      "NoSpeech": 308
+    }
+  },
+  "files": {
+    "train.csv": {
+      "sha256": "60e2509fd4186227f41a5b77fbf7355d6c826abce0eb653e4de469cb0b584e1c",
+      "rows": 13282,
+      "by_category": {
+        "block": 1723,
+        "fluent": 4890,
+        "other_disfluent": 6669
+      },
+      "by_show": {
+        "HVSA": 628,
+        "HeStutters": 3361,
+        "IStutterSoWhat": 779,
+        "WomenWhoStutter": 8514
+      }
+    },
+    "dev.csv": {
+      "sha256": "3030592364bcf7f7514eb85a59d72323558706aae40cc61fe1ec5ed7dc80b340",
+      "rows": 5882,
+      "by_category": {
+        "block": 549,
+        "fluent": 3056,
+        "other_disfluent": 2277
+      },
+      "by_show": {
+        "MyStutteringLife": 2264,
+        "StutteringIsCool": 3618
+      }
+    },
+    "test.csv": {
+      "sha256": "fd558b91fb405f83f1b9e8e85ff7922a1aaad4193725bd21d29dd475c25832c2",
+      "rows": 7051,
+      "by_category": {
+        "block": 844,
+        "fluent": 3394,
+        "other_disfluent": 2813
+      },
+      "by_show": {
+        "StrongVoices": 2222,
+        "StutterTalk": 4829
+      }
+    }
+  },
+  "limits": [
+    "speaker identity unknown; separation by show only",
+    "HeStutters and WomenWhoStutter share a host (same audio host domain and series title); kept together in train",
+    "weak cross-show guest first-name matches only (geoff: HeStutters/StrongVoices; alex: StrongVoices/WomenWhoStutter); not verified",
+    "gender skew: WomenWhoStutter mostly female, HeStutters mostly male, both in train",
+    "two shows per dev/test split: show clustering reduces effective sample size",
+    "at least 26 mirror clips are empty, consistent with truncated episode audio (e.g. HeStutters_0 after ~700 s, HeStutters_1 after ~1772 s); filtered when eval items are built, not here",
+    "3 s clips: blocks longer than ~2.5 s cannot appear",
+    "labels are SEP-28k annotator votes, not human-validated turn ends",
+    "audio not included; rights remain with podcast owners"
+  ]
+}
