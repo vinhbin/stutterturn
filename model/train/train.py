@@ -53,6 +53,17 @@ def dev_refs(group):
     return out
 
 
+def eow_refs():
+    """In-loop M3 (spec rev 265ab02): dev end-of-window completed proxies, cut at
+    round((silence_start_s + 0.20) * 16000) from the clip start."""
+    out = []
+    for line in open(os.path.join(C.BENCH, "items", "v1", "dev_end_of_window.jsonl")):
+        it = json.loads(line)
+        out.append({"id": it["item_id"], "audio": it["audio"], "label": 1,
+                    "cut_samples": int(round((it["silence_start_s"] + 0.20) * C.SR))})
+    return out
+
+
 def feature_cache(work, name, refs):
     """float32 memmap [N, 80, 800] in W/features/<name>.f32, keyed by the refs' content hash."""
     d = os.path.join(work, "features")
@@ -82,9 +93,10 @@ def load_data(work):
     stu = _load_refs(os.path.join(dd, "stutter_neg.jsonl"))
     rep = _load_refs(os.path.join(dd, "orig_replay.jsonl"))
     grd = _load_refs(os.path.join(dd, "guard.jsonl"))
-    dstu, dflu = dev_refs("stuttered"), dev_refs("fluent")
+    dstu, dflu, deow = dev_refs("stuttered"), dev_refs("fluent"), eow_refs()
     return {"manifest": man, "manifest_sha256": C.sha256_file(os.path.join(dd, "manifest.json")),
-            "stu": stu, "rep": rep, "grd": grd, "dstu": dstu, "dflu": dflu,
+            "stu": stu, "rep": rep, "grd": grd, "dstu": dstu, "dflu": dflu, "deow": deow,
+            "F_deow": feature_cache(work, "dev_eow_t020", deow),
             "F_stu": feature_cache(work, "stutter_neg", stu), "F_rep": feature_cache(work, "orig_replay", rep),
             "F_grd": feature_cache(work, "guard", grd), "F_dstu": feature_cache(work, "dev_stu_t020", dstu),
             "F_dflu": feature_cache(work, "dev_flu_t020", dflu)}
@@ -116,8 +128,10 @@ def validate(model, D, device, threshold=0.5):
     """In-loop fast validation (section 4): rates at t = 0.20 and on the guard set."""
     p_stu, p_flu, p_grd = probs(model, D["F_dstu"], device), probs(model, D["F_dflu"], device), \
         probs(model, D["F_grd"], device)
+    p_eow = probs(model, D["F_deow"], device)
     y = np.array([r["label"] for r in D["grd"]])
     return {"dev_stutter_premature": round(float((p_stu > threshold).mean()), 4), "n_dev_stutter": len(p_stu),
+            "dev_eow_first_check_decide": round(float((p_eow > threshold).mean()), 4), "n_dev_eow": len(p_eow),
             "dev_fluent_premature": round(float((p_flu > threshold).mean()), 4), "n_dev_fluent": len(p_flu),
             "guard_recall": round(float((p_grd[y == 1] > threshold).mean()), 4), "n_guard_pos": int((y == 1).sum()),
             "guard_specificity": round(float((p_grd[y == 0] <= threshold).mean()), 4),
