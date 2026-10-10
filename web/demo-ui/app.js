@@ -25,6 +25,7 @@
     firstAudible: $('first-audible'),
     decisionGap: $('decision-gap'),
     eventBody: $('event-body'),
+    eventScroll: $('event-scroll'),
     eventCaption: $('event-caption'),
     previewToggle: $('preview-toggle'),
   };
@@ -159,6 +160,7 @@
   }
 
   function clearEvents() {
+    el.eventScroll.tabIndex = -1;
     el.eventBody.innerHTML =
       '<tr class="empty-row"><td colspan="6">No events. Start a fresh run.</td></tr>';
     el.stateStrip.innerHTML = '<span class="strip-empty">No state events yet.</span>';
@@ -170,6 +172,7 @@
   }
 
   function appendEventRow(run, evt) {
+    el.eventScroll.tabIndex = 0;
     var empty = el.eventBody.querySelector('.empty-row');
     if (empty) { empty.remove(); }
     var tr = document.createElement('tr');
@@ -228,6 +231,12 @@
         : '—';
   }
 
+  function stopAdapter() {
+    // Cleanup can synchronously emit callbacks; invalidate this run first.
+    if (state.run) { state.run.token = null; }
+    state.adapter.stop();
+  }
+
   function startRun() {
     var cfg = selectedConfig();
     if (!cfg || !cfg.available) {
@@ -242,7 +251,7 @@
     if (state.runPhase === 'running') { return; }
 
     // A fresh run resets prior events (handoff requirement).
-    state.adapter.stop();
+    stopAdapter();
     clearEvents();
 
     var token = {};
@@ -258,9 +267,14 @@
     };
     state.run = run;
 
+    // A start may emit before returning its run identity. Deliver those events
+    // after attribution is ready, preserving their order and terminal guards.
+    var started = false;
+    var pending = [];
     var guard = function (fn) {
-      return function (a) {
+      return function dispatch(a) {
         if (state.run !== run || run.token !== token) { return; } // stale run: drop
+        if (!started) { pending.push(function () { dispatch(a); }); return; }
         fn(a);
       };
     };
@@ -274,11 +288,13 @@
         updateTimingSummary(run);
       }),
       onEnd: guard(function () {
+        stopAdapter();
         setRunPhase('ended');
         el.currentState.textContent = 'run ended';
         el.currentState.className = 'state-badge state-none';
       }),
       onError: guard(function (message) {
+        stopAdapter();
         setRunPhase('error');
         setStatusText('error', 'Run error: ' + String(message));
         appendEventRow(run, { t: NaN, kind: 'error', detail: String(message) });
@@ -289,6 +305,7 @@
     try {
       startInfo = state.adapter.start(cfg.id, handlers);
     } catch (err) {
+      stopAdapter();
       state.run = null;
       setRunPhase('error');
       setStatusText('error', String(err && err.message ? err.message : err));
@@ -307,12 +324,13 @@
     }
     setRunPhase('running');
     refreshChrome(); // keep the preview labeling in view during the run
+    started = true;
+    pending.forEach(function (deliver) { deliver(); });
   }
 
   function stopRun() {
     if (state.runPhase !== 'running') { return; }
-    state.adapter.stop();
-    if (state.run) { state.run.token = null; } // drop late events from this run
+    stopAdapter();
     setRunPhase('stopped');
     el.currentState.textContent = 'stopped';
     el.currentState.className = 'state-badge state-none';
@@ -320,8 +338,7 @@
 
   // One-tap reset: stop everything and return the surface to idle.
   function resetAll() {
-    state.adapter.stop();
-    if (state.run) { state.run.token = null; }
+    stopAdapter();
     state.run = null;
     clearEvents();
     el.runId.textContent = '—';
@@ -335,7 +352,7 @@
   /* ---------- adapter switching (blocked <-> preview) ---------- */
 
   function setAdapter(mode) {
-    state.adapter.stop();
+    stopAdapter();
     state.adapter = new window.StutterTurnAdapters[mode]();
     resetAll();
     renderConfigs();

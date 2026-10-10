@@ -179,13 +179,13 @@ kbd {
 .state-agent    { background: var(--agent); }
 
 .state-strip {
-  display: flex; min-height: 34px; border: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; min-height: 34px; border: 1px solid var(--border);
   border-radius: 6px; overflow: hidden; background: var(--bg);
 }
 .state-strip .strip-empty { align-self: center; padding: 4px 10px; color: var(--muted); font-size: 0.85rem; }
 .strip-seg {
   display: flex; align-items: center; justify-content: center;
-  min-width: 56px; padding: 2px 6px;
+  min-width: max-content; padding: 2px 6px;
   color: #fff; font-size: 0.75rem; font-weight: 700; white-space: nowrap;
 }
 :root[data-theme="dark"] .strip-seg { color: #15171c; }
@@ -195,6 +195,7 @@ kbd {
 
 .legend { margin: 8px 0 0; }
 
+.event-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem; }
 caption { text-align: left; color: var(--muted); font-size: 0.82rem; padding-bottom: 4px; }
 th, td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
