@@ -64,6 +64,57 @@ be on `PATH`. 20 checks across three modes:
 Exit code 0 = all passed; 1 = check failures; 2 = environment missing
 (Playwright module or chromium binary), with the install command printed.
 
+## 3. Site interactions and responsive integration (Playwright chromium)
+
+```sh
+node web/demo-ui/dev/checks/site-checks.mjs
+```
+
+Uses the same Playwright/Chromium installation and cache discovery as the browser
+suite above. It serves the full `web/` directory on an ephemeral loopback port;
+no Python server, agent backend, API credentials, or paid services are involved.
+External requests and WebSocket connections are blocked and fail the check.
+No screenshots are captured.
+
+The 48 checks cover:
+
+- Reduced-motion initial state, explicit Play, keyboard Pause, and native range
+  scrubbing to Pause/Continuing/Reply while playback is active.
+- Automatic offscreen pause/resume and manual pause persisting across scroll.
+  Hidden-page behavior is exercised by injecting the browser visibility signal;
+  headless tab focus alone does not reliably produce a hidden document.
+- Complete, visible concept illustration and usable navigation without
+  JavaScript; illustration/no-audio disclosures stay explicit.
+- Distinct overview, judge guide, and live workspace navigation; the judge guide
+  provides evaluation steps and pinned evidence without embedding run controls.
+  The legacy `/judges/` link redirects to `/judge/`, retaining its fragment,
+  and offers a usable link without JavaScript.
+- The guide's dated replay-v2 facts, separate execution/artifact revisions, and
+  label/playback limitations. This checks the published snapshot against its
+  fixed expected values; it does not rerun or validate the experiment.
+- Landing, judge guide, live workspace, and standalone console containment at
+  360, 390, 1280, and 1440 pixels, including header navigation.
+- At 360/390 pixels: the visible setup jump moves keyboard focus to its target;
+  the ledger caption stays outside horizontal scrolling, wraps inside the
+  viewport, and describes the table; the left-aligned empty message is readable
+  at the initial scroll position. Populated ledgers expose their keyboard hint
+  and scroll with ArrowRight while the caption stays in place.
+- The phone landing diagram keeps a 520px content width inside its own
+  keyboard-scrollable region, displays scroll instructions, and preserves
+  functional phase text at 11px or above without widening the page.
+- Live iframe sizing after preview starts, embedded-console mode, synthetic
+  provenance, and the no-response-audio notice.
+- Enabled Start action within the first 900 vertical pixels on desktop after
+  preview is selected; no uncaught browser errors, external page requests, or
+  automatic backend connections.
+
+This suite checks behavior and layout containment, not exact colors or screenshot
+pixels. It does not establish real playback, voice-agent efficacy, or visual
+quality. Exit codes match the browser suite: 0 passed, 1 check failure, 2 missing
+Playwright/Chromium. On October 10, 2026, the first studio-refresh run passed
+30/30, the expanded review-fix suite passed 38/38, and the judge/live route-split
+suite passed 48/48.
+
 ## Recorded results
 
 2026-10-10, Windows 11, Node 24.21.0, Python 3.12.10, Playwright 1.64.0

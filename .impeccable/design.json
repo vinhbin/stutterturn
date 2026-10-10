@@ -1,0 +1,452 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-10T20:43:29.705Z",
+  "title": "Design System: StutterTurn Studio",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Ice cyan",
+        "canonical": "#50d9f3",
+        "tonalRamp": [
+          "oklch(15.00% 0.1213 212.71)",
+          "oklch(26.43% 0.1213 212.71)",
+          "oklch(37.86% 0.1213 212.71)",
+          "oklch(49.29% 0.1213 212.71)",
+          "oklch(60.71% 0.1213 212.71)",
+          "oklch(72.14% 0.1213 212.71)",
+          "oklch(83.57% 0.1213 212.71)",
+          "oklch(95.00% 0.1213 212.71)"
+        ]
+      },
+      "speaking": {
+        "role": "secondary",
+        "displayName": "Caller mint",
+        "canonical": "#71e0b5",
+        "tonalRamp": [
+          "oklch(15.00% 0.1204 165.94)",
+          "oklch(26.43% 0.1204 165.94)",
+          "oklch(37.86% 0.1204 165.94)",
+          "oklch(49.29% 0.1204 165.94)",
+          "oklch(60.71% 0.1204 165.94)",
+          "oklch(72.14% 0.1204 165.94)",
+          "oklch(83.57% 0.1204 165.94)",
+          "oklch(95.00% 0.1204 165.94)"
+        ]
+      },
+      "holding": {
+        "role": "secondary",
+        "displayName": "Holding amber",
+        "canonical": "#f4c46a",
+        "tonalRamp": [
+          "oklch(15.00% 0.1213 81.59)",
+          "oklch(26.43% 0.1213 81.59)",
+          "oklch(37.86% 0.1213 81.59)",
+          "oklch(49.29% 0.1213 81.59)",
+          "oklch(60.71% 0.1213 81.59)",
+          "oklch(72.14% 0.1213 81.59)",
+          "oklch(83.57% 0.1213 81.59)",
+          "oklch(95.00% 0.1213 81.59)"
+        ]
+      },
+      "agent": {
+        "role": "secondary",
+        "displayName": "Reported audio cyan",
+        "canonical": "#50d9f3",
+        "tonalRamp": [
+          "oklch(15.00% 0.1213 212.71)",
+          "oklch(26.43% 0.1213 212.71)",
+          "oklch(37.86% 0.1213 212.71)",
+          "oklch(49.29% 0.1213 212.71)",
+          "oklch(60.71% 0.1213 212.71)",
+          "oklch(72.14% 0.1213 212.71)",
+          "oklch(83.57% 0.1213 212.71)",
+          "oklch(95.00% 0.1213 212.71)"
+        ]
+      },
+      "overlap": {
+        "role": "secondary",
+        "displayName": "Overlap rose",
+        "canonical": "#fb7185",
+        "tonalRamp": [
+          "oklch(15.00% 0.1690 13.43)",
+          "oklch(26.43% 0.1690 13.43)",
+          "oklch(37.86% 0.1690 13.43)",
+          "oklch(49.29% 0.1690 13.43)",
+          "oklch(60.71% 0.1690 13.43)",
+          "oklch(72.14% 0.1690 13.43)",
+          "oklch(83.57% 0.1690 13.43)",
+          "oklch(95.00% 0.1690 13.43)"
+        ]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Cool charcoal",
+        "canonical": "#090e14",
+        "tonalRamp": [
+          "oklch(15.00% 0.0151 253.14)",
+          "oklch(26.43% 0.0151 253.14)",
+          "oklch(37.86% 0.0151 253.14)",
+          "oklch(49.29% 0.0151 253.14)",
+          "oklch(60.71% 0.0151 253.14)",
+          "oklch(72.14% 0.0151 253.14)",
+          "oklch(83.57% 0.0151 253.14)",
+          "oklch(95.00% 0.0151 253.14)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Studio slate",
+        "canonical": "#101923",
+        "tonalRamp": [
+          "oklch(15.00% 0.0240 251.59)",
+          "oklch(26.43% 0.0240 251.59)",
+          "oklch(37.86% 0.0240 251.59)",
+          "oklch(49.29% 0.0240 251.59)",
+          "oklch(60.71% 0.0240 251.59)",
+          "oklch(72.14% 0.0240 251.59)",
+          "oklch(83.57% 0.0240 251.59)",
+          "oklch(95.00% 0.0240 251.59)"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Raised slate",
+        "canonical": "#172330",
+        "tonalRamp": [
+          "oklch(15.00% 0.0300 251.03)",
+          "oklch(26.43% 0.0300 251.03)",
+          "oklch(37.86% 0.0300 251.03)",
+          "oklch(49.29% 0.0300 251.03)",
+          "oklch(60.71% 0.0300 251.03)",
+          "oklch(72.14% 0.0300 251.03)",
+          "oklch(83.57% 0.0300 251.03)",
+          "oklch(95.00% 0.0300 251.03)"
+        ]
+      },
+      "fg": {
+        "role": "neutral",
+        "displayName": "Ice white",
+        "canonical": "#edf4fa",
+        "tonalRamp": [
+          "oklch(15.00% 0.0110 243.65)",
+          "oklch(26.43% 0.0110 243.65)",
+          "oklch(37.86% 0.0110 243.65)",
+          "oklch(49.29% 0.0110 243.65)",
+          "oklch(60.71% 0.0110 243.65)",
+          "oklch(72.14% 0.0110 243.65)",
+          "oklch(83.57% 0.0110 243.65)",
+          "oklch(95.00% 0.0110 243.65)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Blue gray",
+        "canonical": "#9cabbc",
+        "tonalRamp": [
+          "oklch(15.00% 0.0299 251.54)",
+          "oklch(26.43% 0.0299 251.54)",
+          "oklch(37.86% 0.0299 251.54)",
+          "oklch(49.29% 0.0299 251.54)",
+          "oklch(60.71% 0.0299 251.54)",
+          "oklch(72.14% 0.0299 251.54)",
+          "oklch(83.57% 0.0299 251.54)",
+          "oklch(95.00% 0.0299 251.54)"
+        ]
+      },
+      "dim": {
+        "role": "neutral",
+        "displayName": "Dim blue gray",
+        "canonical": "#8d9bad",
+        "tonalRamp": [
+          "oklch(15.00% 0.0310 254.74)",
+          "oklch(26.43% 0.0310 254.74)",
+          "oklch(37.86% 0.0310 254.74)",
+          "oklch(49.29% 0.0310 254.74)",
+          "oklch(60.71% 0.0310 254.74)",
+          "oklch(72.14% 0.0310 254.74)",
+          "oklch(83.57% 0.0310 254.74)",
+          "oklch(95.00% 0.0310 254.74)"
+        ]
+      },
+      "silence": {
+        "role": "neutral",
+        "displayName": "Silence slate",
+        "canonical": "#63758a",
+        "tonalRamp": [
+          "oklch(15.00% 0.0392 252.46)",
+          "oklch(26.43% 0.0392 252.46)",
+          "oklch(37.86% 0.0392 252.46)",
+          "oklch(49.29% 0.0392 252.46)",
+          "oklch(60.71% 0.0392 252.46)",
+          "oklch(72.14% 0.0392 252.46)",
+          "oklch(83.57% 0.0392 252.46)",
+          "oklch(95.00% 0.0392 252.46)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Structural slate",
+        "canonical": "#304154",
+        "tonalRamp": [
+          "oklch(15.00% 0.0396 251.67)",
+          "oklch(26.43% 0.0396 251.67)",
+          "oklch(37.86% 0.0396 251.67)",
+          "oklch(49.29% 0.0396 251.67)",
+          "oklch(60.71% 0.0396 251.67)",
+          "oklch(72.14% 0.0396 251.67)",
+          "oklch(83.57% 0.0396 251.67)",
+          "oklch(95.00% 0.0396 251.67)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Quiet rule",
+        "canonical": "#223141",
+        "tonalRamp": [
+          "oklch(15.00% 0.0353 250.62)",
+          "oklch(26.43% 0.0353 250.62)",
+          "oklch(37.86% 0.0353 250.62)",
+          "oklch(49.29% 0.0353 250.62)",
+          "oklch(60.71% 0.0353 250.62)",
+          "oklch(72.14% 0.0353 250.62)",
+          "oklch(83.57% 0.0353 250.62)",
+          "oklch(95.00% 0.0353 250.62)"
+        ]
+      },
+      "hover": {
+        "role": "neutral",
+        "displayName": "Hover slate",
+        "canonical": "#203247",
+        "tonalRamp": [
+          "oklch(15.00% 0.0448 252.97)",
+          "oklch(26.43% 0.0448 252.97)",
+          "oklch(37.86% 0.0448 252.97)",
+          "oklch(49.29% 0.0448 252.97)",
+          "oklch(60.71% 0.0448 252.97)",
+          "oklch(72.14% 0.0448 252.97)",
+          "oklch(83.57% 0.0448 252.97)",
+          "oklch(95.00% 0.0448 252.97)"
+        ]
+      },
+      "selected": {
+        "role": "neutral",
+        "displayName": "Selected teal",
+        "canonical": "#12303d",
+        "tonalRamp": [
+          "oklch(15.00% 0.0427 229.13)",
+          "oklch(26.43% 0.0427 229.13)",
+          "oklch(37.86% 0.0427 229.13)",
+          "oklch(49.29% 0.0427 229.13)",
+          "oklch(60.71% 0.0427 229.13)",
+          "oklch(72.14% 0.0427 229.13)",
+          "oklch(83.57% 0.0427 229.13)",
+          "oklch(95.00% 0.0427 229.13)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control steel",
+        "canonical": "#526b82",
+        "tonalRamp": [
+          "oklch(15.00% 0.0471 246.61)",
+          "oklch(26.43% 0.0471 246.61)",
+          "oklch(37.86% 0.0471 246.61)",
+          "oklch(49.29% 0.0471 246.61)",
+          "oklch(60.71% 0.0471 246.61)",
+          "oklch(72.14% 0.0471 246.61)",
+          "oklch(83.57% 0.0471 246.61)",
+          "oklch(95.00% 0.0471 246.61)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Landing headline",
+        "purpose": "Primary overview heading."
+      },
+      "label": {
+        "displayName": "Instrumentation",
+        "purpose": "Compact event and phase labels."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "control-transition",
+        "value": "140ms ease-out",
+        "purpose": "Background and console border changes; disabled under reduced motion."
+      },
+      {
+        "name": "holding-pulse",
+        "value": "1.5s ease-in-out infinite",
+        "purpose": "Console open holding span during an active run only; disabled under reduced motion."
+      },
+      {
+        "name": "illustrative-sequence",
+        "value": "7500ms cycle; 6000ms advance",
+        "purpose": "Explicitly illustrative playback with Play/Pause and scrub. Reduced motion starts completed; manual play remains available."
+      },
+      {
+        "name": "site-navigation",
+        "value": "160ms",
+        "purpose": "Progressive root view transition on overview/judge/live pages only, under no-preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "site-compact",
+        "value": "1000px"
+      },
+      {
+        "name": "site-stacked",
+        "value": "720px"
+      },
+      {
+        "name": "site-phone",
+        "value": "480px"
+      },
+      {
+        "name": "diagram-scroll-hint",
+        "value": "640px"
+      },
+      {
+        "name": "sequence-container",
+        "value": "620px"
+      },
+      {
+        "name": "console-large",
+        "value": "1440px"
+      },
+      {
+        "name": "console-compact",
+        "value": "1100px"
+      },
+      {
+        "name": "console-stacked",
+        "value": "850px"
+      },
+      {
+        "name": "monitor-container",
+        "value": "610px"
+      },
+      {
+        "name": "console-phone",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Landing navigation action.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Open judge guide</button>",
+      "css": ".ds-primary { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:11px 20px; border:1px solid var(--accent, #50d9f3); border-radius:6px; background:var(--accent, #50d9f3); color:var(--bg, #090e14); font:650 15px system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 140ms ease-out,border-color 140ms ease-out; } .ds-primary:hover:not(:disabled) { background:#98eafa; } .ds-primary:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:5px; } .ds-primary:active:not(:disabled) { transform:translateY(1px); } .ds-primary:disabled { background:var(--panel, #101923); color:var(--dim, #8d9bad); border-color:var(--border, #304154); cursor:not-allowed; } @media(prefers-reduced-motion:reduce) { .ds-primary { transition:none; } }"
+    },
+    {
+      "name": "Quiet action",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Landing navigation action.",
+      "html": "<button class=\"ds-quiet\" type=\"button\">The evidence</button>",
+      "css": ".ds-quiet { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:11px 20px; border:1px solid var(--border, #304154); border-radius:6px; background:transparent; color:var(--fg, #edf4fa); font:650 15px system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 140ms ease-out,border-color 140ms ease-out; } .ds-quiet:hover:not(:disabled) { background:#233649; } .ds-quiet:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:5px; } .ds-quiet:active:not(:disabled) { transform:translateY(1px); } .ds-quiet:disabled { background:var(--panel, #101923); color:var(--dim, #8d9bad); border-color:var(--border, #304154); cursor:not-allowed; } @media(prefers-reduced-motion:reduce) { .ds-quiet { transition:none; } }"
+    },
+    {
+      "name": "Start fresh run",
+      "kind": "button",
+      "refersTo": "console-button-primary",
+      "description": "Native run transport control.",
+      "html": "<button class=\"ds-start\" type=\"button\">Start fresh run</button>",
+      "css": ".ds-start { display:inline-flex; align-items:center; justify-content:flex-start; min-height:48px; padding:10px 12px; border:1px solid var(--accent, #50d9f3); border-radius:6px; background:var(--accent, #50d9f3); color:#06232c; font:750 14px system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 140ms ease-out,border-color 140ms ease-out; } .ds-start:hover:not(:disabled) { background:#89e9f8; } .ds-start:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:3px; } .ds-start:active:not(:disabled) { background:#2fc1dd; } .ds-start:disabled { background:var(--panel, #101923); color:var(--dim, #8d9bad); border-color:var(--border, #304154); cursor:not-allowed; } @media(prefers-reduced-motion:reduce) { .ds-start { transition:none; } }"
+    },
+    {
+      "name": "Secondary transport",
+      "kind": "button",
+      "refersTo": "console-button-secondary",
+      "description": "Native run transport control.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Stop</button>",
+      "css": ".ds-secondary { display:inline-flex; align-items:center; justify-content:flex-start; min-height:44px; padding:10px 12px; border:1px solid var(--control-border, #526b82); border-radius:6px; background:var(--raised, #172330); color:var(--fg, #edf4fa); font:600 13px system-ui, -apple-system, 'Segoe UI', sans-serif; cursor:pointer; transition:background-color 140ms ease-out,border-color 140ms ease-out; } .ds-secondary:hover:not(:disabled) { background:var(--hover, #203247); } .ds-secondary:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:3px; } .ds-secondary:active:not(:disabled) { background:#2a4158; } .ds-secondary:disabled { background:var(--panel, #101923); color:var(--dim, #8d9bad); border-color:var(--border, #304154); cursor:not-allowed; } @media(prefers-reduced-motion:reduce) { .ds-secondary { transition:none; } }"
+    },
+    {
+      "name": "Backend URL",
+      "kind": "input",
+      "refersTo": "input-url",
+      "description": "Native URL field in the setup inspector.",
+      "html": "<label class=\"ds-url-label\">Backend URL<input class=\"ds-url\" type=\"url\" value=\"http://127.0.0.1:8765\" spellcheck=\"false\" autocomplete=\"off\"></label>",
+      "css": ".ds-url-label { display:grid; gap:8px; color:var(--muted, #9cabbc); font:12px system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-url { min-width:0; min-height:44px; padding:10px 11px; border:1px solid var(--control-border, #526b82); border-radius:6px; background:var(--bg, #090e14); color:var(--fg, #edf4fa); caret-color:var(--accent, #50d9f3); font:12px/1.4 'JetBrains Mono', Consolas, monospace; } .ds-url:hover { border-color:#8197ad; } .ds-url:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:3px; } .ds-url:disabled { color:var(--muted, #9cabbc); border-color:var(--border, #304154); }"
+    },
+    {
+      "name": "Site navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Current route uses a cyan underline.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"#overview\" aria-current=\"page\">Overview</a><a href=\"#evidence\">Evidence</a><a href=\"#workspace\">Judge view</a></nav>",
+      "css": ".ds-nav { display:flex; flex-wrap:wrap; align-items:center; gap:28px; } .ds-nav a { display:inline-flex; align-items:center; min-height:44px; padding:10px 0; color:var(--muted, #9cabbc); text-decoration:none; font:550 14px/1.65 system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-nav a[aria-current] { color:var(--fg, #edf4fa); text-decoration:underline; text-decoration-color:var(--accent, #50d9f3); text-underline-offset:14px; } .ds-nav a:hover { text-decoration:underline; } .ds-nav a:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:5px; }"
+    },
+    {
+      "name": "Connection status",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "Text and status dot remain paired.",
+      "html": "<span class=\"ds-chip\">LIVE INTEGRATION: BLOCKED</span>",
+      "css": ".ds-chip { display:inline-block; border:1px solid var(--border, #304154); border-radius:6px; padding:7px 9px; color:var(--fg, #edf4fa); background:var(--panel, #101923); font:11px/1.45 'JetBrains Mono', Consolas, monospace; } .ds-chip::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; margin:0 7px 1px 0; background:var(--silence, #63758a); }"
+    },
+    {
+      "name": "Call monitor",
+      "kind": "card",
+      "refersTo": "monitor",
+      "description": "Flat monitor surface with a named state and event time.",
+      "html": "<section class=\"ds-monitor\" aria-label=\"Call monitor\"><h2>Call monitor</h2><div class=\"ds-tally\"><strong>No run</strong><span>00:00.00<br>EVENT TIME</span></div><p>Connect a source. Give every turn room.</p></section>",
+      "css": ".ds-monitor { padding:18px 22px 20px; border:1px solid var(--border, #304154); border-radius:12px; background:var(--panel, #101923); color:var(--fg, #edf4fa); } .ds-monitor h2 { margin:0; font:650 15px/1.5 Archivo, 'Segoe UI', sans-serif; } .ds-tally { display:flex; flex-wrap:wrap; justify-content:space-between; gap:18px; margin-top:14px; padding:20px 0 24px; border-top:2px solid var(--silence, #63758a); } .ds-tally strong { color:#c3d0de; font:760 64px/.98 Archivo, 'Segoe UI', sans-serif; letter-spacing:-.035em; text-transform:uppercase; } .ds-tally span { color:var(--muted, #9cabbc); font:11px/1.5 'JetBrains Mono', Consolas, monospace; } .ds-monitor p { margin:0; color:var(--muted, #9cabbc); font:13px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }"
+    },
+    {
+      "name": "Configuration tile",
+      "kind": "custom",
+      "refersTo": "configuration",
+      "description": "Native radio with selected border and fill.",
+      "html": "<label class=\"ds-config\"><input type=\"radio\" name=\"ds-configuration\" checked><span>Patient</span><small>Longer silence gate</small></label>",
+      "css": ".ds-config { display:grid; grid-template-columns:17px minmax(0,1fr); gap:4px 10px; padding:12px; border:1px solid var(--border, #304154); border-radius:6px; color:var(--fg, #edf4fa); background:var(--panel, #101923); cursor:pointer; } .ds-config:has(input:checked) { background:var(--selected, #12303d); border-color:var(--accent, #50d9f3); } .ds-config:hover { background:var(--raised, #172330); border-color:#8197ad; } .ds-config:has(input:checked):hover { background:var(--selected, #12303d); border-color:var(--accent, #50d9f3); } .ds-config input { margin:0; width:16px; height:16px; accent-color:var(--accent, #50d9f3); } .ds-config input:focus-visible { outline:2px solid var(--accent, #50d9f3); outline-offset:3px; } .ds-config span { font:700 14px Archivo, 'Segoe UI', sans-serif; letter-spacing:.01em; } .ds-config small { grid-column:2; color:var(--muted, #9cabbc); font:12px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Dark studio console",
+    "overview": "Cool charcoal surfaces, ice cyan actions, and clear instrument labels give StutterTurn the character of a working studio. The user selected this direction on 2026-10-10, replacing the earlier warm brown and cream appearance. Controls have visible edges and clear state changes; generous landing-page type introduces the same visual language used in the denser operating console.\n\nThis is the shared visual authority for the [overview](index.html), [judge guide](judge/index.html), [live workspace](live/index.html), and [call console](demo-ui/index.html). Its tokens come from [site.css](site.css) and [console styles](demo-ui/styles.css); the [console design document](demo-ui/DESIGN.md) specializes their operating layout and event semantics. [PRODUCT.md](../PRODUCT.md) records product constraints, and the [surface brief](../.impeccable/surfaces/studio-refresh.md) records this refresh's composition. The [root v2 sidecar](../.impeccable/design.json) holds component previews and extensions; its derived tonal ramps are preview aids, not additional production colors.",
+    "keyCharacteristics": [
+      "Cool charcoal layers and cyan controls with visible borders.",
+      "Large Archivo headlines balanced by precise JetBrains Mono instrumentation.",
+      "Caller, decision, and reported audio remain distinct, labeled tracks.",
+      "Responsive controls, keyboard access, and explicit evidence provenance."
+    ],
+    "rules": [
+      {
+        "name": "The Labeled State Rule",
+        "body": "State color always accompanies text; overlap also has a patterned band. Cyan controls do not imply reported audio.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Reading Speeds Rule",
+        "body": "Use Archivo and body copy to explain the task; use mono type for values that people inspect or compare.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Workspace Rule",
+        "body": "Separate working areas with tone, spacing, and borders; reserve bright color for an action or a labeled state.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use the shared cool charcoal palette and cyan control hierarchy.",
+      "**Do** keep labels, focus, native controls, and horizontal-scroll access intact.",
+      "**Do** keep illustration, synthetic preview, and backend evidence visibly distinct.",
+      "**Do** keep replay provenance and playback limitations beside the corresponding data."
+    ],
+    "donts": [
+      "**Don't** reintroduce the superseded warm brown and cream visual world.",
+      "**Don't** turn illustrative proportions into recorded timings or add invented waveforms.",
+      "**Don't** use color alone to communicate caller, holding, audio, or overlap state.",
+      "**Don't** imply that a turn decision or received audio verifies speaker playback."
+    ]
+  }
+}

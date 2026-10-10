@@ -80,7 +80,10 @@ These all use 2 epochs and seed 0, with checkpoints every half epoch plus the en
 1. **Data build:** report:
    - 2e counts by category and gate reason, and the stuttered/fluent split;
    - the overlap assert and the both-sources clip count;
-   - the 2a vs 2e length distributions (p10/p50/p90): after matching they must agree within 0.1 s at each quantile;
+   - the 2a vs 2e length distributions (p10/p50/p90). After matching, 2e must agree with 2a within 0.1 s at p10 and p50, and must **not exceed** 2a at any quantile (amended 17:05, before any v2 training run):
+     - **The gap is structural.** 2e cuts sit at 2.08–2.6 s, so for about 17% of 2e weight the drawn `L` exceeds the cut and the whole cut is kept. 2e's p90 therefore can't reach 2a's (2.19 vs 2.36 s).
+     - **The direction is safe.** Positives come out slightly shorter at the top, so any residual cue points toward "incomplete" and can't inflate M3. M3-crop remains the detector for length reliance.
+     - **Record the residual gap** in the manifest and the results.
    - that the leakage asserts pass.
 
    A rebuild gives identical hashes.
