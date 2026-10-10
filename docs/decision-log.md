@@ -2,6 +2,20 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-006 — Bounded proof and earlier decisions (approved by Vinh)
+
+Vinh approved adding the review's concrete tasks to the plan and GitHub issues: Niko proves the trainable-weight/one-batch/export path (45-minute checkpoint-recovery cap); Guttuu runs a complete web-agent baseline and patient/wait comparison; Vinh + Kareem human-check 30 examples across unfinished blocks, completed stuttered turns and completed fluent turns. The 30 examples are a feasibility set, not the final benchmark.
+
+**2 PM EDT:** decide whether model work is feasible and the real agent exposes a meaningful remaining failure. **3 PM:** require development improvement without worse completion delay or nonresponse for either caller group; otherwise commit to a corrected benchmark/comparison scope. The earlier 10 PM model-abandon decision and telephony-first dependency are superseded. Final headline results require a separately frozen test and matched stock/candidate runs.
+
+Review found that existing completion predictions do not establish audible interruption rates; short observation windows do not establish three-second fallback rates; and the fine-tuning checkpoint path remains unproved. D-002/D-003 below record earlier interpretations, **not currently validated conclusions**. Rebuild show-separated partitions, preserve original endpoint labels and prevent mixed-model caches before accepting comparisons.
+
+Vinh explicitly wants to keep the strongest pitch draft. Strong claims can become deliverable wording after their evidence gates pass; this plan does not replace the pitch with a tentative research question. Preserve denominator/outcome distinctions, scope novelty carefully, and treat phone/sponsor/polish work as deferred rather than removed. Worktree agents may prepare Vinh's UI and pitch tasks using `docs/agent-handoff.md`; humans still verify audio labels and make scope decisions.
+
+Approval here is for the planning/task handoff. It does not establish teammate agreement, successful experiments, commercial rights or completed implementation.
+
+Vinh additionally requested that all four teammates work in parallel. The plan now gives each an exclusive write lane, splits listening into disjoint 15-sample batches, requires early model/event contract drafts, and permits frontend scaffolding while model/agent work proceeds. Only dependent training/integration and the gate decisions synchronize the lanes.
+
 ## 2026-10-10 D-005 — Repo created ahead of the noon confirmation (Vinh's instruction)
 
 Private repo with planning, phases, roles and a submission-ready README, modeled on the team's previous hackathon repos. The team's noon pick is still the gate for build work; if the pick changes, this repo is archived, not deleted (the benchmark stands on its own).
