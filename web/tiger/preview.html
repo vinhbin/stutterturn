@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Tiger block — development preview</title>
+  <link rel="stylesheet" href="chart.css">
+  <style>
+    /* Dev-only shell approximating the judges page canvas; not a judge route. */
+    body { margin: 0; background: #0c0a09; color: #f5f4f2; font: 16px/1.65 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .dev-shell { width: min(100% - 80px, 1200px); margin: 40px auto 80px; }
+    .dev-note { color: #aaa29a; font: 12px/1.6 'JetBrains Mono', Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+    @media (max-width: 560px) { .dev-shell { width: min(100% - 32px, 1200px); } }
+  </style>
+</head>
+<body>
+  <div class="dev-shell">
+    <p class="dev-note">Development preview of web/tiger/chart.js — not a judge route. Embed per web/tiger/EMBED.md.</p>
+    <div id="tiger-chart" data-snapshot="snapshot.json"></div>
+  </div>
+  <script src="chart.js" defer></script>
+</body>
+</html>
