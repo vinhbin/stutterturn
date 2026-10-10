@@ -10,9 +10,9 @@ uv pip install --python agent\.venv\Scripts\python.exe -r agent/requirements.txt
 agent\.venv\Scripts\python.exe agent/fetch_assets.py 5
 ```
 
-`fetch_assets.py` downloads Smart Turn v3.2 CPU ONNX (`pipecat-ai/smart-turn-v3` at `f766f81`) and Silero VAD v5.1.2 into `agent/models/`, checks both SHA-256 hashes, and fetches N block + N fluent SEP-28k clips into `benchmark/audio/`. None of these files are committed.
+`fetch_assets.py` downloads Smart Turn v3.2 INT8 and FP32 ONNX (`pipecat-ai/smart-turn-v3` at `f766f81`) and Silero VAD v5.1.2 into `agent/models/`, checks every SHA-256 hash, and fetches N block + N fluent SEP-28k clips into `benchmark/audio/`. None of these files are committed.
 
-For real replies, copy `agent/.env.example` to `agent/.env` and fill in `GEMINI_API_KEY` and `ELEVENLABS_API_KEY`. `agent/.env` is gitignored; never put keys in `.env.example`. Optional: `GEMINI_MODEL` (default `gemini-3.8-flash`), `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MAX_CHARS` (default 3000 per process, protects credits), `CANDIDATE_MODEL` (path to Niko's ONNX export).
+For real replies, copy `agent/.env.example` to `agent/.env` and fill in `GEMINI_API_KEY` and `ELEVENLABS_API_KEY`. `agent/.env` is gitignored; never put keys in `.env.example`. Optional: `GEMINI_MODEL` (default `gemini-3.8-flash`), `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MAX_CHARS` (default 3000 per process, protects credits), `CANDIDATE_MODEL` (path to Niko's ONNX export; its metadata JSON beside it supplies `sha256` and `threshold`, or set `CANDIDATE_SHA256`). A model whose hash does not match is refused.
 
 ## Run
 
@@ -40,6 +40,7 @@ Each run writes `agent/runs/<run_id>.jsonl` (gitignored). Runs used as evidence 
 | `server.py` | HTTP + WebSocket per CONTRACT.md |
 | `ws_client_check.py` | Minimal client to check the server |
 | `fetch_assets.py` | Pinned weights and source clips |
+| `check_features.py` | Same clip through the benchmark's `predict()` and the agent; must match |
 | `IMPLEMENTATION_STEPS.md` | Build steps and rules for this lane |
 
 ## Not covered

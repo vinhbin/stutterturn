@@ -26,11 +26,22 @@ source WAV (16 kHz mono, real time, 32 ms frames = 512 samples, as Silero v5 req
 
 | id | Model | Turn logic | available |
 |---|---|---|---|
-| `stock` | Smart Turn v3.2 CPU ONNX, upstream preprocessing, `p > 0.5` = complete | Model runs when VAD reports 0.2 s of silence; if incomplete, waits for more speech or a 3.0 s silence fallback (Pipecat's `LocalSmartTurnAnalyzerV3` defaults) | yes |
+| `stock` | `stock-int8`: Smart Turn v3.2 CPU INT8 ONNX, upstream preprocessing, `p > 0.5` = complete | Model runs when VAD reports 0.2 s of silence; if incomplete, waits for more speech or a 3.0 s silence fallback (Pipecat's `LocalSmartTurnAnalyzerV3` defaults) | yes |
 | `patient` | Same model and threshold | Model runs only after **1.0 s** of silence (stock 0.2 s); same 3.0 s fallback. Provisional; reported in `GET /v0/configurations` `detail` and every run log `params`. Label text: "Same model and threshold; acts only after 1.0 s of silence (stock: 0.2 s). A waiting configuration, not a trained model" | yes (1.0 s, provisional) |
-| `candidate` | Niko's export `stutterturn-v{N}.onnx` (see `model/CONTRACT.md`) | Same turn logic as `stock` | `false` until Niko's handoff; never faked |
+| `stock_fp32` | `stock-fp32`: the unquantized export `smart-turn-v3.2-gpu.onnx` (runs on CPU) | Same turn logic as `stock` | yes |
+| `candidate` | Niko's export `stutterturn-v{N}.onnx` (see `model/CONTRACT.md`) | Same turn logic as `stock`; threshold from its metadata | `false` until Niko's handoff; never faked |
 
 `patient` is a waiting configuration, not a trained model. The UI must not present `candidate` when `available` is `false`.
+
+**Comparator.** Candidates are compared against `stock_fp32`, not INT8 (`model/CONTRACT.md` 5.4): INT8 and FP32 probabilities differ by a lot on some clips (`HeStutters_0_26`: 0.23 vs 0.83 on the whole clip), so INT8-vs-candidate would mix quantization with training.
+
+**Model hashes (implemented).** The agent refuses to load any model whose SHA-256 differs from its expected value: pinned values for `stock-int8` (`2bb02631…`) and `stock-fp32` (`ab8dc64b…`); for `candidate`, the `sha256` in the metadata JSON beside the ONNX file (same name, `.json`, schema in `model/CONTRACT.md` 5), or `CANDIDATE_SHA256` if there is no metadata file. A mismatching candidate is listed with `available: false` and refused by `start`.
+
+**Model input (implemented).** The model sees the **current turn's audio**: 0.2 s of pre-roll before the turn's first speech frame, then everything since, up to and including the frame on which the check runs; the last 8 s are used (left zero-padded if shorter). A turn opens at the first speech start and closes when the speaker resumes after a `turn_complete`; the resumed speech starts a new turn with its own pre-roll. Agent audio is never part of the input. This differs from the offline benchmark, which feeds the clip from its start: the two inputs are identical only when the clip's first speech segment starts within 0.2 s of the clip start and no turn reset happens before the check. `input_s` on each decision gives the input length. The preprocessing itself matches the benchmark exactly: `python agent/check_features.py` (same clip, benchmark `predict()` vs agent) gave zero difference in features and probabilities on 10 clips × both stock models.
+
+**Check schedule.** One model check per pause, when silence reaches `vad_stop_s` (rounded up to whole 32 ms frames: 0.2 s → 7 frames = 0.224 s, which is the `silence_s` reported), then the `fallback_s` timeout. No re-checks during continued silence.
+
+**Synthetic trailing silence.** Every run appends 5 s of digital zeros after the source. `fallback_timeout` and `no_response` outcomes on 3 s clips therefore happen during that padding; cite them as such (the offline benchmark treats them as censored).
 
 ## Running it (implemented)
 
@@ -88,6 +99,7 @@ One socket can carry several runs one after another; one run at a time.
 | `info` | `speech_start`, `speech_stop` | VAD on the source |
 | `decision` | `turn_incomplete` | Model ran, `prob <= threshold`; agent keeps waiting |
 | `decision` | `turn_complete` | Agent decides the caller finished. `trigger`: `smart_turn` or `fallback_timeout` |
+| | (both decision events) | Also carry `model_id`, `prob`, `threshold`, `complete`, `silence_s` (silence included in the input when the check ran; for the fallback, silence elapsed), `infer_ms` (feature extraction + inference, milliseconds; `null` for the fallback) and `input_s` (model input length). These are the per-call fields of `model/CONTRACT.md` 7; `run_started.params` carries `time_origin: "source_audio_start"` and `pre_roll_s`. `infer_ms` measured about 180–220 ms on the Windows dev laptop, not the 25 ms reference from another machine |
 | `info` | `response_requested` | Reply generation started (Gemini) |
 | `audible` | `agent_audio_start` | **First agent audio sample starts playing**; see measurement note |
 | `audible` | `agent_audio_end` | Agent audio finished or was cut |

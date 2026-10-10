@@ -1,5 +1,6 @@
 # First stock/patient replay: 5 block clips
 
+> **Correction (Oct 10, after review of Niko's questions on PR #11): these runs used a faulty model input.** At commit `a229787` the engine opened a turn only when speech was confirmed (7 frames after it began) and kept just the last 6 frames as "pre-roll", so the model saw **no audio before the speech and missed the first speech frame**, not the documented 0.2 s pre-roll. Fixed on `guttuu/niko-review`. A dry rerun (no services) with the fixed input changes two stock results: **2_57** becomes `turn_complete` at 2.176 s (p 0.72, before the 2.82 s resume) and **5_150** becomes `turn_complete` at 0.512 s (p 0.82, before the 0.93 s resume). Stock would then decide early in **4 of 5** clips, not 2 of 5; patient still makes no early decision. The tables below are kept as recorded and are **superseded** until the services-on runs are repeated with the fixed engine.
 **Recorded:** Saturday Oct 10, 2026, about 2:58–3:00 PM EDT, by Guttuu's agent on a Windows 11 laptop (CPU). **Commit:** `a229787` on `guttuu/web-agent`. **Contract:** agent v0.1.
 
 ## What ran
