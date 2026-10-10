@@ -10,7 +10,7 @@ This file defines what a StutterTurn model artifact is and how the agent calls i
 |---|---|---|---|---|
 | `stock-int8` | `smart-turn-v3.2-cpu.onnx` (pipecat-ai/smart-turn-v3 @ `f766f81`) | `2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f` | **Verified** hash and inference ([handoff](../docs/model-recovery-handoff.md)) | Stock arm, and the exploratory benchmark's model |
 | `stock-fp32` | `smart-turn-v3.2-gpu.onnx` (same revision; runs on CPU) | `ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be` | **Verified** hash and reconstruction parity ([evidence](../docs/proofs/model-mechanics/evidence.json)) | Starting point for training; a stock arm when compared against an FP32 candidate |
-| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). Training v1 and v2 gave `dev_nothing_passes`, v3 is paused (D-010), and test is sealed (D-009) | Candidate arm |
+| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). Training v1 and v2 gave `dev_nothing_passes`; W3 was approved under D-011 and [reported started at 19:10 EDT](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103190286), with no selection result yet. Test stays sealed (D-009) | Candidate arm |
 
 - `synthetic-one-batch.onnx` (`9a00002e…7d3c`) is a mechanical proof output. **It must never be loaded as a candidate or shown in the demo.**
 - Never overwrite a published `v{N}`. Any retraining, even with the same data, produces `v{N+1}`.
