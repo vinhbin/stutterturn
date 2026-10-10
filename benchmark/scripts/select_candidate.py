@@ -62,7 +62,16 @@ LIMITS_V3 = [x for x in LIMITS_V2 if not x.startswith("Disclosure: training v2")
     "items; dev has served three pre-registered attempts. The test set stays sealed under D-009; a v3 pass is a "
     "development decision only and does not authorize a test run.",
 ]
-LIMITS_BY_SPEC = {"v1": LIMITS, "v2": LIMITS_V2, "v3": LIMITS_V3}
+# proposed v4 (issue #2 comment 6103360382): weight interpolation of stock and the W3 prescreen top 2.
+LIMITS_V4 = [x for x in LIMITS_V3 if not x.startswith("Disclosure: training v3")] + [
+    "Disclosure: v4 (weight interpolation of stock FP32 and the W3 prescreen top 2, no new training) was designed "
+    "after v1, v2 and v3 all failed (dev_nothing_passes) on these same dev items; dev has served four "
+    "pre-registered attempts. The test set stays sealed under D-009; a v4 pass is a development decision only "
+    "and does not authorize a test run.",
+    "Candidate 'epoch' is alpha x source epoch (effective epochs from stock); 'ties -> earlier' prefers the blend "
+    "closer to stock.",
+]
+LIMITS_BY_SPEC = {"v1": LIMITS, "v2": LIMITS_V2, "v3": LIMITS_V3, "v4": LIMITS_V4}
 
 
 def die(msg):
@@ -649,7 +658,7 @@ def build_parser():
     ap.add_argument("--items-main")
     ap.add_argument("--items-eow")
     ap.add_argument("--selftest", action="store_true")
-    ap.add_argument("--training-spec", choices=["v1", "v2", "v3"], default="v1",
+    ap.add_argument("--training-spec", choices=["v1", "v2", "v3", "v4"], default="v1",
                     help="which training spec's limits/disclosure text to write")
     return ap
 

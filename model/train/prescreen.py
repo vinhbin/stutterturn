@@ -30,8 +30,9 @@ def main():
     ap.add_argument("--v2", action="store_true",
                     help="training-v2 rule: also M3s >= step0 - 0.020 and M3-crop >= step0 - 0.020")
     ap.add_argument("--v3", action="store_true", help="training-v3: the v2 rule unchanged, cited as training-v3")
+    ap.add_argument("--v4", action="store_true", help="proposed v4 (interpolation): the v2 rule unchanged")
     a = ap.parse_args()
-    a.v2 = a.v2 or a.v3
+    a.v2 = a.v2 or a.v3 or a.v4
     extra = [("dev_stu_completed_decide", "M3s"), ("dev_eow_crop_decide", "M3-crop")] if a.v2 else []
     out_path = os.path.join(a.work, a.out)
     if os.path.exists(out_path):
@@ -80,6 +81,9 @@ def main():
     if a.v3:
         rule = rule.replace("(training-v2.md section 4)",
                             "(training-v3.md section 4: training-v2.md section 4 unchanged)")
+    if a.v4:
+        rule = rule.replace("(training-v2.md section 4)",
+                            "(proposed v4, issue #2 comment 6103360382: training-v2.md section 4 unchanged)")
     out = {"rule": rule,
            "ranking": rows, "eligible_order": [f"{r['run']}/{r['ckpt']}" for r in eligible],
            "top2": [f"{r['run']}/{r['ckpt']}" for r in top2], "code_commit": C.git_commit()}
