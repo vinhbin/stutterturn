@@ -68,8 +68,8 @@ LIMITS_V4 = [x for x in LIMITS_V3 if not x.startswith("Disclosure: training v3")
     "after v1, v2 and v3 all failed (dev_nothing_passes) on these same dev items; dev has served four "
     "pre-registered attempts. The test set stays sealed under D-009; a v4 pass is a development decision only "
     "and does not authorize a test run.",
-    "Candidate 'epoch' is alpha x source epoch (effective epochs from stock); 'ties -> earlier' prefers the blend "
-    "closer to stock.",
+    "Candidate 'epoch' is the blend's relative L2 weight distance from stock (‖θ − θ_stock‖ / ‖θ_stock‖); "
+    "'ties -> earlier' prefers the blend closest to stock.",
 ]
 LIMITS_BY_SPEC = {"v1": LIMITS, "v2": LIMITS_V2, "v3": LIMITS_V3, "v4": LIMITS_V4}
 
