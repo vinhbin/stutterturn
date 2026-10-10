@@ -1,6 +1,6 @@
 # Agent contract
 
-**Owner: Guttuu** · **Version: 0.1** · **Status: implemented on `guttuu/web-agent` (engine `8e47dad`, services `a229787`, server `18229dc`)** except where a section still says proposed. First evidence: `agent/evidence/2026-10-10-first-replay/`.
+**Owner: Guttuu** · **Version: 0.1** · **Status: implemented on `guttuu/web-agent` (engine `8e47dad`, services `a229787`, server `18229dc`)** except where a section still says proposed. Current evidence: `agent/evidence/2026-10-10-replay-v2/` (fixed model input, `bcf50d1`; supersedes `2026-10-10-first-replay/`).
 
 This is the interface between the voice agent (`agent/`) and its consumers: Vinh's demo UI (`web/demo-ui/adapter.js`), Kareem's judges page and Niko's evaluation (E1). Consumers may build against it now. Each section is marked **proposed** until a committed run proves it, then **implemented** with the commit. Breaking changes bump the version and are announced in issue #2 first.
 
@@ -112,6 +112,8 @@ One socket can carry several runs one after another; one run at a time.
 | `info` | `timeout` | A service call (Gemini or ElevenLabs) exceeded its limit; names the service |
 
 **Measurement note for `agent_audio_start`.** In replay mode the agent owns the output timeline: `t` is when the first decoded speech sample is scheduled to play, which is when it would reach the listener. Service latency (Gemini plus ElevenLabs time to first audio) is therefore included, and each part is reported separately in the summary. Speaker playback of the demo laptop adds a device delay that is not measured.
+
+**Playback mode (`--play`, implemented).** `run.py --play` or `server.py --play` also plays the run on the machine's speakers: the source recording and the agent's speech are mixed on one 16 kHz timeline, where sample *i* plays *i*/16000 s after the run starts. In this mode `agent_audio_start` / `agent_audio_end` are positions on that timeline, so they line up with source times as a listener hears them. Agent speech starts no earlier than the device's next writable block (256 samples); a late TTS chunk is placed at the next playable position rather than dropped, and `summary.playback_late_chunks` counts these. On barge-in the agent's audio is silenced from the stop time. Both tracks share the device output latency, reported in `run_started.playback.reported_output_latency_s` (Realtek laptop speakers, MME: 0.096 s) but not measured acoustically. `run_started.playback` is `null` without `--play`, and `GET /v0/health` reports `playback: "on" | "off"`. Decisions and VAD events are unaffected by playback.
 
 ## Run log and summary (implemented)
 

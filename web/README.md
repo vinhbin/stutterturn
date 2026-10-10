@@ -64,8 +64,9 @@ mock, no audio and not evidence. Stock and patient use identical mock scripts.
 - [Console reference](demo-ui/README.md), [design system](demo-ui/DESIGN.md) and
   [original UI verification](demo-ui/verification.md).
 - [Site design extension](DESIGN.md) and [desktop/mobile captures](screenshots/).
-- [First published backend replay logs](https://github.com/vinhbin/stutterturn/tree/3ed3786/agent/evidence/2026-10-10-first-replay):
-  exploratory traces, with unreviewed boundaries and no efficacy claim.
+- [Backend replay logs, v2](https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2)
+  (supersede the first replay, whose model input lacked pre-roll): exploratory
+  traces, with unreviewed boundaries and no efficacy claim.
 
 The site can be served as static files. A deployed HTTPS page requires a separately
 reachable HTTPS/WSS backend for real runs; a visitor's loopback URL does not

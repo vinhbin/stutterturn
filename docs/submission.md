@@ -23,7 +23,7 @@
 | Clock | What happens | Who |
 |---|---|---|
 | 0:00–0:30 | Hook: 160,000 calls/month + "in our offline test, stock predicted 'turn complete' in 116 of 200 energy-detected gaps, or 58%, in clips labeled as containing blocks; the exact boundaries still need human validation" (exploratory framing spoken). | Vinh |
-| 0:30–1:30 | **The comparison.** Same pipeline, same real labeled recording, fresh call each side: STOCK vs **PATIENT — on-screen label states it is a longer-wait configuration, not a trained model** (exact config per Guttuu). Describe only the difference established by the saved run. Do not assume stock interrupts or patient is slower; show decisions and audible events separately. | **Judge presses it** |
+| 0:30–1:30 | **The comparison.** Same pipeline, same real labeled recording, fresh call each side: STOCK vs **PATIENT — on-screen label states it is a longer-wait configuration, not a trained model** (exact config per Guttuu). Describe only the difference established by the saved run — the current saved evidence is [replay v2](../agent/evidence/2026-10-10-replay-v2/README.md), which supersedes the first replay. Do not assume stock interrupts or patient is slower; show decisions and audible events separately. | **Judge presses it** |
 | 1:30–2:00 | **The judge's own call** on both configurations, if working. This establishes liveness, not a latency distribution. | **Judge talks to the agent** |
 | 2:00–2:40 | Benchmark page: corrected matched comparison, outcome definitions, counts, completed-turn delays and censoring. Keep historical offline and ElevenLabs event results separately labeled; show release terms and disclosures. | Vinh, one scroll |
 | 2:40–3:00 | Honest close: name the corrected method/artifacts actually delivered and remaining limits. A trained improvement remains unproved; existing configurations may already meet the target. | Vinh |
@@ -71,6 +71,9 @@ A longer wait is a relevant baseline, and it may be sufficient. In the selected 
 
 **"What happens if the model isn't ready?"**
 The 2 PM feasibility and 3 PM development gates choose the scope. The fallback is a corrected benchmark and clearly labeled stock/patient comparison, but it still needs validated labels, reproducible runs and a working comparison. If those are missing, report the saved work as exploratory and name the unresolved blockers; do not mark the fallback complete.
+
+**"Your replay showed no audible interruptions — so stock already works?"**
+No. In [replay v2](../agent/evidence/2026-10-10-replay-v2/README.md) (5 block clips × stock/patient on `bcf50d1`; it supersedes the first replay after the pre-roll fix), stock decided "complete" inside the labelled gap in 4 of 5 clips; 3 of those replies were cancelled before any audio because the speaker resumed during the roughly 1.6–3.5 s reply delay, and the fourth clip ended before overlap was observable. The cancellations hid the premature decisions; a faster reply path or a longer block would expose them, and that was not tested. Patient made no early in-gap decision on these clips, but 5 clips support no rates and do not show that the patient configuration prevents interruptions. Labels are exploratory and energy-derived, not human-reviewed.
 
 **"Hasn't Apple already solved this?"**
 Apple's published Siri work is relevant prior art, and SEP-28k supplies our exploratory clips. We must check the precise source before quoting an exact improvement or asserting that a particular result shipped as a setting. It does not establish what other agents do. Our intended contribution is an inspectable, validated comparison and an improvement if the experiments support one (L-17/L-28).

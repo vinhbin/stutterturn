@@ -35,7 +35,8 @@ def jres(data, status=200):
 
 async def health(request):
     return jres({"ok": True, "contract": engine.CONTRACT_VERSION, "commit": engine._commit(),
-                 "services": "on" if request.app["services"] else "off"})
+                 "services": "on" if request.app["services"] else "off",
+                 "playback": "on" if request.app["play"] else "off"})
 
 
 async def configurations(request):
@@ -105,7 +106,8 @@ async def ws_handler(request):
                     continue
                 try:
                     run = engine.Run(msg.get("config", ""), msg.get("source", ""),
-                                     services=request.app["services"], listener=queue.put_nowait)
+                                     services=request.app["services"], listener=queue.put_nowait,
+                                     play=request.app["play"])
                 except Exception as e:
                     error(f"cannot start: {e}")
                     continue
@@ -136,10 +138,13 @@ async def options(request):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--services", choices=["on", "off"], default="on")
+    ap.add_argument("--play", action="store_true",
+                    help="play the source and agent speech on this machine's speakers (demo)")
     ap.add_argument("--port", type=int, default=8765)
     a = ap.parse_args()
     app = web.Application()
     app["services"] = engine.Services() if a.services == "on" else None
+    app["play"] = a.play
     app.router.add_get("/v0/health", health)
     app.router.add_get("/v0/configurations", configurations)
     app.router.add_get("/v0/sources", sources)
