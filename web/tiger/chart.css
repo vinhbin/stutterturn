@@ -1,5 +1,5 @@
 /* StutterTurn — run-log time-series block (web/tiger/).
-   Self-contained: own tokens (values from web/DESIGN.md), own font faces
+   Self-contained: inherits site tokens with charcoal/cyan fallbacks, own font faces
    (same families and files as site.css, so the judges page downloads
    nothing twice). Scoped under #tiger-chart; no site.css dependency. */
 
@@ -7,30 +7,30 @@
 @font-face { font-family: 'JetBrains Mono'; src: url('../demo-ui/fonts/jetbrains-mono-latin.woff2') format('woff2'); font-style: normal; font-weight: 100 800; font-display: swap; }
 
 #tiger-chart {
-  --tgr-bg: #0c0a09; --tgr-panel: #171412; --tgr-raised: #201c19;
-  --tgr-fg: #f5f4f2; --tgr-muted: #aaa29a; --tgr-border: #39332e; --tgr-rule: #2a2521;
-  --tgr-speaking: #30d158; --tgr-silence: #57534e; --tgr-holding: #f59e0b; --tgr-agent: #38bdf8;
+  --tgr-bg: var(--bg, #090e14); --tgr-panel: var(--panel, #101923); --tgr-raised: var(--raised, #172330);
+  --tgr-fg: var(--fg, #edf4fa); --tgr-muted: var(--muted, #9cabbc); --tgr-border: var(--border, #304154); --tgr-rule: var(--rule, #223141);
+  --tgr-speaking: var(--speaking, #71e0b5); --tgr-silence: var(--silence, #63758a); --tgr-holding: var(--holding, #f4c46a); --tgr-agent: var(--agent, #50d9f3);
   --tgr-display: Archivo, 'Segoe UI', sans-serif;
   --tgr-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --tgr-mono: 'JetBrains Mono', Consolas, monospace;
   color: var(--tgr-fg);
   font: 16px/1.65 var(--tgr-body);
 }
-#tiger-chart * { box-sizing: border-box; margin: 0; }
+:where(#tiger-chart *) { box-sizing: border-box; margin: 0; }
 
 .tgr-block { border: 1px solid var(--tgr-border); border-radius: 14px; background: var(--tgr-panel); padding: 24px 28px 20px; }
 
 /* Header: title, offline badge, provenance */
 .tgr-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; }
 .tgr-title { font: 650 22px/1.2 var(--tgr-display); letter-spacing: -0.02em; }
-.tgr-badge { font: 600 11px/1 var(--tgr-mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 10px; border-radius: 2px; border: 1px solid var(--tgr-holding); color: var(--tgr-holding); white-space: nowrap; }
+.tgr-badge { max-width: 100%; font: 600 11px/1.5 var(--tgr-mono); letter-spacing: 0.04em; text-transform: uppercase; padding: 6px 10px; border-radius: 2px; border: 1px solid var(--tgr-holding); color: var(--tgr-holding); }
 .tgr-badge-live { border-color: var(--tgr-speaking); color: var(--tgr-speaking); }
-.tgr-provenance { flex-basis: 100%; color: var(--tgr-muted); font: 12px/1.6 var(--tgr-mono); }
+.tgr-provenance { flex-basis: 100%; overflow-wrap: anywhere; color: var(--tgr-muted); font: 12px/1.6 var(--tgr-mono); }
 .tgr-provenance strong { color: var(--tgr-fg); font-weight: 600; }
 
 /* Figures */
 .tgr-figure { margin-top: 26px; border-top: 1px solid var(--tgr-rule); padding-top: 16px; }
-.tgr-figtitle { color: var(--tgr-muted); font: 600 12px/1 var(--tgr-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+.tgr-figtitle { color: var(--tgr-fg); font: 600 17px/1.4 var(--tgr-display); letter-spacing: -0.01em; }
 .tgr-fignote { margin-top: 6px; color: var(--tgr-muted); font-size: 13px; max-width: 72ch; }
 
 /* Legend */
@@ -41,15 +41,16 @@
 .tgr-mark { width: 9px; height: 9px; border-radius: 1px; flex-shrink: 0; }
 .tgr-mark-complete { background: var(--tgr-fg); }
 .tgr-mark-fallback { background: transparent; border: 1.5px solid var(--tgr-muted); }
+.tgr-mark-later { border: 1.5px solid var(--tgr-fg); border-radius: 50%; }
 .tgr-mark-cancel { background: var(--tgr-holding); transform: rotate(45deg); }
 .tgr-mark-audio { background: var(--tgr-agent); }
 
 /* Clip groups and lanes */
 .tgr-clip { margin-top: 18px; }
-.tgr-clip-name { font: 600 13px/1 var(--tgr-mono); letter-spacing: 0.04em; }
-.tgr-lane { display: grid; grid-template-columns: 70px 1fr; gap: 4px 14px; align-items: center; margin-top: 10px; }
+.tgr-clip-name { overflow-wrap: anywhere; font: 600 13px/1.5 var(--tgr-mono); letter-spacing: 0.04em; }
+.tgr-lane { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 4px 14px; align-items: center; margin-top: 10px; }
 .tgr-lane-tag { color: var(--tgr-muted); font: 600 11px/1 var(--tgr-mono); letter-spacing: 0.1em; text-transform: uppercase; text-align: right; }
-.tgr-values { grid-column: 2; color: var(--tgr-muted); font: 12px/1.7 var(--tgr-mono); }
+.tgr-values { grid-column: 2; overflow-wrap: anywhere; color: var(--tgr-muted); font: 12px/1.7 var(--tgr-mono); }
 .tgr-values b { color: var(--tgr-fg); font-weight: 600; }
 
 /* The track: 0..tmax seconds, 1 s tick grid, source region shaded */
@@ -60,13 +61,13 @@
 .tgr-track .tgr-mark-cancel { transform: rotate(45deg); }
 
 /* Time ruler (one per figure) */
-.tgr-ruler { position: relative; height: 16px; margin-top: 14px; margin-left: 84px; color: var(--tgr-muted); font: 10px/1 var(--tgr-mono); }
+.tgr-ruler { position: relative; height: 16px; margin-top: 14px; margin-left: 84px; color: var(--tgr-muted); font: 11px/1 var(--tgr-mono); }
 .tgr-ruler span { position: absolute; translate: -50%; white-space: nowrap; }
 .tgr-ruler span:first-child { translate: 0; }
 .tgr-ruler span:last-child { translate: -100%; }
 
 /* Gap figure rows */
-.tgr-gap-row { display: grid; grid-template-columns: 70px 1fr; gap: 4px 14px; align-items: center; margin-top: 10px; }
+.tgr-gap-row { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 4px 14px; align-items: center; margin-top: 10px; }
 .tgr-gap-bar { position: relative; height: 16px; border-radius: 2px; }
 .tgr-gap-fill { position: absolute; inset: 0 auto 0 0; background: var(--tgr-raised); border: 1px solid var(--tgr-silence); border-radius: 2px; }
 .tgr-gap-fill::after { content: ''; position: absolute; right: -1px; top: -1px; bottom: -1px; width: 3px; background: var(--tgr-agent); border-radius: 0 2px 2px 0; }
