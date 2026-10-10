@@ -52,7 +52,7 @@ Ledger IDs refer to [docs/claims-ledger.md](claims-ledger.md). Evidence gates pe
 
 ### The short version — ready now
 
-> "We checked an open turn-taking model on 200 real speech clips labeled as containing stutter blocks. It predicted 'done' in 116 energy-detected gaps. We are building StutterTurn to help callers finish speaking; human boundary validation and live response measurements are the next proof."
+> "In our first offline check, we tested an open turn-taking model on 200 real speech clips labeled as containing stutter blocks. It predicted 'done' in 116 energy-detected gaps. We are building StutterTurn to help callers finish speaking; human boundary validation and live response measurements are the next proof."
 
 This is an offline observation and a stated goal. It does not claim a trained model, verified interruption rate or working live rig.
 
