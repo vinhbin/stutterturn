@@ -1,0 +1,15 @@
+# audio clips: SEP-28k podcast audio stays out of the repo (copyright with podcast owners)
+audio/
+*.wav
+*.mp3
+# upstream model repo clone and weights
+smart-turn/
+*.onnx
+# secrets and local state
+.env
+.env.*
+__pycache__/
+venv/
+node_modules/
+dist/
+.expo/

@@ -1,0 +1,13 @@
+{
+ "block": {
+  "empty_or_short_wav": 11,
+  "ok": 310,
+  "no_resume": 79,
+  "gap_but_no_pre_speech": 84,
+  "no_gap": 16
+ },
+ "fluent": {
+  "empty_or_short_wav": 26,
+  "ok": 274
+ }
+}

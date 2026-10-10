@@ -1,0 +1,201 @@
+file,Show,NoStutteredWords,speech_end,trailing_sil,total_speech,pauses,vad_th_db
+HeStutters_0_17.wav,HeStutters,3,3.0,0.0,1.22,"[[2.17, 2.9]]",-39.8
+HeStutters_0_20.wav,HeStutters,3,2.96,0.04,1.77,[],-38.6
+HeStutters_0_26.wav,HeStutters,3,1.98,1.02,1.79,[],-44.0
+HeStutters_1_4.wav,HeStutters,3,1.98,1.02,1.52,[],-45.0
+HeStutters_1_107.wav,HeStutters,3,1.45,1.55,1.16,[],-45.0
+HeStutters_1_110.wav,HeStutters,3,3.0,0.0,1.94,[],-44.7
+HeStutters_1_131.wav,HeStutters,3,3.0,0.0,1.39,"[[1.8, 2.29]]",-44.2
+HeStutters_1_152.wav,HeStutters,3,2.01,0.99,1.39,[],-45.0
+HeStutters_1_192.wav,HeStutters,3,1.97,1.03,1.64,[],-45.0
+HeStutters_1_195.wav,HeStutters,3,3.0,0.0,1.84,[],-45.0
+HeStutters_1_228.wav,HeStutters,3,2.49,0.51,1.39,[],-45.0
+HeStutters_1_256.wav,HeStutters,3,1.94,1.06,1.72,[],-45.0
+HeStutters_2_14.wav,HeStutters,3,1.98,1.02,1.46,[],-36.9
+HeStutters_2_29.wav,HeStutters,3,1.96,1.04,1.57,[],-28.5
+HeStutters_2_31.wav,HeStutters,3,1.91,1.09,1.73,[],-30.7
+HeStutters_2_33.wav,HeStutters,3,1.96,1.04,1.83,[],-33.1
+HeStutters_2_36.wav,HeStutters,3,3.0,0.0,1.82,[],-35.4
+HeStutters_2_43.wav,HeStutters,3,3.0,0.0,1.74,[],-28.8
+HeStutters_2_54.wav,HeStutters,3,3.0,0.0,1.08,"[[1.99, 2.71], [2.34, 2.71]]",-34.9
+HeStutters_2_65.wav,HeStutters,3,1.93,1.07,1.59,[],-28.8
+HeStutters_2_88.wav,HeStutters,3,2.7,0.3,1.49,[],-32.6
+HeStutters_2_96.wav,HeStutters,3,3.0,0.0,0.67,"[[1.43, 2.7]]",-31.3
+HeStutters_2_118.wav,HeStutters,3,3.0,0.0,1.59,[],-28.4
+HeStutters_2_135.wav,HeStutters,3,3.0,0.0,0.61,"[[1.39, 2.73]]",-30.5
+HeStutters_2_141.wav,HeStutters,3,1.95,1.05,1.81,[],-29.4
+HeStutters_2_152.wav,HeStutters,3,3.0,0.0,1.51,"[[1.68, 1.98]]",-28.9
+HeStutters_2_156.wav,HeStutters,3,3.0,0.0,1.95,[],-27.6
+HeStutters_2_162.wav,HeStutters,3,2.82,0.18,1.6,[],-31.0
+HeStutters_2_170.wav,HeStutters,3,3.0,0.0,1.73,[],-30.6
+HeStutters_2_181.wav,HeStutters,3,1.9,1.1,1.47,"[[1.22, 1.54]]",-32.8
+HeStutters_2_182.wav,HeStutters,3,2.95,0.05,1.67,[],-34.1
+HeStutters_2_209.wav,HeStutters,3,3.0,0.0,1.49,[],-29.5
+HeStutters_3_7.wav,HeStutters,3,1.93,1.07,1.38,[],-33.6
+HeStutters_3_16.wav,HeStutters,3,2.91,0.09,1.83,[],-34.2
+HeStutters_3_25.wav,HeStutters,3,3.0,0.0,1.66,[],-32.7
+HeStutters_3_28.wav,HeStutters,3,2.86,0.14,1.57,[],-34.1
+HeStutters_4_5.wav,HeStutters,3,1.9,1.1,1.57,[],-37.4
+HeStutters_4_11.wav,HeStutters,3,3.0,0.0,1.67,[],-35.7
+HeStutters_4_13.wav,HeStutters,3,3.0,0.0,1.27,"[[1.94, 2.56]]",-34.9
+HeStutters_4_15.wav,HeStutters,3,1.99,1.01,1.85,[],-42.6
+HeStutters_4_21.wav,HeStutters,3,3.0,0.0,1.27,[],-37.3
+HeStutters_4_29.wav,HeStutters,3,2.6,0.4,1.14,[],-39.5
+HeStutters_4_30.wav,HeStutters,3,1.93,1.07,0.79,"[[1.19, 1.76]]",-33.3
+HeStutters_4_31.wav,HeStutters,3,1.78,1.22,1.48,[],-38.9
+HeStutters_4_34.wav,HeStutters,3,2.92,0.08,1.55,[],-39.1
+HeStutters_4_36.wav,HeStutters,3,2.38,0.62,1.26,[],-37.2
+HeStutters_5_12.wav,HeStutters,3,1.89,1.11,1.2,[],-35.6
+HeStutters_5_42.wav,HeStutters,3,3.0,0.0,1.85,[],-38.8
+HeStutters_5_43.wav,HeStutters,3,3.0,0.0,2.01,[],-37.8
+HeStutters_5_56.wav,HeStutters,3,2.97,0.03,1.97,"[[1.96, 2.75]]",-39.2
+HeStutters_5_57.wav,HeStutters,3,3.0,0.0,1.41,"[[0.21, 1.02], [1.76, 2.17]]",-35.9
+HeStutters_5_67.wav,HeStutters,3,1.94,1.06,1.69,[],-35.2
+HeStutters_5_72.wav,HeStutters,3,3.0,0.0,1.31,"[[1.97, 2.37]]",-35.9
+HeStutters_5_86.wav,HeStutters,3,3.0,0.0,1.93,[],-36.0
+HeStutters_5_116.wav,HeStutters,3,2.96,0.04,1.95,"[[1.9, 2.7]]",-34.4
+HeStutters_5_120.wav,HeStutters,3,3.0,0.0,2.01,[],-36.6
+HeStutters_5_177.wav,HeStutters,3,2.83,0.17,0.9,"[[1.4, 2.41]]",-38.1
+HeStutters_5_178.wav,HeStutters,3,1.96,1.04,1.78,[],-35.2
+HeStutters_5_194.wav,HeStutters,3,3.0,0.0,1.86,"[[1.92, 2.91]]",-34.4
+HeStutters_6_0.wav,HeStutters,3,3.0,0.0,1.8,[],-37.1
+HeStutters_6_12.wav,HeStutters,3,1.93,1.07,1.53,[],-36.7
+HeStutters_6_16.wav,HeStutters,3,3.0,0.0,1.62,[],-34.7
+HeStutters_6_19.wav,HeStutters,3,3.0,0.0,1.79,[],-37.7
+HeStutters_6_20.wav,HeStutters,3,1.96,1.04,1.25,"[[0.63, 1.12]]",-41.7
+HeStutters_6_23.wav,HeStutters,3,3.0,0.0,1.84,[],-34.6
+HeStutters_6_24.wav,HeStutters,3,1.91,1.09,1.62,[],-32.8
+HeStutters_6_28.wav,HeStutters,3,1.81,1.19,1.53,[],-34.0
+HeStutters_6_30.wav,HeStutters,3,3.0,0.0,1.47,[],-40.1
+HeStutters_6_35.wav,HeStutters,3,1.97,1.03,1.73,[],-45.0
+HeStutters_6_37.wav,HeStutters,3,1.89,1.11,1.45,[],-34.2
+HeStutters_6_40.wav,HeStutters,3,2.94,0.06,1.46,[],-33.7
+HeStutters_6_53.wav,HeStutters,3,2.72,0.28,1.68,[],-35.3
+HeStutters_6_61.wav,HeStutters,3,1.94,1.06,1.8,[],-41.6
+HeStutters_6_69.wav,HeStutters,3,1.92,1.08,1.51,[],-34.4
+HeStutters_6_72.wav,HeStutters,3,3.0,0.0,0.72,"[[1.57, 2.81]]",-37.9
+HeStutters_6_78.wav,HeStutters,3,2.95,0.05,1.51,[],-33.8
+HeStutters_6_104.wav,HeStutters,3,1.96,1.04,1.59,[],-39.0
+HeStutters_6_105.wav,HeStutters,3,3.0,0.0,1.42,[],-39.8
+HeStutters_6_113.wav,HeStutters,3,1.98,1.02,1.76,[],-41.9
+HeStutters_6_120.wav,HeStutters,3,1.94,1.06,1.41,[],-35.1
+HeStutters_6_122.wav,HeStutters,3,1.96,1.04,1.29,"[[0.69, 1.19]]",-42.4
+HeStutters_6_124.wav,HeStutters,3,1.91,1.09,1.41,[],-34.0
+HeStutters_6_126.wav,HeStutters,3,1.95,1.05,1.61,[],-35.4
+HeStutters_6_130.wav,HeStutters,3,1.92,1.08,1.09,[],-42.2
+HeStutters_6_135.wav,HeStutters,3,3.0,0.0,1.53,[],-32.9
+HeStutters_6_140.wav,HeStutters,3,1.95,1.05,1.56,[],-38.9
+HeStutters_6_141.wav,HeStutters,3,3.0,0.0,1.8,[],-38.2
+HeStutters_6_143.wav,HeStutters,3,2.88,0.12,1.47,[],-34.0
+HeStutters_6_149.wav,HeStutters,3,1.9,1.1,1.53,[],-35.8
+HeStutters_6_150.wav,HeStutters,3,3.0,0.0,1.69,[],-40.3
+HeStutters_6_155.wav,HeStutters,3,3.0,0.0,1.09,"[[2.04, 2.72]]",-33.3
+HeStutters_6_159.wav,HeStutters,3,2.07,0.93,0.81,[],-38.1
+HeStutters_6_163.wav,HeStutters,3,1.98,1.02,1.9,[],-43.6
+HeStutters_6_164.wav,HeStutters,3,3.0,0.0,0.79,"[[1.55, 2.63]]",-45.0
+HeStutters_6_176.wav,HeStutters,3,3.0,0.0,1.77,[],-37.5
+HeStutters_6_198.wav,HeStutters,3,1.94,1.06,1.37,[],-33.6
+HeStutters_6_211.wav,HeStutters,3,3.0,0.0,1.35,"[[1.86, 2.38]]",-33.5
+HeStutters_6_218.wav,HeStutters,3,1.94,1.06,1.27,[],-40.0
+HeStutters_6_220.wav,HeStutters,3,1.95,1.05,1.58,[],-32.9
+HeStutters_6_232.wav,HeStutters,3,3.0,0.0,1.78,[],-39.4
+HeStutters_6_236.wav,HeStutters,3,3.0,0.0,1.73,[],-32.8
+HeStutters_6_237.wav,HeStutters,3,1.88,1.12,1.39,[],-33.0
+HeStutters_6_239.wav,HeStutters,3,3.0,0.0,1.63,[],-34.2
+HeStutters_6_242.wav,HeStutters,3,3.0,0.0,0.99,"[[1.81, 2.67]]",-35.9
+HeStutters_6_254.wav,HeStutters,3,3.0,0.0,1.8,[],-33.7
+HeStutters_6_255.wav,HeStutters,3,1.92,1.08,1.65,[],-38.7
+HeStutters_6_261.wav,HeStutters,3,2.87,0.13,1.58,[],-34.4
+HeStutters_6_268.wav,HeStutters,3,2.95,0.05,1.48,[],-33.7
+HeStutters_6_276.wav,HeStutters,3,1.83,1.17,1.56,[],-32.8
+HeStutters_6_283.wav,HeStutters,3,3.0,0.0,1.28,"[[1.49, 1.95]]",-40.0
+HeStutters_6_286.wav,HeStutters,3,1.97,1.03,1.94,[],-43.1
+HeStutters_6_292.wav,HeStutters,3,1.97,1.03,1.31,[],-34.8
+HeStutters_7_3.wav,HeStutters,3,3.0,0.0,1.89,[],-38.2
+HeStutters_7_9.wav,HeStutters,3,3.0,0.0,1.79,[],-43.6
+HeStutters_7_15.wav,HeStutters,3,1.86,1.14,1.05,[],-37.7
+HeStutters_7_16.wav,HeStutters,3,3.0,0.0,1.88,[],-36.4
+HeStutters_7_17.wav,HeStutters,3,3.0,0.0,1.75,[],-37.3
+HeStutters_7_18.wav,HeStutters,3,2.55,0.45,2.0,[],-40.9
+HeStutters_7_21.wav,HeStutters,3,2.93,0.07,1.8,[],-45.0
+HeStutters_7_24.wav,HeStutters,3,3.0,0.0,1.89,[],-45.0
+HeStutters_7_25.wav,HeStutters,3,2.0,1.0,1.94,[],-43.2
+HeStutters_7_29.wav,HeStutters,3,3.0,0.0,1.86,[],-39.8
+HeStutters_7_35.wav,HeStutters,3,3.0,0.0,2.18,"[[0.4, 1.01]]",-44.7
+HeStutters_7_36.wav,HeStutters,3,3.0,0.0,2.08,[],-36.2
+HeStutters_7_37.wav,HeStutters,3,1.97,1.03,1.68,[],-40.3
+HeStutters_7_38.wav,HeStutters,3,3.0,0.0,1.38,[],-38.9
+HeStutters_7_39.wav,HeStutters,3,1.98,1.02,1.49,[],-43.7
+HeStutters_8_5.wav,HeStutters,3,1.98,1.02,1.83,[],-42.0
+HeStutters_8_7.wav,HeStutters,3,1.93,1.07,1.34,[],-32.5
+HeStutters_8_12.wav,HeStutters,3,3.0,0.0,1.72,[],-42.9
+HeStutters_8_13.wav,HeStutters,3,1.95,1.05,1.76,[],-37.4
+HeStutters_8_15.wav,HeStutters,3,3.0,0.0,1.88,"[[1.95, 2.87]]",-38.0
+HeStutters_8_19.wav,HeStutters,3,2.84,0.16,1.83,"[[1.91, 2.76]]",-33.3
+HeStutters_8_30.wav,HeStutters,3,2.83,0.17,1.5,[],-33.5
+HeStutters_8_41.wav,HeStutters,3,2.75,0.25,1.59,"[[1.31, 1.64]]",-36.6
+HeStutters_8_50.wav,HeStutters,3,3.0,0.0,1.48,"[[1.45, 1.79]]",-35.3
+HeStutters_8_62.wav,HeStutters,3,1.93,1.07,1.54,[],-35.3
+HeStutters_8_64.wav,HeStutters,3,3.0,0.0,1.53,"[[0.25, 0.66], [1.96, 2.79]]",-34.7
+HeStutters_8_69.wav,HeStutters,3,3.0,0.0,1.87,"[[0.22, 1.02]]",-35.9
+HeStutters_8_71.wav,HeStutters,3,3.0,0.0,1.17,"[[2.04, 2.75]]",-34.0
+HeStutters_8_79.wav,HeStutters,3,3.0,0.0,2.0,[],-34.8
+HeStutters_8_80.wav,HeStutters,3,3.0,0.0,1.22,"[[0.49, 0.91], [1.89, 2.85]]",-32.0
+HeStutters_8_86.wav,HeStutters,3,3.0,0.0,1.61,"[[1.92, 2.76]]",-40.1
+HeStutters_8_90.wav,HeStutters,3,3.0,0.0,1.48,"[[0.82, 1.42], [1.92, 2.72]]",-37.9
+HeStutters_8_94.wav,HeStutters,3,1.93,1.07,0.83,"[[0.22, 0.72], [1.0, 1.58]]",-41.0
+HeStutters_8_95.wav,HeStutters,3,3.0,0.0,1.5,[],-36.6
+HeStutters_8_97.wav,HeStutters,3,3.0,0.0,2.08,"[[1.9, 2.74]]",-36.2
+HeStutters_8_100.wav,HeStutters,3,2.78,0.22,1.43,[],-36.2
+HeStutters_8_126.wav,HeStutters,3,3.0,0.0,1.82,"[[1.95, 2.81]]",-34.5
+HeStutters_8_127.wav,HeStutters,3,3.0,0.0,1.51,[],-34.0
+HeStutters_8_128.wav,HeStutters,3,1.97,1.03,1.68,[],-37.7
+HeStutters_8_132.wav,HeStutters,3,1.92,1.08,1.33,[],-36.5
+HeStutters_8_139.wav,HeStutters,3,3.0,0.0,1.91,[],-31.1
+HeStutters_8_140.wav,HeStutters,3,3.0,0.0,1.85,"[[1.88, 2.88]]",-34.9
+HeStutters_8_145.wav,HeStutters,3,3.0,0.0,1.83,"[[1.91, 2.69]]",-32.9
+HeStutters_8_150.wav,HeStutters,3,3.0,0.0,1.75,"[[1.81, 2.8]]",-39.3
+HeStutters_8_163.wav,HeStutters,3,2.98,0.02,2.09,"[[0.24, 1.03]]",-36.2
+HeStutters_8_164.wav,HeStutters,3,3.0,0.0,1.9,"[[1.88, 2.72]]",-32.9
+HeStutters_8_166.wav,HeStutters,3,3.0,0.0,2.02,"[[1.91, 2.74]]",-37.8
+HeStutters_8_167.wav,HeStutters,3,3.0,0.0,1.64,"[[0.21, 1.04]]",-36.7
+HeStutters_8_168.wav,HeStutters,3,1.99,1.01,1.56,"[[1.06, 1.37]]",-44.3
+HeStutters_8_172.wav,HeStutters,3,3.0,0.0,1.83,"[[1.91, 2.83]]",-37.2
+HeStutters_8_177.wav,HeStutters,3,3.0,0.0,1.81,[],-36.9
+HeStutters_8_178.wav,HeStutters,3,3.0,0.0,2.37,"[[2.48, 2.79]]",-40.2
+HeStutters_8_180.wav,HeStutters,3,2.28,0.72,2.05,[],-38.0
+HeStutters_8_183.wav,HeStutters,3,3.0,0.0,1.93,[],-32.6
+HeStutters_8_195.wav,HeStutters,3,3.0,0.0,1.86,[],-33.5
+HeStutters_8_197.wav,HeStutters,3,3.0,0.0,1.88,[],-32.0
+HeStutters_9_1.wav,HeStutters,3,1.53,1.47,1.45,[],-44.1
+HeStutters_9_2.wav,HeStutters,3,2.0,1.0,1.81,[],-41.0
+HeStutters_9_3.wav,HeStutters,3,3.0,0.0,1.63,[],-43.0
+HeStutters_9_4.wav,HeStutters,3,2.03,0.97,1.55,"[[0.58, 0.92]]",-42.5
+HeStutters_9_7.wav,HeStutters,3,2.84,0.16,1.62,[],-40.1
+HeStutters_9_9.wav,HeStutters,3,2.99,0.01,1.71,[],-38.6
+HeStutters_9_10.wav,HeStutters,3,1.82,1.18,1.45,[],-45.0
+HeStutters_9_12.wav,HeStutters,3,1.88,1.12,1.68,[],-45.0
+HeStutters_9_15.wav,HeStutters,3,1.99,1.01,1.64,[],-43.0
+HeStutters_9_16.wav,HeStutters,3,2.01,0.99,1.89,[],-41.8
+HeStutters_9_19.wav,HeStutters,3,2.94,0.06,1.79,[],-38.7
+HeStutters_9_25.wav,HeStutters,3,3.0,0.0,1.84,[],-42.7
+HeStutters_9_26.wav,HeStutters,3,1.97,1.03,1.86,[],-39.8
+HeStutters_9_28.wav,HeStutters,3,3.0,0.0,1.19,[],-41.5
+HeStutters_9_32.wav,HeStutters,3,1.96,1.04,1.75,[],-42.0
+HeStutters_9_34.wav,HeStutters,3,3.0,0.0,1.85,[],-38.6
+HeStutters_9_36.wav,HeStutters,3,2.92,0.08,1.69,[],-40.6
+HeStutters_9_39.wav,HeStutters,3,2.0,1.0,1.92,[],-41.4
+HeStutters_10_0.wav,HeStutters,3,3.0,0.0,1.83,[],-29.1
+HeStutters_10_3.wav,HeStutters,3,3.0,0.0,1.96,[],-27.5
+HeStutters_10_8.wav,HeStutters,3,2.94,0.06,1.5,"[[2.35, 2.67]]",-27.5
+HeStutters_10_10.wav,HeStutters,3,3.0,0.0,0.66,[],-28.9
+HeStutters_10_11.wav,HeStutters,3,1.97,1.03,1.36,"[[1.09, 1.56]]",-29.4
+HeStutters_10_16.wav,HeStutters,3,3.0,0.0,1.69,[],-27.0
+HeStutters_10_21.wav,HeStutters,3,3.0,0.0,1.34,[],-28.4
+HeStutters_10_22.wav,HeStutters,3,1.97,1.03,1.57,[],-29.1
+HeStutters_10_25.wav,HeStutters,3,1.99,1.01,1.73,[],-31.2
+HeStutters_10_27.wav,HeStutters,3,1.97,1.03,1.54,[],-28.6
+HeStutters_10_29.wav,HeStutters,3,3.0,0.0,1.82,[],-27.8
+HeStutters_10_30.wav,HeStutters,3,2.93,0.07,1.66,[],-28.2
+HeStutters_11_11.wav,HeStutters,3,3.0,0.0,1.67,[],-43.4
+HeStutters_11_12.wav,HeStutters,3,3.0,0.0,1.86,"[[1.81, 2.81]]",-41.0
