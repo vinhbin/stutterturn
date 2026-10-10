@@ -1,0 +1,214 @@
+{
+  "generated_utc": "2026-10-10T20:44:20Z",
+  "offline_fallback": true,
+  "source_note": "Computed directly from committed run logs by snapshot.py --offline; no TigerData service has been queried yet. See web/tiger/README.md.",
+  "evidence": {
+    "dirs": [
+      "agent/evidence/2026-10-10-first-replay",
+      "agent/evidence/2026-10-10-replay-v2"
+    ],
+    "commit": "bcf50d1",
+    "contract": "0.1",
+    "runs_current": 10,
+    "runs_superseded_excluded": 10,
+    "clips": 5,
+    "configs": [
+      "patient",
+      "stock"
+    ]
+  },
+  "clips": [
+    {
+      "source_id": "HeStutters_1_133.wav",
+      "configs": {
+        "stock": {
+          "run_id": "20261010T194710Z-stock-3dd9",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.864,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.864,
+          "first_audio_t": 6.578,
+          "gap_s": 1.714,
+          "llm_latency_s": 1.375,
+          "tts_first_audio_s": 0.328
+        },
+        "patient": {
+          "run_id": "20261010T194722Z-patient-c821",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.864,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.864,
+          "first_audio_t": 6.828,
+          "gap_s": 1.964,
+          "llm_latency_s": 1.734,
+          "tts_first_audio_s": 0.219
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_2_57.wav",
+      "configs": {
+        "stock": {
+          "run_id": "20261010T194736Z-stock-b728",
+          "source_duration_s": 3.0,
+          "first_complete_t": 2.176,
+          "trigger": "smart_turn",
+          "prob": 0.72,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 2.176,
+          "first_audio_t": 4.078,
+          "gap_s": 1.902,
+          "llm_latency_s": 1.61,
+          "tts_first_audio_s": 0.234
+        },
+        "patient": {
+          "run_id": "20261010T194748Z-patient-31bf",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.0,
+          "trigger": "smart_turn",
+          "prob": 0.969,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.0,
+          "first_audio_t": 6.406,
+          "gap_s": 2.406,
+          "llm_latency_s": 2.11,
+          "tts_first_audio_s": 0.25
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_4_32.wav",
+      "configs": {
+        "stock": {
+          "run_id": "20261010T194800Z-stock-bec1",
+          "source_duration_s": 3.0,
+          "first_complete_t": 1.12,
+          "trigger": "smart_turn",
+          "prob": 0.85,
+          "speaker_resumed_after_decision": true,
+          "cancelled_before_audio": true,
+          "cancelled_t": 1.536,
+          "cancelled_decision_t": 1.12,
+          "answered_decision_t": 4.992,
+          "first_audio_t": 6.735,
+          "gap_s": 1.743,
+          "llm_latency_s": 1.5,
+          "tts_first_audio_s": 0.235
+        },
+        "patient": {
+          "run_id": "20261010T194813Z-patient-3064",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.992,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.992,
+          "first_audio_t": 6.703,
+          "gap_s": 1.711,
+          "llm_latency_s": 1.453,
+          "tts_first_audio_s": 0.25
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_5_123.wav",
+      "configs": {
+        "stock": {
+          "run_id": "20261010T194825Z-stock-9916",
+          "source_duration_s": 3.0,
+          "first_complete_t": 0.768,
+          "trigger": "smart_turn",
+          "prob": 0.954,
+          "speaker_resumed_after_decision": true,
+          "cancelled_before_audio": true,
+          "cancelled_t": 1.088,
+          "cancelled_decision_t": 0.768,
+          "answered_decision_t": 5.024,
+          "first_audio_t": 6.875,
+          "gap_s": 1.851,
+          "llm_latency_s": 1.641,
+          "tts_first_audio_s": 0.203
+        },
+        "patient": {
+          "run_id": "20261010T194838Z-patient-dd02",
+          "source_duration_s": 3.0,
+          "first_complete_t": 5.024,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 5.024,
+          "first_audio_t": 7.078,
+          "gap_s": 2.054,
+          "llm_latency_s": 1.86,
+          "tts_first_audio_s": 0.203
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_5_150.wav",
+      "configs": {
+        "stock": {
+          "run_id": "20261010T194851Z-stock-27bf",
+          "source_duration_s": 3.0,
+          "first_complete_t": 0.512,
+          "trigger": "smart_turn",
+          "prob": 0.817,
+          "speaker_resumed_after_decision": true,
+          "cancelled_before_audio": true,
+          "cancelled_t": 1.472,
+          "cancelled_decision_t": 0.512,
+          "answered_decision_t": 2.176,
+          "first_audio_t": 4.235,
+          "gap_s": 2.059,
+          "llm_latency_s": 1.781,
+          "tts_first_audio_s": 0.235
+        },
+        "patient": {
+          "run_id": "20261010T194903Z-patient-50d1",
+          "source_duration_s": 3.0,
+          "first_complete_t": 6.016,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 6.016,
+          "first_audio_t": 9.406,
+          "gap_s": 3.39,
+          "llm_latency_s": 3.172,
+          "tts_first_audio_s": 0.203
+        }
+      }
+    }
+  ],
+  "caveats": [
+    "5 clips, one run each, one show (HeStutters). Per-clip values only; no rates or aggregates.",
+    "gap_start/resume labels in the evidence README are energy-derived and not human-reviewed.",
+    "Each run appends 5 s of synthetic silence; fallback decisions on these 3 s clips happen during that padding.",
+    "First agent audio is when the first sample was scheduled to play; Gemini + ElevenLabs latency included, speaker playback delay not measured.",
+    "These are turn decisions and cancelled replies, not observed audible interruptions."
+  ]
+}

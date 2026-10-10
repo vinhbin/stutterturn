@@ -9,9 +9,8 @@ function fitConsole() {
   if (!frameDocument?.body) return;
   consoleObserver?.disconnect();
 
-  const style = frameDocument.createElement('style');
-  style.textContent = 'body { max-width: none; padding: 0 0 20px !important; } .page-header { min-height: 32px; padding-top: 8px; border: 0; justify-content: flex-end; } .page-header .identity, .header-meta > span { display: none; } .header-meta { max-width: none !important; } @media (min-width: 1001px) { .page-header { min-height: 26px; padding-top: 0; } .status-banner { min-height: 36px; padding-block: 8px; } }';
-  frameDocument.head.append(style);
+  frameDocument.documentElement.classList.add('embedded-console');
+  consoleFrame.contentWindow.dispatchEvent(new Event('resize'));
 
   let scheduled = false;
   const resize = () => {
@@ -36,57 +35,93 @@ if (consoleFrame) {
   if (consoleFrame.contentDocument?.readyState === 'complete') fitConsole();
 }
 
-// Landing page: concept-loop playback and section reveals.
-// The loop is an illustrative sequence; it represents no recorded timing or audio.
+// This seekable illustration represents no recorded timing or audio.
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const turnFigure = document.querySelector('.turn-figure');
 
-if (turnFigure && !reducedMotion.matches && 'IntersectionObserver' in window) {
+if (turnFigure) {
   const loopClock = document.querySelector('#loop-clock');
-  const CYCLE_MS = 7500; // matches the CSS loop-* animation duration
-  const WIPE_MS = 6000;  // reveal completes at 80% of the cycle, then holds
-  let startedAt = null;
+  const toggle = document.querySelector('#sequence-toggle');
+  const slider = document.querySelector('#sequence-position');
+  const phaseLabel = document.querySelector('#sequence-phase');
+  const note = document.querySelector('#sequence-note');
+  const CYCLE_MS = 7500;
+  const SEQUENCE_MS = 6000;
+  let position = 100;
+  let playing = false;
+  let startedAt = 0;
   let frame = null;
+  let inView = false;
+  let userPaused = reducedMotion.matches;
+  document.querySelector('.sequence-transport').hidden = false;
 
-  const renderClock = (now) => {
-    const elapsed = Math.min((now - startedAt) % CYCLE_MS, WIPE_MS) / 1000;
-    const whole = Math.floor(elapsed);
-    const centis = Math.floor((elapsed - whole) * 100);
-    loopClock.textContent = `00:0${whole}.${String(centis).padStart(2, '0')}`;
-    frame = requestAnimationFrame(renderClock);
+  const render = (percent) => {
+    position = percent;
+    const phase = percent < 32 ? 'Speaking' : percent < 51 ? 'Pause' : percent < 82 ? 'Continuing' : 'Reply';
+    const descriptions = {
+      Speaking: 'The caller is speaking. The agent keeps listening.',
+      Pause: 'A pause can belong to an unfinished turn. The agent holds.',
+      Continuing: 'The caller continues the same thought. Keep the turn open.',
+      Reply: 'The caller has finished. Now the agent can reply.',
+    };
+    const elapsed = percent * SEQUENCE_MS / 100000;
+    loopClock.textContent = `00:0${elapsed.toFixed(2)}`;
+    slider.value = String(Math.round(percent));
+    slider.setAttribute('aria-valuetext', `${phase}, ${Math.round(percent)} percent through the illustration`);
+    phaseLabel.textContent = phase;
+    note.textContent = descriptions[phase];
+    turnFigure.style.setProperty('--sequence-progress', `${percent}%`);
+    turnFigure.style.setProperty('--wait-visible', percent >= 32 ? '1' : '0');
+    turnFigure.style.setProperty('--reply-visible', percent >= 82 ? '1' : '0');
+    turnFigure.style.setProperty('--speaking-visible', phase === 'Speaking' || phase === 'Continuing' ? '1' : '0');
+    turnFigure.style.setProperty('--holding-visible', phase === 'Pause' ? '1' : '0');
   };
 
-  const play = () => {
-    if (startedAt !== null) return;
-    turnFigure.classList.add('is-playing');
-    startedAt = performance.now();
-    frame = requestAnimationFrame(renderClock);
+  const updateButton = () => {
+    const label = playing ? 'Pause illustration' : 'Play illustration';
+    toggle.querySelector('span').textContent = label;
+    toggle.setAttribute('aria-label', label);
+    turnFigure.classList.toggle('is-playing', playing);
   };
-
   const pause = () => {
-    if (startedAt === null) return;
-    turnFigure.classList.remove('is-playing');
+    playing = false;
     cancelAnimationFrame(frame);
-    startedAt = null;
-    loopClock.textContent = '00:06.00';
+    updateButton();
+  };
+  const tick = (now) => {
+    if (!playing) return;
+    const elapsed = (now - startedAt) % CYCLE_MS;
+    render(Math.min(elapsed / SEQUENCE_MS * 100, 100));
+    frame = requestAnimationFrame(tick);
+  };
+  const play = () => {
+    if (playing || document.hidden) return;
+    playing = true;
+    startedAt = performance.now() - (position === 100 ? 0 : position / 100 * SEQUENCE_MS);
+    updateButton();
+    frame = requestAnimationFrame(tick);
   };
 
-  new IntersectionObserver((entries) => {
-    entries.forEach((entry) => (entry.isIntersecting ? play() : pause()));
-  }, { threshold: 0.25 }).observe(turnFigure);
-
-  reducedMotion.addEventListener?.('change', (event) => { if (event.matches) pause(); });
-}
-
-if (document.body.classList.contains('landing') && !reducedMotion.matches && 'IntersectionObserver' in window) {
-  const revealed = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-revealed');
-      observer.unobserve(entry.target);
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-  document.body.classList.add('reveal-armed');
-  document.querySelectorAll('[data-reveal]').forEach((section) => revealed.observe(section));
+  toggle.addEventListener('click', () => {
+    userPaused = playing;
+    if (playing) pause(); else play();
+  });
+  slider.addEventListener('input', () => {
+    userPaused = true;
+    pause();
+    render(Number(slider.value));
+  });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      if (inView && !userPaused) play(); else pause();
+    }, { threshold: 0.25 }).observe(turnFigure);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pause(); else if (inView && !userPaused) play();
+  });
+  reducedMotion.addEventListener('change', (event) => {
+    if (event.matches) { userPaused = true; pause(); }
+  });
+  render(100);
 }
