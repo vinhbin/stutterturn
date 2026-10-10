@@ -64,6 +64,47 @@ be on `PATH`. 20 checks across three modes:
 Exit code 0 = all passed; 1 = check failures; 2 = environment missing
 (Playwright module or chromium binary), with the install command printed.
 
+## 3. Site interactions and responsive integration (Playwright chromium)
+
+```sh
+node web/demo-ui/dev/checks/site-checks.mjs
+```
+
+Uses the same Playwright/Chromium installation and cache discovery as the browser
+suite above. It serves the full `web/` directory on an ephemeral loopback port;
+no Python server, agent backend, API credentials, or paid services are involved.
+External requests are blocked and fail the check. No screenshots are captured.
+
+The 38 checks cover:
+
+- Reduced-motion initial state, explicit Play, keyboard Pause, and native range
+  scrubbing to Pause/Continuing/Reply while playback is active.
+- Automatic offscreen pause/resume and manual pause persisting across scroll.
+  Hidden-page behavior is exercised by injecting the browser visibility signal;
+  headless tab focus alone does not reliably produce a hidden document.
+- Complete, visible concept illustration and usable navigation without
+  JavaScript; illustration/no-audio disclosures stay explicit.
+- Landing, judge view, and standalone console containment at 360, 390, 1280,
+  and 1440 pixels, including header navigation.
+- At 360/390 pixels: the visible setup jump moves keyboard focus to its target;
+  the ledger caption stays outside horizontal scrolling, wraps inside the
+  viewport, and describes the table; the left-aligned empty message is readable
+  at the initial scroll position. Populated ledgers expose their keyboard hint
+  and scroll with ArrowRight while the caption stays in place.
+- The phone landing diagram keeps a 520px content width inside its own
+  keyboard-scrollable region, displays scroll instructions, and preserves
+  functional phase text at 11px or above without widening the page.
+- Judge iframe sizing after preview starts, embedded-console mode, synthetic
+  provenance, and the no-response-audio notice.
+- Enabled Start action within the first 900 vertical pixels on desktop after
+  preview is selected; no uncaught browser errors or external page requests.
+
+This suite checks behavior and layout containment, not exact colors or screenshot
+pixels. It does not establish real playback, voice-agent efficacy, or visual
+quality. Exit codes match the browser suite: 0 passed, 1 check failure, 2 missing
+Playwright/Chromium. The first studio-refresh run passed 30/30; the expanded
+review-fix suite passed 38/38 on October 10, 2026.
+
 ## Recorded results
 
 2026-10-10, Windows 11, Node 24.21.0, Python 3.12.10, Playwright 1.64.0

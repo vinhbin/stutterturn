@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0c0a09">
+  <meta name="theme-color" content="#090e14">
   <meta name="description" content="Compare recorded-source runs and inspect StutterTurn's replay evidence in the judge view.">
   <title>StutterTurn — Judge view</title>
   <link rel="preload" href="../demo-ui/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -13,8 +13,8 @@
 <body class="judge-page">
   <a class="skip-link" href="#judge-console">Skip to console</a>
   <header class="site-header shell">
-    <a class="wordmark" href="../" aria-label="StutterTurn home">StutterTurn.</a>
-    <nav aria-label="Main navigation"><a href="../">About the project</a><a href="../demo-ui/">Full console <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></nav>
+    <a class="wordmark" href="../" aria-label="StutterTurn home"><svg class="brand-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M12 4v16m4-12 4 4-4 4"/></svg><span>StutterTurn<span class="brand-dot">.</span></span></a>
+    <nav aria-label="Main navigation"><a href="../">Overview</a><a href="./" aria-current="page">Judge workspace</a><a href="../demo-ui/">Full console <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></nav>
   </header>
   <main id="main" class="shell" tabindex="-1">
     <section class="judge-intro" aria-labelledby="judge-title">
@@ -35,12 +35,12 @@
       <p class="embed-fallback">You can also <a href="../demo-ui/">open the full console in this tab</a>.</p>
     </section>
     <section id="replay-evidence" class="judge-evidence" aria-labelledby="replay-title">
-      <div class="section-intro"><h2 id="replay-title">The replay handoff</h2><p>Guttuu’s recorded-source replay v2 is pinned below so the demonstration can be checked against its source.</p></div>
+      <div class="section-intro"><h2 id="replay-title">The replay handoff</h2><p>The corrected recorded-source replay is pinned below so the demonstration can be checked against its source.</p></div>
       <div class="evidence-content">
-        <div class="evidence-heading"><h3>5 clips · 2 configurations · 10 logs</h3><span class="revision">2026-10-10 · Replay v2 supersedes the first replay<br>Saved logs executed on bcf50d1</span></div>
-        <p>Stock and patient replay the same five SEP-28k recordings with the same model. Patient increases the silence gate from 0.2 s to 1.0 s. Replay v2 corrected the model input (pre-roll); it supersedes the first replay. No trained candidate exists yet.</p>
+        <div class="evidence-heading"><h3>5 clips · 2 configurations · 10 logs</h3><span class="revision">2026-10-10 · Replay v2<br>Saved logs executed on bcf50d1</span></div>
+        <p>Stock and patient replay the same five SEP-28k recordings with the same model. Patient increases the silence gate from 0.2 s to 1.0 s. This handoff does not include a trained candidate.</p>
         <dl class="handoff-observations">
-          <div><dt>Observed</dt><dd>Stock decided “complete” inside the labelled gap in 4 of 5 clips; 3 of those replies were cancelled before that reply’s audio, and in the fourth the 3 s clip ended before overlap could be observed. No run produced an audible interruption — the reply delay, not demonstrated safety. These are model decisions, not observed audio overlaps.</dd></div>
+          <div><dt>Observed</dt><dd>Stock decided complete before the energy-labeled resumption in four of these five clips; patient did not. No response-audio overlap was reported. These are exploratory observations, not interruption rates.</dd></div>
           <div><dt>Still unverified</dt><dd>Human review of the energy-derived labels, completed-turn delay, and actual speaker playback. The recordings are replayed input, not a live microphone or phone call.</dd></div>
         </dl>
         <p class="evidence-limit">This is an engineering prototype. These logs do not establish improved interruption rates or model efficacy.</p>

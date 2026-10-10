@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0c0a09">
+  <meta name="theme-color" content="#090e14">
   <meta name="description" content="StutterTurn makes a voice agent's turn-taking decisions visible. Compare recorded-source runs in the call console.">
   <title>StutterTurn — Let people finish.</title>
   <link rel="preload" href="demo-ui/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -14,27 +14,28 @@
 <body class="landing">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header shell">
-    <a class="wordmark" href="./" aria-label="StutterTurn home">StutterTurn.</a>
-    <nav aria-label="Main navigation"><a href="#evidence">The evidence</a><a href="judges/">Judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></nav>
+    <a class="wordmark" href="./" aria-label="StutterTurn home"><svg class="brand-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M12 4v16m4-12 4 4-4 4"/></svg><span>StutterTurn<span class="brand-dot">.</span></span></a>
+    <nav aria-label="Main navigation"><a href="./" aria-current="page">Overview</a><a href="#evidence">Evidence</a><a class="nav-workspace" href="judges/">Judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></nav>
   </header>
   <main id="main" tabindex="-1">
     <section class="hero shell" aria-labelledby="hero-title">
-      <p class="hero-eyebrow">Turn-taking for real speech</p>
-      <h1 id="hero-title">Let people finish.</h1>
-      <p class="hero-deck">Speech has pauses, repetitions, and restarts. StutterTurn is an engineering prototype for comparing when a voice agent decides to answer — examining the space between a pause and a finished turn.</p>
+      <div class="hero-copy"><h1 id="hero-title">Let people<br><span>finish.</span></h1><div class="hero-intro">
+      <p class="hero-deck">A pause isn’t the end of a thought. Give real speech room, then inspect exactly when a voice agent decides to answer.</p>
+      <p class="hero-context">StutterTurn is a turn-taking research prototype. Compare recorded speech, model decisions, and reported agent audio in one workspace.</p>
       <div class="hero-actions">
-        <a class="button button-primary" href="judges/">Open judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a>
+        <a class="button button-primary" href="judges/">Open judge workspace <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a>
         <a class="button button-quiet" href="#evidence">The evidence</a>
       </div>
+      </div></div>
       <figure class="turn-figure" id="turn-figure">
         <div class="figure-title">
           <h2>A pause can still be part of a turn.</h2>
           <div class="figure-meta">
-            <span class="figure-chip">Illustrative sequence</span>
+            <span class="figure-chip">Illustrative sequence · no audio</span>
             <span class="figure-clock"><span id="loop-clock">00:06.00</span><span class="clock-label">concept loop</span></span>
           </div>
         </div>
-        <div class="turn-diagram" role="img" aria-label="Illustrative sequence, not recorded data: the caller speaks, pauses, and continues. The agent waits through the pause — an incomplete-turn decision — and replies only after the caller finishes.">
+        <div class="turn-diagram" tabindex="0" role="img" aria-describedby="diagram-scroll-note" aria-label="Illustrative sequence, not recorded data: the caller speaks, pauses, and continues. The agent waits through the pause — an incomplete-turn decision — and replies only after the caller finishes.">
           <div class="diagram-grid" aria-hidden="true">
             <div class="ruler-row">
               <span class="lane-tag">Phase</span>
@@ -86,20 +87,22 @@
             </div>
           </div>
         </div>
+        <p id="diagram-scroll-note" class="diagram-scroll-note">Scroll the diagram horizontally. Keyboard: focus it and use Left/Right.</p><div class="sequence-transport" hidden><button id="sequence-toggle" type="button" aria-label="Play illustration"><svg viewBox="0 0 20 20" aria-hidden="true"><path class="play-icon" d="m7 4 9 6-9 6Z"/><path class="pause-icon" d="M7 4v12M13 4v12"/></svg><span>Play illustration</span></button><label for="sequence-position">Explore the turn</label><input id="sequence-position" type="range" min="0" max="100" value="100" step="1" aria-describedby="sequence-note"><span id="sequence-phase">Reply</span></div>
+        <p id="sequence-note" class="sequence-note">The caller has finished. Now the agent can reply.</p>
         <figcaption>Concept illustration. No recorded timing or audio is represented here.</figcaption>
       </figure>
     </section>
 
     <section id="evidence" class="evidence-section shell" aria-labelledby="evidence-title" data-reveal>
-      <div class="section-intro"><h2 id="evidence-title">Inspect what<br>we have.</h2><p>The replay-v2 handoff checks the recording-to-event path. It is an engineering check, with human review and model evaluation still ahead.</p></div>
+      <div class="section-intro"><h2 id="evidence-title">Inspect what<br>we have.</h2><p>The corrected replay checks the recording-to-event path with pre-roll and the first speech frame included. It is an engineering check, with human review and model evaluation still ahead.</p></div>
       <div class="evidence-card">
-        <div class="evidence-heading"><h3>Recorded-source replay v2</h3><span class="revision">2026-10-10 · Replay v2 supersedes the first replay<br>Saved logs executed on bcf50d1</span></div>
+        <div class="evidence-heading"><h3>Recorded-source replay v2</h3><span class="revision">2026-10-10 · Replay v2<br>Saved logs executed on bcf50d1</span></div>
         <dl class="evidence-facts">
           <div><dt><span class="dot dot-recorded"></span>Sources</dt><dd>5 SEP-28k recordings</dd></div>
           <div><dt><span class="dot dot-recorded"></span>Runs</dt><dd>10 replay logs across stock and patient</dd></div>
           <div><dt><span class="dot dot-recorded"></span>Setting changed</dt><dd>Silence gate: 0.2 s → 1.0 s</dd></div>
-          <div><dt><span class="dot dot-recorded"></span>Observed</dt><dd>Stock decided “complete” inside the labelled gap on 4 of 5 clips; 3 of those replies were cancelled before any audio</dd></div>
-          <div><dt><span class="dot dot-pending"></span>Candidate model</dt><dd>None exists yet; the console lists one only when the backend supplies it</dd></div>
+          <div><dt><span class="dot dot-recorded"></span>Observed</dt><dd>Stock decided complete before the labeled resumption in 4 of 5 clips; patient did not. Three early stock replies were cancelled before their audio.</dd></div>
+          <div><dt><span class="dot dot-pending"></span>Candidate model</dt><dd>Not included in this replay; availability is supplied by the connected backend</dd></div>
         </dl>
         <p class="evidence-limit">Labels have not been human-reviewed. These runs do not establish improved interruption rates or response delay. Audio receipt is logged; speaker playback is unverified.</p>
         <a class="button button-quiet evidence-link" href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2">Inspect the pinned replay evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a>
@@ -115,7 +118,7 @@
       </ol>
     </section>
 
-    <section class="closing shell" aria-labelledby="closing-title" data-reveal><h2 id="closing-title">Watch the turn.<br>Inspect the record.</h2><div><p>The judge view brings the comparison, console, and evidence into one place.</p><a class="button button-primary" href="judges/">Open judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></div></section>
+    <section class="closing shell" aria-labelledby="closing-title" data-reveal><h2 id="closing-title">Watch the turn.<br>Inspect the record.</h2><div><p>The judge view brings the comparison, console, and evidence into one place.</p><a class="button button-primary" href="judges/">Open judge workspace <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></div></section>
   </main>
   <footer class="site-footer shell">
     <div class="footer-top">

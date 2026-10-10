@@ -1,85 +1,237 @@
 ---
-name: StutterTurn Site Extension
-description: Landing and judge routes extending the existing broadcast console.
+name: StutterTurn Studio
+description: A cool charcoal studio workspace for inspecting voice-agent turn taking.
 colors:
-  bg: "#0c0a09"
-  panel: "#171412"
-  raised: "#201c19"
-  fg: "#f5f4f2"
-  muted: "#aaa29a"
-  border: "#39332e"
-  rule: "#2a2521"
-  speaking: "#30d158"
-  silence: "#57534e"
-  holding: "#f59e0b"
-  agent: "#38bdf8"
+  accent: "#50d9f3"
+  speaking: "#71e0b5"
+  holding: "#f4c46a"
+  agent: "#50d9f3"
+  overlap: "#fb7185"
+  bg: "#090e14"
+  panel: "#101923"
+  raised: "#172330"
+  fg: "#edf4fa"
+  muted: "#9cabbc"
+  dim: "#8d9bad"
+  silence: "#63758a"
+  border: "#304154"
+  rule: "#223141"
+  hover: "#203247"
+  selected: "#12303d"
+  control-border: "#526b82"
 typography:
   display:
     fontFamily: "Archivo, 'Segoe UI', sans-serif"
+    fontSize: "clamp(64px, 7.8vw, 96px)"
+    fontWeight: 750
+    lineHeight: 0.99
+    letterSpacing: "-0.04em"
+  headline:
+    fontFamily: "Archivo, 'Segoe UI', sans-serif"
+    fontSize: "clamp(30px, 3vw, 42px)"
+    fontWeight: 660
+    lineHeight: 1.08
+    letterSpacing: "-0.035em"
+  introduction:
+    fontFamily: "Archivo, 'Segoe UI', sans-serif"
+    fontSize: "clamp(21px, 2vw, 27px)"
+    fontWeight: 520
+    lineHeight: 1.35
+    letterSpacing: "-0.012em"
   body:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif"
     fontSize: "16px"
+    fontWeight: 400
     lineHeight: 1.65
-  data:
+  label:
     fontFamily: "'JetBrains Mono', Consolas, monospace"
+    fontSize: "11px"
+    fontWeight: 400
+  note:
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: 1.65
 rounded:
-  figure: "14px"
-  control: "4px"
+  surface: "12px"
+  control: "6px"
+  key: "3px"
   track: "2px"
+spacing:
+  control-gap: "8px"
+  action-gap: "12px"
+  field-gap: "16px"
+  section-gap: "24px"
+  hero-gap: "72px"
+components:
+  button-primary:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.bg}"
+    rounded: "{rounded.control}"
+    padding: "11px 20px"
+  button-quiet:
+    backgroundColor: "transparent"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.control}"
+    padding: "11px 20px"
+  console-button-primary:
+    backgroundColor: "{colors.accent}"
+    textColor: "#06232c"
+    rounded: "{rounded.control}"
+    padding: "10px 12px"
+  console-button-secondary:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.control}"
+    padding: "10px 12px"
+  input-url:
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.control}"
+    padding: "10px 11px"
+  navigation:
+    textColor: "{colors.muted}"
+    padding: "10px 0"
+  status-chip:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.control}"
+    padding: "7px 9px"
+  monitor:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.surface}"
+    padding: "18px 22px 20px"
+  configuration:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.control}"
+    padding: "12px"
+  sequence-button:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.fg}"
+    rounded: "{rounded.control}"
 ---
 
-# Design System: StutterTurn Site Extension
+# Design System: StutterTurn Studio
 
 ## Overview
 
-**Creative North Star: "Broadcast console"**
+**Creative North Star: "Dark studio console"**
 
-[The call console design](demo-ui/DESIGN.md) remains the visual authority. This document records its extension into [the landing page](index.html) and [judge view](judges/index.html), implemented by [site.css](site.css) and [site.js](site.js). It does not redefine the console's components or event semantics.
+Cool charcoal surfaces, ice cyan actions, and clear instrument labels give StutterTurn the character of a working studio. The user selected this direction on 2026-10-10, replacing the earlier warm brown and cream appearance. Controls have visible edges and clear state changes; generous landing-page type introduces the same visual language used in the denser operating console.
 
-The landing route uses **Persuade** mode: one hero hierarchy (mono eyebrow, full-width headline, a single dek, console-key actions), an animated conceptual caller/agent loop in the console's own timeline language, the pinned evidence promoted directly beneath the hero, and a three-channel comparison leading to the judge view. The judge route uses **Operate** mode: brief presentation guidance surrounds the existing console, with the replay handoff below it. Both retain the warm near-black canvas, warm-white typography, flat rules, and semantic state colors.
+This is the shared visual authority for the [overview](index.html), [judge workspace](judges/index.html), and [call console](demo-ui/index.html). Its tokens come from [site.css](site.css) and [console styles](demo-ui/styles.css); the [console design document](demo-ui/DESIGN.md) specializes their operating layout and event semantics. [PRODUCT.md](../PRODUCT.md) records product constraints, and the [surface brief](../.impeccable/surfaces/studio-refresh.md) records this refresh's composition. The [root v2 sidecar](../.impeccable/design.json) holds component previews and extensions; its derived tonal ramps are preview aids, not additional production colors.
+
+**Key Characteristics:**
+
+- Cool charcoal layers and cyan controls with visible borders.
+- Large Archivo headlines balanced by precise JetBrains Mono instrumentation.
+- Caller, decision, and reported audio remain distinct, labeled tracks.
+- Responsive controls, keyboard access, and explicit evidence provenance.
 
 ## Colors
 
-Warm white supplies primary text and action fills. Muted text, panel tones, and quiet borders establish hierarchy without shadows. The site frontmatter records the actual shared values used in its stylesheet.
+Cyan supplies the active voice against a cool, dark neutral range. The frontmatter is the normative palette; console-only interaction tokens are included so new surfaces share the same controls.
 
-Green represents caller speech, neutral gray represents silence, amber represents holding, and cyan represents an agent reply. On the landing page these colors explain a labeled concept; within the console they accompany reported states and events. The console's overlap and error treatments remain defined by its own design authority.
+### Primary
+
+- **Ice cyan — accent:** primary actions, focus, current-route marks, the brand symbol, and the illustrative playhead.
+- **Ice cyan — agent:** reported agent audio on the console and the explicitly illustrative reply on the overview. It shares the accent value but keeps its separate semantic name.
+
+### Secondary
+
+- **Caller mint — speaking:** caller speech and connected status.
+- **Holding amber — holding:** incomplete-turn decisions, holding spans, preview status, and pending evidence items.
+- **Overlap rose — overlap:** console overlap state and patterned collision bands.
+
+### Neutral
+
+- **Cool charcoal — bg:** the page and inset fields.
+- **Studio slate — panel:** monitors, toolbars, configuration tiles, and status chips.
+- **Raised slate — raised:** secondary controls and selected interaction surfaces.
+- **Ice white — fg:** primary text and complete-decision flags.
+- **Blue gray — muted:** secondary copy, labels, and provenance.
+- **Dim blue gray — dim:** unavailable console controls.
+- **Silence slate — silence:** silence indicators and scrollbars.
+- **Structural slate — border / rule:** panel edges and quieter internal dividers.
+- **Control steel — control-border:** stronger native field and button boundaries.
+- **Hover slate / selected teal — hover / selected:** console hover and checked-configuration fills.
+
+**The Labeled State Rule.** State color always accompanies text; overlap also has a patterned band. Cyan controls do not imply reported audio.
 
 ## Typography
 
-Archivo supplies the wordmark, headline, and section headings; system fonts carry body text; JetBrains Mono carries every data voice on the landing page — the eyebrow, loop timecode, ruler and lane labels, decision flags, state chips, evidence fact labels and values, channel numbers, and revisions. Both web fonts reuse the console's local Latin-subset WOFF2 assets and fallbacks, and both are preloaded.
+Archivo carries the brand, headlines, introduction, and console tally. System sans-serif carries prose and fields. JetBrains Mono carries clocks, phase labels, revisions, and event measurements. Both web fonts are local Latin-subset WOFF2 files with fallback stacks and `font-display: swap`; the assets and licenses live in [fonts/](demo-ui/fonts/).
 
-The landing headline uses a tight line height (0.98) and a fluid desktop scale (clamp 64–96px) across the full shell width; the dek is a single Archivo paragraph beneath it. Body copy remains comfortably spaced; short instrumentation and provenance labels use smaller type. The judge title stays subordinate to the console's large state tally.
+The frontmatter records the desktop landing hierarchy. The introduction is limited to 32 characters per line and contextual copy to 55; general paragraphs have a 70-character cap. Section headings are smaller than the hero, while mono labels stay at least 11px. The console uses its own compact body and tally roles documented alongside the application.
+
+**The Two Reading Speeds Rule.** Use Archivo and body copy to explain the task; use mono type for values that people inspect or compare.
 
 ## Layout
 
-The landing shell is centered and capped at 1440px. Desktop pairs the headline with introductory copy, then uses ruled two-column explanation and evidence sections. At 720px and below these become a single reading column; at 480px and below navigation sits beneath the wordmark. Narrow layouts retain side gutters rather than shrinking body text.
+The overview uses a centered shell capped at 1440px with 40px desktop gutters. Its first row pairs a headline with the introduction and primary action (1.05fr / 1fr, 72px gap), followed by the wide illustrative sequence. Evidence uses two columns and open ruled rows; three numbered comparison channels lead to the final workspace action.
 
-The judge view uses a wider shell and compact introductory content. Its same-origin iframe loads the existing console once. The host hides duplicate console branding and adjusts the frame height when its content changes; the connection status, controls, provenance, and ledger remain part of the console. The console retains its own stacking breakpoints and horizontal scrolling for timeline and ledger content. A direct full-console link provides an alternate route.
+- At 1000px and below, hero spacing tightens and the heading uses a smaller fluid scale.
+- At 720px and below, the hero, evidence, comparison, and closing sections become one reading column; overview gutters are 20px.
+- At 480px and below, navigation moves below the wordmark and hero actions remain side by side, with the primary action taking the flexible space.
+- The illustration retains a 520px minimum diagram width inside a horizontally scrollable, focusable region. Its visible scroll instruction appears at 640px and below.
+- A sequence container query at 620px stacks the figure heading and arranges playback controls into two columns. It responds to the figure's available width.
+
+The judge shell is capped at 1536px, with 32px desktop and 16px narrow-screen gutters. A compact introduction and native presenter-guide disclosure precede the dominant console. The console itself places source selection and transport above the monitor and right setup inspector; see its design document for breakpoints and scroll regions.
+
+[site.js](site.js) loads the same console in a same-origin iframe and adds the `embedded-console` class to its root. The console stylesheet owns the embedded layout, hides duplicate branding, retains connection status, and keeps its responsive rules active. A `ResizeObserver`, font readiness, and animation-frame batching keep frame height aligned with the content; the direct full-console link remains available.
 
 ## Elevation & Depth
 
-There are no shadows. Panel fills and single-pixel borders separate the conceptual figure, controls, and evidence rows. Warm-white focus outlines make keyboard location visible.
+Depth comes from tonal surfaces and single-pixel rules. There are no shadows, decorative glass layers, or floating evidence cards. Cyan focus outlines are 2px with a 5px offset on site controls; the console uses a 3px offset.
 
-Motion is restrained and fully gated. The landing page owns two moments: the hero concept loop (a 7.5 s CSS cycle — a 6 s left-to-right reveal wipe, playhead, holding pulse, decision-flag pops, and a 1.5 s completed hold) and a single opacity/translate scroll reveal on section entries. JavaScript starts the loop only while the figure is in view and never under `prefers-reduced-motion`; without JavaScript or with reduced motion, the base styles are the completed final frame and sections stay visible. Console-key buttons keep the console's 140 ms background transition and add a 1px press offset.
+Site buttons change background over 140ms with ease-out and move down 1px while pressed. The illustration's JavaScript animation and the console's active holding pulse are described with their components. Cross-document view transitions appear only in [site.css](site.css), with a 160ms root transition inside `prefers-reduced-motion: no-preference`. They progressively enhance supported overview/judge navigation; the console has no view-transition rule. Reduced-motion styles remove CSS transitions and animations.
+
+**The Flat Workspace Rule.** Separate working areas with tone, spacing, and borders; reserve bright color for an action or a labeled state.
 
 ## Shapes
 
-The conceptual figure uses the console monitor's restrained rounded container. Actions have smaller corners; timeline bars are nearly square. Supporting prose uses open sections and rules rather than repeated cards.
+Working panels have modest corners, controls have smaller corners, and timeline bars stay almost square. The frontmatter records these reusable steps. Small dots identify status and legend entries; the brand mark is an inline line symbol. Evidence is organized with horizontal rules and open space rather than another raised panel.
 
 ## Components
 
-- **Console keys:** actions reuse the console transport's materials — primary is warm-white fill on dark text, the quiet key is the raised tone with the console's #70665d border and hover/active fills. Minimum height 48px, 140ms background transition, 1px press offset, reduced motion respected.
-- **Concept loop (signature):** caller and agent lanes in the console's timeline language — mono lane tags, a phase ruler with ticks, amber WAIT and warm-white COMPLETE decision flags, an amber holding label and bar that pulse while open, a cyan reply, a one-pixel playhead, a state chip row echoing the tally, and a mono loop timecode labeled CONCEPT LOOP. A visible ILLUSTRATIVE SEQUENCE chip and accessible description identify it as illustrative, with no recorded timing or audio; the caption keeps that wording verbatim. Reduced motion and no-JS render the completed final frame statically.
-- **Evidence:** the pinned handoff sits in a console-panel card directly after the hero. Mono uppercase fact labels with semantic status dots (speaking green for facts recorded in the handoff, holding amber for pending items), mono values, per-row hairlines, the unreduced human-review caveat, and a console-key link to the pinned source.
-- **Channels:** the three comparison steps run full width as numbered channels (01–03, mono numbers over ruled columns); the numbering reflects the real operating sequence.
-- **Footer:** brand line, repository/benchmark/console links, the SEP-28k CC BY-NC attribution, and the provenance line that nobody imitates stuttering — the recordings are real and labeled.
-- **Presenter guide:** native disclosure keeps instructions available without occupying the main operating area when closed.
-- **Embedded console:** the same controls, backend adapter, event renderer, status notices, and keyboard behavior as the full console; the site adds no second run model or simulated playback.
+### Navigation and actions
+
+The wordmark and cyan symbol lead a simple route navigation. The current route has a cyan underline and `aria-current`; links retain visible keyboard focus. A cyan primary action and outlined quiet action use a 48px minimum height. Hover lightens the primary and fills the quiet action. The console's Start, Stop, and Reset variants retain native button states and keyboard hints.
+
+### Illustrative sequence
+
+The signature figure shows caller and agent lanes, WAIT and COMPLETE flags, a playhead, a concept clock, and a phase explanation. The visible caption says that it represents no recorded timing or audio. The diagram has a complete accessible text description; decorative track internals are hidden from assistive technology.
+
+JavaScript reveals a native Play/Pause button and range input. Scrubbing pauses playback and updates the phase, explanation, clock, and range `aria-valuetext`. The animation uses a 7.5-second cycle: 6 seconds advance through the illustration and 1.5 seconds hold the completed frame. With normal motion preference it runs only while visible; leaving the viewport or hiding the document pauses it. A user's pause is respected on return.
+
+Reduced motion starts at the completed frame without autoplay. A user can still explicitly play or scrub; a new reduced-motion preference pauses an active sequence. Without JavaScript, the completed diagram and caption remain visible and the transport stays hidden. There is no scroll-reveal animation.
+
+### Console toolbar, inspector, and records
+
+The source selector sits beside the transport above the monitor. Configuration radios and connection/preview controls occupy the right inspector. Native inputs, a distinct selected fill and border, disabled states, and visible focus keep the operating controls legible. On mobile, a setup jump link reaches the inspector below the monitor.
+
+The monitor, connection chip, synthetic banner, run record, summary, and independently scrollable ledger share this palette. Detailed behavior belongs to the [console component contract](demo-ui/DESIGN.md). Do not replace its event times with an illustrative playback clock.
+
+### Evidence and presenter guidance
+
+Evidence uses readable body labels, precise revision text, quiet rules, and recorded/pending dots. The overview and judge page link to the exact [replay-v2 evidence](https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2); the judge page also links to the [event contract at the execution revision](https://github.com/vinhbin/stutterturn/blob/bcf50d1/agent/CONTRACT.md). The evidence artifact is pinned to `9805a06`; its five recordings and ten stock/patient logs were executed on `bcf50d1`.
+
+Keep the source revision, unreviewed-label caveat, and playback qualification with the evidence. The browser plays no audio. Candidate availability comes from the connected backend. A decision, reported audio receipt, verified speaker playback, and an efficacy claim are different facts. The presenter guide uses native disclosure to keep guidance accessible without crowding the workspace.
 
 ## Do's and Don'ts
 
-- Do preserve the console's fonts, state meanings, visible labels, focus treatment, and honest provenance.
-- Do keep illustrative sequences distinct from backend reports and received audio distinct from verified playback.
-- Do preserve the landing page's reading space while keeping judge guidance compact enough to support operating the console.
-- Don't turn the concept tracks into measured charts, add decorative waveforms, or imply recorded timing from their proportions.
-- Don't duplicate console logic or present synthetic previews as replay evidence.
+### Do:
+
+- **Do** use the shared cool charcoal palette and cyan control hierarchy.
+- **Do** keep labels, focus, native controls, and horizontal-scroll access intact.
+- **Do** keep illustration, synthetic preview, and backend evidence visibly distinct.
+- **Do** keep replay provenance and playback limitations beside the corresponding data.
+
+### Don't:
+
+- **Don't** reintroduce the superseded warm brown and cream visual world.
+- **Don't** turn illustrative proportions into recorded timings or add invented waveforms.
+- **Don't** use color alone to communicate caller, holding, audio, or overlap state.
+- **Don't** imply that a turn decision or received audio verifies speaker playback.
