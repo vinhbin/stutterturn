@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StutterTurn Demo</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="auto">
+
+<!-- Shown ONLY while the labeled development preview fixture is active. -->
+<div id="preview-banner" class="preview-banner" hidden role="alert">
+  DEVELOPMENT PREVIEW — synthetic fixture events. Not live agent output. Not benchmark
+  evidence. No audio is playing and no recording is involved.
+</div>
+
+<header class="page-header">
+  <h1>StutterTurn demo surface</h1>
+  <p class="subtitle">Turn-taking comparison rig — passive shell until the agent contract lands.</p>
+  <div id="connection-chip" class="chip chip-blocked" role="status">LIVE INTEGRATION: BLOCKED</div>
+</header>
+
+<main>
+
+  <!-- Global status / error / disconnection messages -->
+  <div id="status-banner" class="status-banner warn" role="status" aria-live="polite">
+    Live integration is <strong>BLOCKED</strong>: <code>agent/CONTRACT.md</code> has not been
+    published (owner: Guttuu). No endpoints are invented here. Use the labeled development
+    preview to exercise the display, or wait for the contract.
+  </div>
+
+  <!-- Configuration -->
+  <section class="panel" aria-labelledby="config-heading">
+    <h2 id="config-heading">Configuration</h2>
+    <p class="note">Configuration changes apply <strong>only to a fresh run</strong>. The rig
+      never switches model weights mid-call. If the model gate fails, the comparison falls back
+      to STOCK vs PATIENT labeling — a candidate model is never presented as available unless a
+      real artifact exists.</p>
+    <fieldset id="config-group">
+      <legend class="visually-hidden">Select configuration for the next fresh run</legend>
+      <!-- Radios are populated by app.js from the adapter's configuration list -->
+    </fieldset>
+  </section>
+
+  <!-- Run controls + status -->
+  <section class="panel" aria-labelledby="run-heading">
+    <h2 id="run-heading">Run</h2>
+    <div class="run-controls">
+      <button id="btn-start" type="button" accesskey="s">Start fresh run <kbd>S</kbd></button>
+      <button id="btn-stop" type="button" disabled>Stop <kbd>X</kbd></button>
+      <button id="btn-reset" type="button" class="danger">Reset <kbd>R</kbd></button>
+    </div>
+    <dl class="run-meta">
+      <div><dt>Run status</dt><dd id="run-phase">idle</dd></div>
+      <div><dt>Run ID</dt><dd id="run-id">—</dd></div>
+      <div><dt>Run configuration</dt><dd id="run-config">—</dd></div>
+      <div><dt>Event source</dt><dd id="run-source">blocked (no backend contract)</dd></div>
+    </dl>
+    <p class="note" id="start-note">Start is disabled while live integration is blocked.
+      Enable the development preview below to exercise the display with labeled synthetic
+      events.</p>
+  </section>
+
+  <!-- Source recording provenance — always visible, never fabricated -->
+  <section class="panel" aria-labelledby="source-heading">
+    <h2 id="source-heading">Source recording</h2>
+    <p class="provenance" id="source-label">
+      No source recording loaded. Recording identity/provenance must come from the agent
+      backend per the (pending) contract. This demo only ever plays <strong>real, labeled
+      SEP-28k recordings</strong> of people who stutter — nobody imitates stuttering, ever.
+    </p>
+  </section>
+
+  <!-- Turn state -->
+  <section class="panel" aria-labelledby="state-heading">
+    <h2 id="state-heading">Caller / agent state</h2>
+    <div class="current-state">
+      <span class="label">Current:</span>
+      <span id="current-state" class="state-badge state-none" role="status">no run</span>
+    </div>
+    <div id="state-strip" class="state-strip" role="img"
+         aria-label="Turn-state timeline for the current run">
+      <span class="strip-empty">No state events yet.</span>
+    </div>
+    <p class="legend">
+      <span class="state-badge state-speaking">speaking</span>
+      <span class="state-badge state-silence">silence</span>
+      <span class="state-badge state-holding">holding</span>
+      <span class="state-badge state-agent">agent</span>
+    </p>
+  </section>
+
+  <!-- Timing events -->
+  <section class="panel" aria-labelledby="events-heading">
+    <h2 id="events-heading">Observed timing events</h2>
+    <p class="note">An <strong>internal completion decision</strong> is the turn model's output;
+      an <strong>audible response</strong> is what the caller actually hears. They are different
+      moments and are reported separately.</p>
+    <dl class="run-meta timing-summary">
+      <div><dt>First internal completion decision</dt><dd id="first-decision">—</dd></div>
+      <div><dt>First audible agent response</dt><dd id="first-audible">—</dd></div>
+      <div><dt>Decision → audible gap</dt><dd id="decision-gap">—</dd></div>
+    </dl>
+    <div id="event-scroll" class="event-scroll" tabindex="-1" role="region" aria-labelledby="events-heading">
+    <table id="event-table">
+      <caption id="event-caption">Events for the current run. A fresh run clears this table.</caption>
+      <thead>
+        <tr><th scope="col">Run</th><th scope="col">t (s)</th><th scope="col">Kind</th>
+            <th scope="col">Detail</th><th scope="col">prob</th><th scope="col">model</th></tr>
+      </thead>
+      <tbody id="event-body">
+        <tr class="empty-row"><td colspan="6">No events. Start a fresh run.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- Integration status -->
+  <section class="panel" aria-labelledby="integration-heading">
+    <h2 id="integration-heading">Integration status</h2>
+    <ul class="integration-list">
+      <li><code>agent/CONTRACT.md</code> (Guttuu) — <strong id="agent-contract-status">missing
+        → live run control and event stream BLOCKED</strong></li>
+      <li><code>model/CONTRACT.md</code> (Niko) — <strong id="model-contract-status">missing
+        → STUTTERTURN candidate arm unavailable</strong></li>
+    </ul>
+    <p class="note">Proposed event schema from PLAN.md (<strong>PROPOSED, not an implemented
+      service</strong>): <code>{t, state: speaking|silence|holding|agent, prob, model}</code>
+      over websocket. Run identity, time origin, decision-vs-audible timing and cancellation
+      events still need agreement — see <code>README.md</code> in this directory.</p>
+    <div class="preview-controls">
+      <label>
+        <input type="checkbox" id="preview-toggle">
+        Enable development preview (labeled synthetic fixture — never evidence) <kbd>P</kbd>
+      </label>
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <h2>Keyboard controls</h2>
+    <ul class="kbd-list">
+      <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> — move between controls</li>
+      <li><kbd>&larr;</kbd> <kbd>&rarr;</kbd> — change configuration (radio group); <kbd>1</kbd>–<kbd>3</kbd> jump directly</li>
+      <li><kbd>S</kbd> start fresh run · <kbd>X</kbd> stop · <kbd>R</kbd> reset (one tap) · <kbd>P</kbd> toggle preview</li>
+    </ul>
+    <p class="note">Owned by Vinh (<code>web/demo-ui/</code> only). Kareem: embed or link this
+      page per <code>web/demo-ui/README.md</code>.</p>
+  </footer>
+
+</main>
+
+<script src="adapter.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
