@@ -1,6 +1,8 @@
 # Approved v3 scope: one 80/20 experiment, with separate validation
 
-**October 10, 2026. Execution approved at approximately 19:00 EDT under D-011.** Vinh explicitly resumed W3 only with “ok do it” after the bounded recommendation. [The approval is recorded on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431). It supersedes his earlier training pause, but keeps the reserved test sealed, all validation/promotion checks, and the 20:00 EDT hard stop. Approval does not establish that Guttuu has started or completed the run.
+**Result update:** W3 completed and [`sel-v3` returned `dev_nothing_passes`](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103321119). All six operating points failed M5. No candidate is promoted; stock/patient remains the backup, pending its human/audio checks. Vinh is continuing the original improvement goal. [The v4 response](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097), recorded in D-012, conditionally approves six blends after Niko signs off on corrected code/protocol, with a 45-minute execution cap and 20:45 EDT absolute stop. No v4 start/result is established. The reserved test stays sealed. The scope below preserves the executed W3 protocol; D-012 separately governs the next attempt. See the updated [training report](training-report-2026-10-10.md).
+
+**Historical approval: October 10, 2026, approximately 19:00 EDT under D-011.** Vinh explicitly resumed W3 only with “ok do it” after the bounded recommendation. [The approval is recorded on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431). It superseded his earlier training pause, keeping the reserved test sealed, all validation/promotion checks, and the 20:00 EDT hard stop. The result above was reported after that approval.
 
 ## Recommendation and why
 
@@ -49,7 +51,7 @@ For later confirmation, obtain different authentic recordings with reviewed endp
 
 ## Timing, ownership and fallback
 
-[Niko's reconciled protocol](../model/specs/training-v3.md) targets prescreen at **resume +20 minutes** and selection at **resume +40 minutes**, with the unchanged **20:00 EDT hard stop** on October 10. Vinh approved at approximately 19:00. If execution or checks cannot fit in the remaining time, do not compress verification or extend the deadline. No v4 or extra sweep follows a failed result.
+[Niko's reconciled protocol](../model/specs/training-v3.md) targeted prescreen at **resume +20 minutes** and selection at **resume +40 minutes**, with the unchanged **20:00 EDT hard stop** on October 10. Vinh approved at approximately 19:00. Under this W3 authorization, execution or checks could not be compressed to fit, the deadline could not be extended, and no v4 or extra sweep was authorized after a failed result.
 
 - **Vinh:** approved W3 only under D-011; later integration still requires evidence and a recorded decision.
 - **Niko:** the amendment is recorded; own selection, matched input checks, and disclosure.

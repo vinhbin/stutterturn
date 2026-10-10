@@ -10,7 +10,7 @@ This file defines what a StutterTurn model artifact is and how the agent calls i
 |---|---|---|---|---|
 | `stock-int8` | `smart-turn-v3.2-cpu.onnx` (pipecat-ai/smart-turn-v3 @ `f766f81`) | `2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f` | **Verified** hash and inference ([handoff](../docs/model-recovery-handoff.md)) | Stock arm, and the exploratory benchmark's model |
 | `stock-fp32` | `smart-turn-v3.2-gpu.onnx` (same revision; runs on CPU) | `ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be` | **Verified** hash and reconstruction parity ([evidence](../docs/proofs/model-mechanics/evidence.json)) | Starting point for training; a stock arm when compared against an FP32 candidate |
-| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). Training v1 and v2 gave `dev_nothing_passes`; W3 was approved under D-011 and [reported started at 19:10 EDT](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103190286), with no selection result yet. Test stays sealed (D-009) | Candidate arm |
+| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). V1 failed its amended prescreen; v2 and [W3](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103321119) gave `dev_nothing_passes`; all six W3 operating points failed M5. Selection/training evidence is published at `bd095f9`. V4 is [conditionally approved](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097) under [D-012](../docs/decision-log.md), pending Niko's corrected code/protocol sign-off; no start/result reported. Test stays sealed (D-009) | Candidate arm |
 
 - `synthetic-one-batch.onnx` (`9a00002e…7d3c`) is a mechanical proof output. **It must never be loaded as a candidate or shown in the demo.**
 - Never overwrite a published `v{N}`. Any retraining, even with the same data, produces `v{N+1}`.
@@ -81,11 +81,11 @@ Being agent-ready doesn't mean improved. Improvement is decided only by the PLAN
 
 | model_id | sha256 | status | evidence |
 |---|---|---|---|
-| — | — | **No released or selected candidate** (status as of 2026-10-10 19:00 EDT) | [model results](../docs/model-results-2026-10-10.md), [training report](../docs/training-report-2026-10-10.md) |
+| — | — | **No released or selected candidate** (after W3 selection, 2026-10-10 evening EDT) | [model results](../docs/model-results-2026-10-10.md), [training report](../docs/training-report-2026-10-10.md), [published v2/v3 selection records](https://github.com/vinhbin/stutterturn/tree/bd095f9/benchmark/selection) |
 | `stutterturn-v2-rV3-c0.51` | `e2b22997…` (full hash in the `sel-v2` `decision.json`) | `dev-candidate`, **rejected** by `sel-v2` (`dev_nothing_passes`: M5 guard) | [issue #2 `decision.md`](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102500044) |
 | `stutterturn-v2-rV2-c2.00` | `3cbb4063…` (full hash in the `sel-v2` `decision.json`) | `dev-candidate`, **rejected** by `sel-v2` (`dev_nothing_passes`: M5 guard) | same |
 
-Rejected development candidates aren't releases. Their names are never reused, their weights aren't distributed, and the agent must not load them as a candidate arm. Training v1 exported no candidate: its pre-screen had 0 eligible checkpoints. Full hashes and records will be committed once the `sel-v2` evidence is preserved (issue #2 request).
+Rejected development candidates aren't releases. Their names are never reused, their weights aren't distributed, and the agent must not load them as a candidate arm. Training v1 exported no candidate: its pre-screen had 0 eligible checkpoints. Full v2/v3 export hashes, training records and guard records are now [published at `bd095f9`](https://github.com/vinhbin/stutterturn/tree/bd095f9/model/evidence/2026-10-10); neither W3 export was selected. The [D-012 approval](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097) permits six fixed v4 blends after Niko signs off corrected code/protocol; `c17e4bc` remains proposal code, not a release. Stop after 45 minutes from the approved execution start or at 20:45 EDT, whichever comes first. This supersedes D-011's 20:00 stop/no-v4 restriction for one attempt only; all numeric gates and the test seal remain, with no automatic v5.
 
 ## 7. Per-call log record (Proposed; consumed by E1 and the UI)
 
@@ -101,7 +101,7 @@ Each model call must produce at least these fields. In agent contract v0.1 they 
 
 ## 8. Known limits
 
-- Only synthetic inputs have been used for training/export so far. No stutter adaptation, real-audio accuracy or drop-in agent behaviour has been demonstrated.
+- The initial mechanical proof used synthetic inputs. Subsequent v1/v2/v3 attempts trained on real podcast proxies plus original Smart Turn replay and were evaluated on development/guard data; none passed selection. Human-validated stutter improvement and candidate drop-in agent behaviour remain unproved.
 - Mechanical evidence was produced on Windows with Python 3.12.10, torch 2.8.0+cpu and transformers 5.19.0. Reproduction on other platforms hasn't been checked.
 - Training uses the community **haan** converter pinned at `540f97d` (BSD-2-Clause; keep its notices). Upstream Smart Turn ships no PyTorch checkpoint.
 - English, wideband podcast audio only. Long blocks (> 1.6 s) and 8 kHz telephony are untested.

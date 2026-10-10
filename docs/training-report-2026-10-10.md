@@ -1,12 +1,14 @@
 # StutterTurn: model training and evaluation report
 
-**Evidence snapshot: October 10, 2026, 18:45 EDT.** Prepared for judge questions and team handoff. Training v1 and v2 were run; neither produced a qualifying candidate. Training v3 was proposed and paused at that snapshot. The current demonstration uses stock/patient behavior, not an accepted fine-tuned model. This report checks repository methods against the executor's published results; it does not independently reproduce the training runs.
+**Evidence update: October 10, 2026, after the 19:42 EDT response to Guttuu.** Training v1, v2, and the approved W3-only v3 attempt produced **no qualifying candidate**. v1 failed the amended prescreen; v2 and v3 returned `dev_nothing_passes` in their saved selection decisions. No fine-tuned model is selected. Vinh is continuing the original improvement goal through a conditionally approved interpolation attempt; stock/patient is the backup, subject to its remaining human/audio acceptance checks. The reserved final test stays sealed. This report checks published methods/results; it does not independently reproduce training or establish real-world efficacy.
 
-**Execution update, approximately 19:00 EDT:** Vinh [approved W3 only](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431) under D-011. The protocol amendment is merged in PR #28; the reserved test remains sealed and the 20:00 stop remains. This approval does not supply a start confirmation, v3 score, or passing result. The results below remain the v1/v2 evidence snapshot.
+Vinh [approved W3 only](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431) under D-011 at approximately 19:00 EDT. Guttuu [reported preflight passing and training starting at 19:10](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103190286), then [reported selection failure at 19:27](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103321119), before the 20:00 hard stop. No extra variant or final-test run followed.
 
 ## The 30-second explanation
 
-We adapted Pipecat's existing Smart Turn v3.2 audio model to study when a voice agent should keep listening. We combined original complete/incomplete training examples with real podcast recordings containing stuttering. Our first attempt reduced premature decisions but also stopped recognizing many completed examples. The second added completed examples from the same podcast domain and improved that trade-off, but made more errors on ordinary unfinished speech, so we rejected it. These are development results using automatic endpoint proxies. We have not demonstrated a validated improvement for people who stutter, and the reserved final evaluation remains unrun.
+We adapted Pipecat's existing Smart Turn v3.2 audio model to study when a voice agent should keep listening. We combined original complete/incomplete training examples with real podcast recordings containing stuttering. Our first attempt reduced premature decisions but also stopped recognizing many completed examples. The second added completed examples from the same podcast domain, but made more errors on ordinary unfinished speech. The third used more original training replay: its nearest miss had a smaller ordinary-speech regression, but still failed our no-regression rule. We rejected all three attempts. These are development results using automatic endpoint proxies. We have not demonstrated a validated improvement for people who stutter, and the reserved final evaluation remains unrun.
+
+**Claim boundary:** the intended product claim is fewer audible interruptions while answering promptly after real turn endings. The measured result is fewer internal "turn complete" predictions during automatically labelled unfinished pauses, with regressions elsewhere. An early model decision may be cancelled before any reply audio plays. These measurements therefore do not establish the intended product claim or a percentage reduction in real people being interrupted.
 
 ## 1. What we trained
 
@@ -47,13 +49,13 @@ An epoch here is a specified number of **weighted random draws with replacement*
 |---|---|---|
 | v1, runs R1–R4 | Usually 60% original replay + 40% SEP unfinished cuts; one run used 75/25; one partially froze the encoder | All 16 checkpoints rejected under the amended prescreen. Completed-window decisions collapsed. |
 | v2, runs V1–V4 | Usually 60% replay + 20% SEP unfinished + 20% SEP completed proxies; run V3 used 40/30/30; one partially froze the encoder | 4 of 16 checkpoints passed the prescreen; two were exported. Every final operating point failed the general-speech incomplete guard. |
-| Proposed v3, W runs | More original replay; our recommendation is W3 only at 80/10/10 | No run or score reported at this snapshot. See the [proposed protocol](v3-recommendation-2026-10-10.md). |
+| v3, W3 only | 80% original replay + 10% SEP unfinished + 10% SEP completed proxies; stock initialization | Three checkpoints passed prescreen; two were exported. All six final operating points failed the unfinished-speech guard. No candidate selected; W1/W2/W4 not run. |
 
 **Naming:** `V3/ckpt-e0.51` is a run within training **v2**. It is not evidence that training **v3** happened.
 
 **v1 chronology:** the completed-window M3 check was added after training and an initial prescreen had already run. Saved checkpoints were rescored, and the earlier selection was retained as superseded. Under the amended rule, all 16 failed: completed-window decisions fell from 46.62% to 8.24–22.06%, while stutter-gap premature decisions fell to 0.85–6.25%. This pattern is consistent with a podcast-domain shortcut; it does not establish the model's internal mechanism. Do not describe the whole v1 evaluation as fixed before any results were seen. [Executor's v1 report](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6101907402).
 
-v2 was designed after inspecting v1. A future v3 would be a third adaptive attempt on the same development data and guard. Report that reuse explicitly.
+v2 was designed after inspecting v1; v3 was designed after inspecting v2. These are three adaptive attempts using the same development data and guard. Report that reuse explicitly.
 
 ## 4. Current score: development results only
 
@@ -74,21 +76,53 @@ For context, stock FP32 at threshold 0.55 met every constraint with M1 45.7%. St
 
 Selection compares point estimates under fixed constraints; the nearest miss cannot become a pass by relaxing a rule afterward. Confidence intervals do not remove label uncertainty or dependence among clips from the same shows. None of these figures is an audible interruption rate, a population efficacy estimate, or a measured completed-turn response delay.
 
+### Training v3: the 80/20 result
+
+[Guttuu's W3 selection report](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103321119) gives **`dev_nothing_passes`**. All six checkpoint/threshold combinations failed M5, the rule that ordinary unfinished speech must not become more likely to be called complete.
+
+| Operating point | Stutter-gap premature decisions, M1 | Change in unfinished-guard specificity vs stock | Failed checks |
+|---|---:|---:|---|
+| Stock FP32 at 0.5 | 47.4% | Baseline 93.5% (1,418/1,516) | Reference |
+| W3 / epoch 1.00 at 0.6: nearest miss | 20.2% | -0.33 percentage point, about five net additional errors | M5 |
+| W3 / epoch 2.00 at 0.6: lowest M1 | 17.6% | -1.06 percentage points, about sixteen net additional errors | M4 and M5 |
+
+Do not combine the second row's smaller guard regression with the third row's lower M1: they are different checkpoints. The nearest miss has M1 **71/352** and guard specificity **1,413/1,516 (93.21%)**, versus stock's **1,418/1,516 (93.54%)**. Compared with stock, 22 guard predictions became wrong and 17 became correct: five **net** extra errors, not just five changed predictions. Its other selection constraints passed. Compared with v2's nearest miss, the guard deficit was smaller (about nine net errors became five), while M1 was higher (18.5% became 20.2%). That is a trade-off between selected development operating points, not proof of improved real-world behavior.
+
+The run used learning rate `1e-5`, seed 0, two weighted epochs, **18,820 draws and 590 steps**, with reported training time 1.73 minutes on an RTX 4070 Laptop. The 80/10/10 mixture, fresh cache, train membership, replay/guard disjointness and step-zero reproduction passed the reported preflight. Final selection used ONNX Runtime CPU; the stock guard output was reused with matching model/data identities. Source code `95c651e` and earlier execution merge `d9b6ae6` are now pushed. The `--v3` prescreen change preserves the v2 rules.
+
+The **additional promotion checks were not reached**: selected-threshold M3s/M3-crop, matched agent `turn_onset`, human endpoints, and audio acceptance were not executed as v3 promotion checks. Some of those metrics already participate in prescreen; do not confuse that with completing promotion. The test-plan block printed by the selector is an inherited template; Guttuu explicitly reports that it was not executed. Test remains sealed. D-011 authorized only W3 within its timebox; it did not authorize another experiment.
+
+### Next step conditionally approved, not yet reported started
+
+At 19:34 EDT, [Guttuu proposed weight interpolation](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103360382): blend stock parameters with the two fixed W3 prescreen checkpoints at candidate weights 0.25, 0.50 and 0.75, then keep the same selection constraints. [Proposed code `c17e4bc`](https://github.com/vinhbin/stutterturn/commit/c17e4bccf10881d2cb288f1ab1b49a24325664a6) is available for review. At Vinh's instruction, [a conditional go-ahead was posted at 19:42 EDT](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097), recorded in [D-012](decision-log.md). Execution requires Niko's signoff on the corrected code and protocol; stop at 45 minutes from that approved execution start or 20:45 EDT, whichever comes first. No v4 start, result or promotion is established by this approval.
+
+The method is motivated by [WiSE-FT](https://arxiv.org/abs/2109.01903), whose reported vision-model results do not guarantee success for speech turn detection. Blending produces one model for inference; it does not itself require two model calls per turn. It changes the adaptation method, not the intended product claim. A future pass would still need the existing human-endpoint, response-delay and audio checks. Human-reviewed unfinished fluent examples and the patient comparison must accompany the 30-item feasibility worksheet; that worksheet alone does not cover every gate. Further tuning on the same development set would be a fourth adaptive attempt, not independent confirmation.
+
+Read-only review of `c17e4bc` found these items to resolve before relying on the proposed result:
+
+- **Selected-threshold promotion:** `interpolate.py` calls `train.validate` at its default threshold 0.5 and stores scalar M3s/M3-crop rates. A selected threshold of 0.4 or 0.6 requires separate development re-evaluation of those groups; the existing in-loop numbers cannot establish promotion there.
+- **Fixed tie rule:** the synthetic checkpoint `epoch` is `alpha * source_epoch`, used in ranking. It is deterministic but does not measure closeness to stock across different source checkpoints. Freeze and describe the intended rule accurately before scores exist.
+- **Source identity:** the script checks checkpoint hashes against run records; preflight must additionally pin the W3 sources and verify their configurations, initialization and dataset manifests. Endpoint weight equality is not runtime probability parity; retain the separate stock reconstruction and export parity evidence.
+
+These are review findings, not edits to the owner's proposed implementation. D-012 makes their resolution and Niko's signoff conditions of execution.
+
+**Accepted direction:** pursue the bounded six-blend experiment after those review conditions, while human labeling proceeds in parallel with reviewers unaware of predictions until their labels are recorded. The stopping rule is D-012's 45-minute/20:45 EDT bound, not a promise that execution or all promotion checks will finish. A selected candidate must then pass the audio/timing and human-endpoint checks, with stock and patient comparisons. If it fails, use the failure analysis and corrected labels to decide the next research step. Repeated parameter changes on the same proxies cannot supply independent evidence. Stock/patient remains the backup while the team pursues the original goal.
+
 ## 5. What remains to establish
 
 - **Human endpoint review:** confirm complete/incomplete turns with surrounding context, including stuttered completions and ordinary pauses. Fluent labels describe a clip, not a person's diagnosis.
 - **Actual operating point:** the stuttered-completion and cropped-context prescreen checks use threshold 0.5. A selected threshold of 0.6 needs those checks too.
 - **Agent input and audio behavior:** main selection uses `clip_start`; the agent-oriented `turn_onset` comparison is report-only. Preprocessing parity does not prove every selected benchmark input equals live-agent input. Measure response audio overlap, cancellation after playback begins, completed-turn delay, and nonresponse separately.
 - **Independent confirmation:** freeze model, threshold, timing, and protocol before evaluating new examples. Keep the reserved set sealed unless Vinh explicitly changes that decision. Any new examples used to tune become development data.
-- **Reproduction package:** executor-local raw selection outputs and candidate artifacts need a shareable, hash-verified handoff before another person can reproduce the claimed run.
+- **Reproduction package:** raw selection records are now published and checked below. Reproducing inference still requires the separately distributed, hash-verified candidate weights, source data and recorded execution environment.
 
 Synthetic ElevenLabs speech and team-recorded scripted pauses can test engineering behavior. They do not establish performance for people who stutter. The current agent replays recordings; live microphone evaluation would require additional input support. The demo must identify recording/synthetic sources honestly.
 
 ## 6. Answers judges may ask for
 
-**Did you train your own model?** We fine-tuned an existing open audio turn-completion model. Two training attempts ran, but neither passed all selection checks. We distinguish that research work from the stock/patient demo.
+**Did you train your own model?** We fine-tuned an existing open audio turn-completion model. Three training attempts ran, but none passed all selection checks. We distinguish that research work from the stock/patient demo.
 
-**Why mix original examples back in?** To preserve ordinary complete/incomplete behavior while adapting to the podcast domain. More replay is the v3 hypothesis; it is not a demonstrated fix.
+**Why mix original examples back in?** To preserve ordinary complete/incomplete behavior while adapting to the podcast domain. v3 tested more replay. Its nearest miss had a smaller guard regression, but still failed; more replay was not a demonstrated fix.
 
 **Is 18.5% your final error rate?** No. It is a development proxy result at one rejected operating point. It does not measure audible interruptions or unseen-user performance.
 
@@ -102,7 +136,7 @@ Synthetic ElevenLabs speech and team-recorded scripted pauses can test engineeri
 
 Niko owns the specification/selection protocol; Guttuu owns execution and its raw artifacts. Vinh coordinates integration. Kareem's delivered landing/judge/evidence work remains credited in the [README](../README.md).
 
-The report was checked against integrated branch `a36d1f7`, training harness `a78f21b`, selection report `sel-v2`, and proposed v3 spec `f720198`. The numerical source is the executor's report; raw `decision.json` and run directories remain on Guttuu's machine. No training, provider synthesis, model evaluation, or reserved-test inspection was performed to write this report.
+The earlier report was checked against integrated branch `a36d1f7`, training harness `a78f21b`, and `sel-v2`. The v3 update uses Guttuu's report at harness `95c651e`, the W3-only protocol merged in PR #28, and the subsequently published [selection-evidence branch at `bd095f9`](https://github.com/vinhbin/stutterturn/tree/bd095f9e815c6916f1e2e4fc0b3d6d558ebf5ed1). A read-only artifact check matched all 12 candidate development summaries to the decision counts and item hashes, reproduced guard counts from saved probabilities, and verified the recorded decision, stock-stage, prescreen, canonical-config and guard-output hashes. The records disclose **`code_dirty=true`**: the runner hash matches the published code, but this is not proof of a fully clean committed execution environment. No training, provider synthesis, model inference, or reserved-test inspection was performed to write this report.
 
 For each executed experiment, preserve: full code/spec commit IDs; dataset revisions and actual train/dev reference hashes; decoded-audio and base-model hashes; environment/device; mixture, loss weight, learning rate, seed, batch size, actual sampled draws/steps; all checkpoint metrics; export/parity evidence and model hashes; every candidate/threshold and gate outcome; per-item probabilities; selection JSON and human-readable decision; and separately versioned audio acceptance results. Disclose incomplete runs and any changed rules. Do not include credentials or redistribute source audio without the required rights.
 
