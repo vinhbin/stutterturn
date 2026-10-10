@@ -1,6 +1,6 @@
 # Model results: Saturday, October 10 (draft for Vinh)
 
-**Status:** filled from the official selection `sel-v2` (Guttuu's machine, Windows 11, `select_candidate.py` @ `f007c06`, code `a78f21b`; [`decision.md` on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102500044)), about 18:00 EDT. **Outcome: `dev_nothing_passes`.** Numbers marked *preview* come from Niko's Mac. Stock FP32 values are identical across both machines (B: 167/352, 767/1518, 317/680 on each). Every number here is a **development** result on energy-labelled proxies. **No efficacy claim exists until the single sealed test run (training-v1 §7.2).**
+**Status:** filled from the official selection `sel-v2` (Guttuu's machine, Windows 11, `select_candidate.py` @ `f007c06`, code `a78f21b`; [`decision.md` on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102500044)), about 18:00 EDT. **Outcome: `dev_nothing_passes`.** Numbers marked *preview* come from Niko's Mac. Stock FP32 values are identical across both machines (B: 167/352, 767/1518, 317/680 on each). These are **development/validation** results using SEP endpoint proxies and upstream guard labels. The reserved final evaluation remains sealed under D-009. An efficacy claim additionally requires reviewed endpoints and relevant audio outcomes; a proxy test run alone would not establish it.
 
 ## What we can say tonight, whatever the outcome
 
@@ -27,13 +27,13 @@
    | 0.8 s | 12.8% | 15.3% | 48.2% | +0.6 s |
 
    M3 counts *whether* the first check decides, not *when*. These wait differences are configuration values, not measured per-turn audible response delays: changed decisions, fallbacks and provider latency also affect response time. This baseline must accompany any candidate comparison.
-4. **A naive fine-tune learns a shortcut, and our pre-registered checks caught it.** Training v1 used stutter-block cuts as "incomplete" examples and nothing else from the podcasts. All 16 checkpoints learned "podcast audio ⇒ incomplete": stutter-block premature fell to 1–6%, but first-check decisions on completed proxies fell from 46.6% to 8–22%. The pre-screen rejected all of them (`dev_nothing_passes`). We kept the evidence rather than tuning around it.
+4. **The v1 result is consistent with a podcast-domain shortcut.** Training v1 used stutter-block cuts as "incomplete" examples and nothing else from the podcasts. Across 16 checkpoints, stutter-block premature fell to 0.85–6.25%, but first-check decisions on completed proxies fell from 46.62% to 8.24–22.06%. The M3 check was added after training and an initial prescreen; all saved checkpoints were rescored and rejected under the amended rule (`dev_nothing_passes`). The earlier selection was retained as superseded. This is not a direct measurement of the model's internal mechanism or a fully preregistered v1 evaluation. See [Guttuu's chronology](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6101907402).
 5. **The saved replay distinguishes early decisions from reported audio overlap.** Replay v2 (fixed pre-roll): stock decided "complete" before the energy-labelled resume in **4 of 5** clips (one decision preceded the labelled gap), versus 0 of 5 for patient. Three replies were cancelled before reported audio; no response-audio overlap was reported in those ten runs. Physical playback was not verified for that packet. A faster reply path could produce overlap, but that is a hypothesis, not an observed result. No interruption rates from n = 5. Separately, [Guttuu's human listening check](https://github.com/vinhbin/stutterturn/issues/3#issuecomment-6102558836) verifies source/reply audibility and explicit Stop/restart; audible cancellation on natural resumption remains untested.
-6. **The agent and the benchmark feed the model identical audio.** This is verified to 1e-4 (agent replay) and 5e-7 (benchmark `turn_onset` vs agent onset on 155 clips). A pre-roll bug that we found in review was fixed (PR #14).
+6. **Parity was verified for the matched replay/onset paths.** Reported probability agreement is within 1e-4 for agent replay and 5e-7 for benchmark `turn_onset` versus agent onset on 155 clips. The main selection instead uses `clip_start`; `turn_onset` is a report-only comparison. This does not establish that every selected benchmark input equals the agent's input. A pre-roll bug was fixed in PR #14.
 
 ## Outcome: `dev_nothing_passes`
 
-**Observed selection outcome:** at 17:45 EDT, the training-v2 selection `sel-v2` (Guttuu's machine; run IDs and hashes in `benchmark/selection/sel-v2/decision.json`, not committed) gave **`dev_nothing_passes`** with `comparator_M1_below_B = true`. Comparator: stock FP32 at threshold 0.55 (M1 45.7%, every constraint met). Training v1 had earlier given `dev_nothing_passes` (domain shortcut). **Niko recommends the corrected-benchmark fallback; Vinh has not approved the later v3 proposal or recorded a final scope choice.** No fine-tuned model is selected for the demo. Vinh explicitly asked to keep the reserved test sealed and unused for later testing ([D-009](decision-log.md)); the stock-only test proposal is not authorized. The existing no-v3 rule and 20:00 hard stop remain unchanged. Limits: energy-derived dev labels, end-of-window proxies, two pre-registered attempts on the same dev items.
+**Observed selection outcome:** at 17:45 EDT, the training-v2 selection `sel-v2` (Guttuu's machine; run IDs and hashes in `benchmark/selection/sel-v2/decision.json`, not committed) gave **`dev_nothing_passes`** with `comparator_M1_below_B = true`. Comparator: stock FP32 at threshold 0.55 (M1 45.7%, every constraint met). Training v1 had earlier given `dev_nothing_passes` under its amended prescreen. **Niko now supports a bounded v3 proposal; Vinh specified an 80/20 training mix, then paused. No v3 execution approval is recorded.** The [v3 recommendation](v3-recommendation-2026-10-10.md) proposes W3 only and preserves the 20:00 hard stop; it does not resume training. No fine-tuned model is selected for the demo. The reserved test remains sealed under [D-009](decision-log.md), including after any future development pass. Limits: automatic endpoint proxies, two adaptive attempts on the same development data, and historical exploratory exposure of some later reserved source clips. See the [judge-facing report](training-report-2026-10-10.md) for the full chronology and qualifications.
 
 **Why v2 didn't pass, stated plainly:** v2 balanced the podcast audio by adding completed proxies as "complete" examples and addressed the v1 shortcut in the measured checks. 4 of 16 checkpoints passed the pre-screen. The top two, run through the benchmark on dev (official arms D, at 0.5):
 
@@ -53,11 +53,11 @@
 
 **Must accompany it:**
 - dev-only;
-- selected on these dev items (two pre-registered attempts; v2 designed after v1 failed);
+- selected on these dev items (two adaptive attempts; v1's M3 check was added after initial results, and v2 was designed after v1 failed);
 - energy-derived labels and end-of-window proxies, not human-confirmed turn ends;
 - training positives and M3 share one proxy definition;
 - no stuttered completed turns confirmed by humans;
-- test sealed and unused.
+- rebuilt final evaluation sealed and unrun; 58 original exploratory block clips fall in the later reserved partition.
 
 ## Never say (any outcome)
 

@@ -43,6 +43,7 @@ Nobody imitates stuttering. A recorded backup must be labeled as a recording; sa
 
 ## Evidence and reproducibility
 
+- [Judge-facing training report](docs/training-report-2026-10-10.md): what we trained, v1/v2 results, data and leakage qualifications, and answers to judge questions. The [80/20 v3 recommendation](docs/v3-recommendation-2026-10-10.md) is a proposed next experiment; training remains paused and the reserved test sealed.
 - [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are the INT8 CPU build's completion predictions under the original harness, **not a validated percentage of callers interrupted**. The [current model results](docs/model-results-2026-10-10.md) report matched stock INT8/FP32 development comparisons and the failed v1/v2 candidate selections, with proxy-label limits.
 - Exploratory comparisons are saved for the configurations we tested — including silence timeouts of 0.8 s and 1.5 s and a 0.99 confidence threshold. They do not yet establish which configurations meet both our interruption and response-delay targets; no universal "no setting fixes it" claim is made.
 - [D-006 and D-007](docs/decision-log.md) record the methodological corrections. One-second observation/censoring does not establish a three-second fallback; energy-derived cut points do not establish semantic turn ends; repeated harness checks do not prove live-agent behavior.
