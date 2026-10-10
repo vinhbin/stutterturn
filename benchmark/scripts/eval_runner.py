@@ -28,7 +28,15 @@ SCHEDULES = {"single", "interval", "legacy"}
 ITEM_FIELDS = ["item_id", "clip_key", "audio", "split", "group", "kind", "silence_start_s",
                "resume_s", "turn_end_s", "observe_until_s", "label_source"]
 OUTCOME_KEYS = ["grid", "infer_ms", "outcome", "premature", "decision_t", "trigger", "margin_s",
-                "delay_s", "censored_at_s", "first_check_complete", "first_check_t"]
+                "delay_s", "censored_at_s", "first_check_complete", "first_check_t",
+                "input_policy", "input_start_s", "onset_s", "input_start_fallback"]
+INPUT_POLICIES = {"clip_start", "turn_onset"}
+# Silero onset detector constants (specs/input-policy-v1.md). Must match agent/engine.py.
+VAD_FRAME = 512
+VAD_CTX = 64
+VAD_THRESHOLD = 0.5
+VAD_START_S = 0.2
+VAD_FRAME_S = 0.032
 
 
 # ---------------------------------------------------------------- helpers
@@ -105,6 +113,19 @@ def load_config(path):
             sys.exit("interval schedule needs recheck_interval_s > 0, a multiple of grid_step_s")
     if cfg["schedule"] == "legacy" and not cfg.get("checkpoints_s"):
         sys.exit("legacy schedule needs checkpoints_s")
+    # NOTE: input_policy / pre_roll_s are deliberately NOT setdefault'ed: the resolved config is hashed
+    # into run.json and existing configs must keep their config_sha256. Read with cfg.get(...).
+    pol = cfg.get("input_policy", "clip_start")
+    if pol not in INPUT_POLICIES:
+        sys.exit(f"bad input_policy {pol!r}")
+    if pol == "turn_onset":
+        pr = cfg.get("pre_roll_s")
+        if not isinstance(pr, (int, float)) or isinstance(pr, bool) or pr < 0:
+            sys.exit("input_policy turn_onset needs numeric pre_roll_s >= 0")
+        if cfg["schedule"] == "legacy":
+            sys.exit("schedule legacy is not allowed with input_policy turn_onset")
+    elif "pre_roll_s" in cfg:
+        sys.exit("pre_roll_s is only allowed with input_policy turn_onset")
     return cfg
 
 
@@ -271,6 +292,54 @@ class Model:
         return self.session.run(None, {"input_features": feats})[0][0].item()  # already a probability
 
 
+class SileroVAD:
+    """Silero VAD v5.1.2 over 512-sample frames (spec text, independent of agent/engine.py)."""
+
+    def __init__(self, path):
+        import onnxruntime as ort
+        so = ort.SessionOptions()
+        so.inter_op_num_threads = 1
+        so.intra_op_num_threads = 1
+        self.sess = ort.InferenceSession(path, sess_options=so, providers=["CPUExecutionProvider"])
+
+    def probs(self, x, stop_after_run=None):
+        """Yield speech probability per consecutive 512-sample frame aligned to sample 0."""
+        state = np.zeros((2, 1, 128), dtype=np.float32)
+        ctx = np.zeros((1, VAD_CTX), dtype=np.float32)
+        sr = np.array(SR, dtype=np.int64)
+        for i in range(len(x) // VAD_FRAME):
+            frame = x[i * VAD_FRAME:(i + 1) * VAD_FRAME].astype(np.float32)
+            inp = np.concatenate([ctx, frame[None, :]], axis=1)
+            out, state = self.sess.run(None, {"input": inp, "state": state, "sr": sr})
+            ctx = inp[:, -VAD_CTX:]
+            yield float(out[0][0])
+
+
+def first_onset_frame(vad, x):
+    """Index of the first frame of the first run of start_n consecutive speech frames, else None.
+    Deliberately the FIRST onset in the clip: each item is scored as if no earlier decision had reset
+    the turn. The agent resets its turn only after a decision, so this matches the agent whenever the
+    item's check is its first decision."""
+    start_n = math.ceil(VAD_START_S / VAD_FRAME_S - 1e-9)
+    run = 0
+    for i, p in enumerate(vad.probs(x)):
+        run = run + 1 if p >= VAD_THRESHOLD else 0
+        if run >= start_n:
+            return i - start_n + 1
+    return None
+
+
+def input_start_for(it, onset_frame, pre_roll_s):
+    """Returns (input_start_sample, onset_s, fallback)."""
+    if onset_frame is None:
+        return 0, None, True
+    onset_s = onset_frame * VAD_FRAME / SR
+    if onset_s >= it["silence_start_s"]:
+        return 0, onset_s, True
+    pre = int(round(pre_roll_s / VAD_FRAME_S))
+    return max(0, (onset_frame - pre) * VAD_FRAME), onset_s, False
+
+
 class Cache:
     def __init__(self, path, enabled):
         self.enabled = enabled
@@ -326,6 +395,14 @@ def summarize(rows, cfg):
                      censored_n=len(rs) - len(dec),
                      delay_s_median=pct(d, 50), delay_s_p90=pct(d, 90),
                      delay_s_max=round(float(d.max()), 4) if len(d) else None)
+        if cfg.get("input_policy", "clip_start") == "turn_onset":
+            nf = [r for r in rs if not r.get("input_start_fallback")]
+            g.update(input_start_fallback_n=len(rs) - len(nf), n_nonfallback=len(nf))
+            if kind == "unfinished":
+                kn = sum(1 for r in nf if r["premature"])
+                g.update(premature_n_nonfallback=kn,
+                         premature_rate_nonfallback=round(kn / len(nf), 4) if nf else None,
+                         premature_ci95_nonfallback=wilson(kn, len(nf)))
         ms = np.array([v for r in rs for v in r["infer_ms"].values() if v is not None])
         g["infer_ms"] = {"n": len(ms), "mean": round(float(ms.mean()), 2) if len(ms) else None,
                          "p95": pct(ms, 95)}
@@ -377,6 +454,14 @@ def do_infer(args):
     model_sha = sha256_file(args.model)
     if model_sha != args.expected_sha256.lower():
         sys.exit(f"model hash mismatch: got {model_sha}, expected {args.expected_sha256}")
+    turn = cfg.get("input_policy", "clip_start") == "turn_onset"
+    vad_sha = None
+    if turn:
+        if not (args.vad_model and args.vad_sha256):
+            sys.exit("input_policy turn_onset requires --vad-model and --vad-sha256")
+        vad_sha = sha256_file(args.vad_model)
+        if vad_sha != args.vad_sha256.lower():
+            sys.exit(f"vad model hash mismatch: got {vad_sha}, expected {args.vad_sha256}")
     items = load_items(args.items)
     items_sha = sha256_file(args.items)
     run_id = make_run_id(args, args.model_id, cfg["config_id"], items_sha)
@@ -384,6 +469,7 @@ def do_infer(args):
     try:
         import soundfile as sf
         model = Model(args.model)
+        vad = SileroVAD(args.vad_model) if turn else None
         cache = Cache(CACHE_PATH, not args.no_cache)
         audio_cache = {}
         rows = []
@@ -394,8 +480,14 @@ def do_infer(args):
                 x, sr = sf.read(ap, dtype="float32")
                 if x.ndim > 1:
                     x = x.mean(axis=1).astype(np.float32)
-                audio_cache[ap] = (x, sha256_file(ap))
-            x, asha = audio_cache[ap]
+                audio_cache[ap] = (x, sha256_file(ap),
+                                   first_onset_frame(vad, x) if turn else None)
+            x, asha, onset_frame = audio_cache[ap]
+            if turn:
+                start, onset_s, fb = input_start_for(it, onset_frame, cfg["pre_roll_s"])
+                pre_v = f"{PREPROC_VERSION}|start={start}|vad={vad_sha[:16]}"
+            else:
+                start, onset_s, fb, pre_v = 0, None, False, PREPROC_VERSION
             grid, ims = {}, {}
             for t in grid_times(it, cfg):
                 if cfg["schedule"] == "legacy":
@@ -403,11 +495,11 @@ def do_infer(args):
                 else:
                     cut = int(round((it["silence_start_s"] + t) * SR))
                 cut = min(cut, len(x))
-                key = (model_sha, PREPROC_VERSION, asha, cut)
+                key = (model_sha, pre_v, asha, cut)
                 p = cache.get(key)
                 if p is None:
                     t0 = time.perf_counter()
-                    p = model.predict(x[:cut])
+                    p = model.predict(x[start:cut] if turn else x[:cut])
                     ims[key3(t)] = round((time.perf_counter() - t0) * 1000, 2)
                     cache.put(key, p)
                     cache.misses += 1
@@ -419,13 +511,18 @@ def do_infer(args):
             row = {k: it[k] for k in it}
             row["grid"], row["infer_ms"] = grid, ims
             row.update(decide(it, cfg, grid))
+            row["input_policy"] = cfg.get("input_policy", "clip_start")
+            row["input_start_s"] = round(start / SR, 6)
+            if turn:
+                row["onset_s"] = None if onset_s is None else round(onset_s, 6)
+                row["input_start_fallback"] = fb
             rows.append(row)
             if (n + 1) % 25 == 0:
                 print(f"{n + 1}/{len(items)}", flush=True)
         summary = summarize(rows, cfg)
         run = base_run(run_id, cfg, {"model_id": args.model_id, "model_sha256": model_sha,
                                      "items_path": os.path.relpath(os.path.abspath(args.items), BASE),
-                                     "items_sha256": items_sha, "cache_hits": cache.hits,
+                                     "items_sha256": items_sha, "vad_model_sha256": vad_sha, "cache_hits": cache.hits,
                                      "cache_misses": cache.misses, "wall_s": round(time.time() - t_start, 2)})
         write_run(d, run, rows, summary)
     except BaseException:
@@ -444,6 +541,11 @@ def do_rescore(args):
     for k in ["grid_step_s", "vad_stop_s"]:
         if cfg[k] != scfg[k]:
             sys.exit(f"refusing rescore: {k} differs ({scfg[k]} -> {cfg[k]})")
+    for k in ["input_policy", "pre_roll_s"]:
+        dflt = "clip_start" if k == "input_policy" else None
+        if cfg.get(k, dflt) != scfg.get(k, dflt):
+            sys.exit(f"refusing rescore: {k} differs ({scfg.get(k, dflt)} -> {cfg.get(k, dflt)}); "
+                     "stored grids are for a different input")
     if (cfg["schedule"] == "legacy") != (scfg["schedule"] == "legacy") or (
             cfg["schedule"] == "legacy" and cfg["checkpoints_s"] != scfg["checkpoints_s"]):
         sys.exit("refusing rescore: legacy schedules can only be rescored with identical checkpoints_s")
@@ -463,6 +565,12 @@ def do_rescore(args):
         row["grid"] = grid
         row["infer_ms"] = {k: r["infer_ms"].get(k) for k in grid}
         row.update(decide(it, cfg, grid))
+        # input fields are carried from the stored run (policy is guaranteed identical above)
+        row["input_policy"] = r.get("input_policy", scfg.get("input_policy", "clip_start"))
+        row["input_start_s"] = r.get("input_start_s", 0.0)
+        if row["input_policy"] == "turn_onset":
+            row["onset_s"] = r.get("onset_s")
+            row["input_start_fallback"] = r.get("input_start_fallback")
         rows.append(row)
     run_id = make_run_id(args, srun["model_id"], cfg["config_id"], srun["items_sha256"])
     d = claim_dir(run_id)
@@ -470,6 +578,7 @@ def do_rescore(args):
         summary = summarize(rows, cfg)
         run = base_run(run_id, cfg, {"model_id": srun["model_id"], "model_sha256": srun["model_sha256"],
                                      "items_path": srun["items_path"], "items_sha256": srun["items_sha256"],
+                                     "vad_model_sha256": srun.get("vad_model_sha256"),
                                      "rescored_from": srun["run_id"], "model_calls": 0,
                                      "cache_hits": 0, "cache_misses": 0,
                                      "wall_s": round(time.time() - t_start, 2)})
@@ -491,6 +600,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model"); ap.add_argument("--model-id"); ap.add_argument("--expected-sha256")
     ap.add_argument("--items"); ap.add_argument("--config", required=True)
+    ap.add_argument("--vad-model", help="Silero VAD onnx (required for input_policy turn_onset)")
+    ap.add_argument("--vad-sha256", help="expected sha256 of --vad-model")
     ap.add_argument("--rescore", help="existing run dir to re-score from stored grids")
     ap.add_argument("--scratch", action="store_true"); ap.add_argument("--no-cache", action="store_true")
     ap.add_argument("--run-id", help="override the derived run id (used to test immutability)")

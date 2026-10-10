@@ -2,6 +2,10 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-008 — Kareem's departure and lane transfer (confirmed by Vinh)
+
+Kareem left the team on Saturday afternoon; Vinh confirmed the departure. No reason is recorded here. The lane transfers as follows: the landing page, judge view and evidence index had already been delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12) and, together with root `README.md` upkeep and disclosures, are now maintained by Vinh's side. The B-batch label cross-check (F4's independence check) needs a new human reviewer — flagged for reassignment to Guttuu or Niko; that reassignment is a pending team decision, not made by this entry. The optional Tiger Data integration is unstaffed and likely cut; also a pending team decision. Gate criteria, evidence standards and the claims ledger are unchanged by this staffing update.
+
 ## 2026-10-10 D-007 — Apply evidence, ownership and integration workflow (requested by Vinh)
 
 Vinh asked to apply the reviewed planning/Git practices to StutterTurn. Keep the accepted direction, strong intended pitch and existing 2 PM/3 PM proof gates. PLAN is the single task-status authority; phase issues link deliverables/evidence and remain open until their acceptance gates pass. Vinh coordinates integration; Guttuu verifies full audio behavior and Niko verifies model/evaluation artifacts.

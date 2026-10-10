@@ -22,8 +22,11 @@ DATA = os.path.join(ROOT, "benchmark", "data")
 
 SMART_TURN_REPO = "pipecat-ai/smart-turn-v3"
 SMART_TURN_REV = "f766f81d3cfdf7737ac64aad813d91bbfd56bf93"
-SMART_TURN_FILE = "smart-turn-v3.2-cpu.onnx"
-SMART_TURN_SHA256 = "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f"
+# INT8 (stock) and FP32 (stock_fp32, comparator for candidates); hashes from model/CONTRACT.md
+SMART_TURN_FILES = {
+    "smart-turn-v3.2-cpu.onnx": "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f",
+    "smart-turn-v3.2-gpu.onnx": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+}
 
 SILERO_URL = "https://github.com/snakers4/silero-vad/raw/v5.1.2/src/silero_vad/data/silero_vad.onnx"
 SILERO_FILE = "silero_vad.onnx"
@@ -40,14 +43,15 @@ def sha256(path):
 
 def fetch_models():
     os.makedirs(MODELS, exist_ok=True)
-    dest = os.path.join(MODELS, SMART_TURN_FILE)
-    if not os.path.exists(dest):
-        src = hf_hub_download(SMART_TURN_REPO, SMART_TURN_FILE, revision=SMART_TURN_REV)
-        shutil.copyfile(src, dest)
-    got = sha256(dest)
-    if got != SMART_TURN_SHA256:
-        sys.exit(f"{SMART_TURN_FILE}: SHA-256 {got} does not match pinned {SMART_TURN_SHA256}")
-    print(f"{SMART_TURN_FILE} ok {got}")
+    for name, pinned in SMART_TURN_FILES.items():
+        dest = os.path.join(MODELS, name)
+        if not os.path.exists(dest):
+            src = hf_hub_download(SMART_TURN_REPO, name, revision=SMART_TURN_REV)
+            shutil.copyfile(src, dest)
+        got = sha256(dest)
+        if got != pinned:
+            sys.exit(f"{name}: SHA-256 {got} does not match pinned {pinned}")
+        print(f"{name} ok {got}")
 
     dest = os.path.join(MODELS, SILERO_FILE)
     if not os.path.exists(dest):

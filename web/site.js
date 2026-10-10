@@ -35,3 +35,58 @@ if (consoleFrame) {
   consoleFrame.addEventListener('load', fitConsole);
   if (consoleFrame.contentDocument?.readyState === 'complete') fitConsole();
 }
+
+// Landing page: concept-loop playback and section reveals.
+// The loop is an illustrative sequence; it represents no recorded timing or audio.
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const turnFigure = document.querySelector('.turn-figure');
+
+if (turnFigure && !reducedMotion.matches && 'IntersectionObserver' in window) {
+  const loopClock = document.querySelector('#loop-clock');
+  const CYCLE_MS = 7500; // matches the CSS loop-* animation duration
+  const WIPE_MS = 6000;  // reveal completes at 80% of the cycle, then holds
+  let startedAt = null;
+  let frame = null;
+
+  const renderClock = (now) => {
+    const elapsed = Math.min((now - startedAt) % CYCLE_MS, WIPE_MS) / 1000;
+    const whole = Math.floor(elapsed);
+    const centis = Math.floor((elapsed - whole) * 100);
+    loopClock.textContent = `00:0${whole}.${String(centis).padStart(2, '0')}`;
+    frame = requestAnimationFrame(renderClock);
+  };
+
+  const play = () => {
+    if (startedAt !== null) return;
+    turnFigure.classList.add('is-playing');
+    startedAt = performance.now();
+    frame = requestAnimationFrame(renderClock);
+  };
+
+  const pause = () => {
+    if (startedAt === null) return;
+    turnFigure.classList.remove('is-playing');
+    cancelAnimationFrame(frame);
+    startedAt = null;
+    loopClock.textContent = '00:06.00';
+  };
+
+  new IntersectionObserver((entries) => {
+    entries.forEach((entry) => (entry.isIntersecting ? play() : pause()));
+  }, { threshold: 0.25 }).observe(turnFigure);
+
+  reducedMotion.addEventListener?.('change', (event) => { if (event.matches) pause(); });
+}
+
+if (document.body.classList.contains('landing') && !reducedMotion.matches && 'IntersectionObserver' in window) {
+  const revealed = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-revealed');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.body.classList.add('reveal-armed');
+  document.querySelectorAll('[data-reveal]').forEach((section) => revealed.observe(section));
+}

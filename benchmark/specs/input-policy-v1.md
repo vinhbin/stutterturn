@@ -96,3 +96,18 @@ Setup: the venv from `benchmark/requirements.txt`, stock INT8 and FP32 models wi
 6. **Report, not a criterion:** first-check premature totals on the legacy items for `agent-v0.1-single` vs `agent-v0.1-turn`, stock INT8 and stock FP32, with the paired discordant counts, both for all 200 items and for the 155 non-fallback items. This states the policy effect in the benchmark's own timing.
 
 If the data contradicts the spec (for example, onsets don't match the fixture), stop and report the first mismatches. Don't adapt. Report any check you couldn't run as **NOT RUN** with the reason, never as passed.
+
+## Acceptance results (2026-10-10, macOS arm64)
+
+All checks 0–5 passed (Sonnet implementer, re-verified by Opus). `clip_start` is bit-identical to the pre-edit runner (legacy still 116/200 first-check, 136/200 any-check; config hashes unchanged). `turn_onset` matches the fixture on all 200 items (start sample exact, exactly the 45 fixture fallbacks), and p at t = 0.200 matches on all 155 non-fallback items within 5.0e-7. All six guards refuse as specified. `compare_runs.py` needed no change.
+
+Check 6 (report only; legacy items, first-check premature):
+
+| Model | Items | clip_start | turn_onset | clip_start-only | turn_onset-only |
+|---|---|---|---|---|---|
+| INT8 | all 200 | 116 | 120 | 1 | 5 |
+| INT8 | 155 non-fallback | 84 | 88 | 1 | 5 |
+| FP32 | all 200 | 87 | 88 | 2 | 3 |
+| FP32 | 155 non-fallback | 61 | 62 | 2 | 3 |
+
+At the benchmark's own timing, the policy changes the count by at most 4 of 200, which is consistent with the agent-side result (no detectable effect).

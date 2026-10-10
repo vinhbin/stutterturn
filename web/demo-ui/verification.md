@@ -116,3 +116,34 @@ All implementation and development helpers remain under `web/demo-ui/`. No
 teammate backend, model, benchmark, judges-page or root manifest is changed.
 Fonts include their redistribution licenses and source hashes. Fixtures exercise
 the same sequence for every arm and must never appear in an efficacy comparison.
+
+## Committed check suite — October 10, 2026 (appendix)
+
+The Phase A/B harnesses above ran from a local scratch directory and could not
+be re-run by reviewers. A committed, reproducible suite now lives in
+[`dev/checks/`](dev/checks/README.md) (exact commands there). This appendix
+records its first run; the historical counts above are unchanged.
+
+- `node web/demo-ui/dev/checks/adapter-checks.mjs` — **38/38 passed** (Node
+  24.21.0, no dependencies). The adapter is loaded as-is over stubbed
+  fetch/WebSocket transports: `validSourceFile` bare-name (contract v0.1,
+  af2813d), tolerated-relative-path and rejection cases; discovery and start
+  acknowledgement validation; `v`/`seq`/`kind`/`prob` checks; mock provenance
+  in both directions; retired-run filtering; unavailable-candidate gating;
+  stop/disconnect lifecycle; blocked/preview labeling.
+- `node web/demo-ui/dev/checks/browser-checks.mjs` — **20/20 passed**
+  (Playwright 1.64.0 chromium-headless-shell, serving `web/demo-ui/` itself and
+  the committed dev mock at `--speed 8`): blocked state, preview and mock
+  banners, candidate unavailable, per-row run attribution,
+  `agent_audio_start (reported)` labeling, services-OFF metadata, reset
+  clearing events while keeping the connection, keyboard S/X/R/P including
+  URL-field keystroke suppression, zero uncaught page errors.
+
+Mutation sanity on the same day: disabling the adapter's mock-provenance guard
+failed two adapter checks; removing the "(reported)" audio-start suffix in
+`app.js` failed one browser check; both files were restored unchanged and the
+suites re-passed 58/58 in total.
+
+The suite changes no acceptance gate: every check drives synthetic fixtures
+through the committed stdlib mock or transport stubs. A pass is not audio,
+playback, model, efficacy or benchmark evidence, and F2/I1 remain open.

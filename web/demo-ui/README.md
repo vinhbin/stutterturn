@@ -80,8 +80,10 @@ adapter.disconnect();
 `getConfigurations()`/`getSources()` return discovery data. Connection/start waits
 are bounded, versions validated, sequence disorder surfaced and stale-run events
 discarded. Reconnection never replays a source by itself. Runtime strings are
-rendered as text. `health.mock: true` selects mock labeling; mock socket messages
-must also carry `mock: true`.
+rendered as text. Mock provenance is a UI-side convention honored by the committed
+dev mock, not part of agent contract v0.1: `health.mock: true` switches the adapter
+to mode `mock`, and every socket message's `mock` flag must then match that mode —
+a mismatch in either direction fails the run.
 
 ## Keyboard and embedding
 
@@ -99,9 +101,10 @@ Serve `web/` and link `/demo-ui/`, or embed:
 
 ## Validation and real acceptance
 
-Development test harnesses stay outside the repository, as requested in the
-builder handoff. The stdlib contract mock is the only repository test helper.
-See [verification notes](verification.md) for the original fixture checks and the
+The original development harnesses ran from local scratch; a committed,
+reproducible check suite now lives in [dev/checks/](dev/checks/README.md)
+(Node adapter checks plus Playwright browser checks against the stdlib mock).
+See [verification notes](verification.md) for the fixture check record and the
 [current handoff review](../handoff-2026-10-10.md) for real-server integration.
 F2/I1 still need verified playback and attributable audible interaction evidence.
 Candidate acceptance also
