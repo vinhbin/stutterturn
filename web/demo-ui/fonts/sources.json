@@ -1,0 +1,20 @@
+[
+  {
+    "family": "Archivo",
+    "file": "archivo-latin.woff2",
+    "bytes": 34928,
+    "sha256": "8f704806dbedeaaeca334b11ec348bc3ac3a439d6431544b3afb54f534ee4967",
+    "source": "https://fonts.gstatic.com/s/archivo/v25/k3kPo8UDI-1M0wlSV9XAw6lQkqWY8Q82sLydOxI.woff2",
+    "css": "https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&display=swap",
+    "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/archivo/OFL.txt"
+  },
+  {
+    "family": "JetBrains Mono",
+    "file": "jetbrains-mono-latin.woff2",
+    "bytes": 31432,
+    "sha256": "83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be",
+    "source": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+    "css": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap",
+    "license": "https://raw.githubusercontent.com/google/fonts/main/ofl/jetbrainsmono/OFL.txt"
+  }
+]

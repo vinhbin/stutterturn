@@ -13,7 +13,7 @@ python web/demo-ui/dev/mock-agent-server.py
 ```
 
 Open `http://127.0.0.1:8040/`, connect to `http://127.0.0.1:8765`, choose a fixture and
-start a fresh run. The page must say **DEVELOPMENT MOCK**. Choose `overlap.fixture`,
+start a fresh run. The page must say **MOCK BACKEND — SYNTHETIC**. Choose `overlap.fixture`,
 `held.fixture`, `cancelled.fixture`, `timeout.fixture` or `no-response.fixture` to
 exercise each outcome. The names identify scripted UI states, not real sources.
 

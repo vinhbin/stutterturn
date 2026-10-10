@@ -12,7 +12,7 @@
     'first-decision', 'first-audible', 'decision-gap', 'event-body', 'event-scroll',
     'event-caption', 'preview-toggle', 'metadata-body', 'summary-body',
     'summary-note', 'run-alert', 'audio-note', 'agent-contract-status',
-    'model-contract-status'
+    'model-contract-status', 'tally', 'tally-note', 'tally-config', 'run-clock', 'timeline-mode', 'timeline-scroll-hint'
   ].forEach(function (id) { el[id] = $(id); });
 
   var state = {
@@ -54,6 +54,18 @@
     el['status-banner'].textContent = message;
   }
 
+  function setTally(name, label, note) {
+    el['tally'].dataset.state = name;
+    el['current-state'].className = 'state-badge state-' + name;
+    el['current-state'].textContent = label;
+    el['tally-note'].textContent = note;
+  }
+
+  function clockText(t) {
+    var value = Math.max(0, t || 0);
+    return String(Math.floor(value / 60)).padStart(2, '0') + ':' + (value % 60).toFixed(2).padStart(5, '0');
+  }
+
   function refreshChrome() {
     var preview = state.adapter.mode === 'preview';
     var mock = !preview && isSynthetic();
@@ -66,8 +78,9 @@
       mock ? (isConnected() ? 'MOCK BACKEND — SYNTHETIC' : 'MOCK BACKEND — DISCONNECTED') : isConnected() ? 'BACKEND CONNECTED — PLAYBACK UNVERIFIED' : state.discovered ? 'BACKEND DISCONNECTED' : 'LIVE INTEGRATION: BLOCKED';
     el['run-source'].textContent = state.adapter.sourceLabel || 'Backend not connected';
     el['audio-note'].textContent = isSynthetic()
-      ? 'Synthetic timing only. No audio plays; even overlap and interruption events are fixtures, never evidence.'
-      : 'Audio timestamps are backend-reported. The current engine reports audio receipt, not verified speaker playback. No audio plays in this console.';
+      ? 'Synthetic timing only. No audio or benchmark evidence.'
+      : 'Backend-reported audio receipt. Speaker playback is unverified; no audio plays here.';
+    el['timeline-mode'].textContent = isSynthetic() ? 'SYNTHETIC · NO AUDIO' : state.run ? 'REPORTED EVENTS' : 'Awaiting events';
     el['agent-contract-status'].textContent = isConnected()
       ? (mock ? 'Mock transport connected; real replay acceptance pending.' : 'Transport connected; real audio playback acceptance pending.')
       : 'Proposed v0.1 contract; real server and replay acceptance pending.';
@@ -75,18 +88,20 @@
     el['model-contract-status'].textContent = preview ? 'Preview labels only; no model artifact is exercised.' :
       candidate && candidate.available ? 'Candidate reported available by the backend; exact model is recorded per run.' :
         'Candidate unavailable unless the backend reports an exported artifact.';
-    if (state.connecting) { setStatus('warn', 'Connecting to backend and loading configurations and sources…'); }
-    else if (preview) { setStatus('warn', 'Development preview: synthetic fixture only. No audio, no model behavior, no benchmark evidence.'); }
+    if (state.connecting) { setStatus('warn', 'Connecting and loading configurations and sources…'); }
+    else if (preview) { setStatus('warn', 'Synthetic preview ready. Choose a configuration, then start a fresh run.'); }
     else if (state.discovered && !isConnected()) { setStatus('warn', 'Backend disconnected. Start a fresh run to reconnect, or use Connect to reload sources. ' + (mock ? 'Mock data is synthetic, with no audio or benchmark evidence.' : 'Audio playback remains unverified.')); }
-    else if (mock) { setStatus('warn', 'Mock backend connected: synthetic transport test only. No real audio or model behavior; not evidence.'); }
-    else if (isConnected()) { setStatus('ok', 'Backend connected. Select a source and configuration for a fresh run. Audio playback remains unverified.'); }
-    else { setStatus('warn', 'Live integration is blocked until a backend is connected. Connect to the proposed v0.1 service or enable the labeled development preview.'); }
+    else if (mock) { setStatus('warn', 'Mock backend connected. Choose a synthetic scenario to exercise the console.'); }
+    else if (isConnected()) { setStatus('ok', 'Backend connected. Choose a source and configuration. Audio playback is unverified.'); }
+    else { setStatus('warn', 'Live integration blocked. Connect a backend or enable development preview in the control desk.'); }
   }
 
   function refreshControls() {
     var locked = isActive() || state.connecting;
     var cfg = selectedConfig();
     var preview = state.adapter.mode === 'preview';
+    el['tally-config'].textContent = state.run ? 'Run configuration: ' + state.run.configLabel :
+      cfg && cfg.available ? 'Next run: ' + cfg.label : 'No available configuration';
     var ready = !!(cfg && cfg.available && (preview || (state.discovered && selectedSource())));
     el['btn-start'].disabled = locked || !ready;
     el['btn-start'].firstChild.textContent = state.runPhase === 'starting' ? 'Starting… ' : 'Start fresh run ';
@@ -101,9 +116,9 @@
       input.disabled = locked || !config || !config.available;
     });
     el['start-note'].hidden = ready && !locked;
-    el['start-note'].textContent = state.connecting ? 'Wait for the connection, or cancel with Disconnect or Reset.' :
-      isActive() ? 'Source and configuration are locked for this run. Stop, Reset or Disconnect cancels it.' :
-      !cfg || !cfg.available ? 'Start is disabled: no available configuration. Connect a backend or enable development preview.' :
+    el['start-note'].textContent = state.connecting ? 'Connecting. Reset or Disconnect to cancel.' :
+      isActive() ? 'Source and configuration locked. Stop or Reset to cancel.' :
+      !cfg || !cfg.available ? 'Connect a backend or enable development preview.' :
       !preview && !state.sources.length ? 'Start is disabled: the backend has no available source recordings.' :
       'Select a source recording before starting.';
   }
@@ -131,7 +146,8 @@
       badge.className = 'badge ' + (!cfg.available ? 'badge-unavailable' : isSynthetic() ? 'badge-preview' : 'badge-available');
       badge.textContent = !cfg.available ? 'unavailable' : isSynthetic() ? 'synthetic only' : 'available';
       var note = document.createElement('span'); note.className = 'cfg-note';
-      note.textContent = [cfg.detail, cfg.note].filter(Boolean).join(' — ');
+      note.textContent = [cfg.detail, !cfg.available ? cfg.note : null].filter(Boolean).join(' — ');
+      label.title = [cfg.detail, cfg.note].filter(Boolean).join(' — ');
       label.append(input, name, key, badge, note);
       el['config-group'].appendChild(label);
     });
@@ -166,6 +182,7 @@
   function setRunPhase(phase) {
     state.runPhase = phase;
     el['run-phase'].textContent = phase;
+    el['state-strip'].dataset.running = isActive() ? 'true' : 'false';
     refreshControls();
   }
   function renderPairs(target, rows) {
@@ -191,7 +208,7 @@
     ]);
     if (metadata.services === 'off') {
       el['audio-note'].textContent = (isSynthetic() ? 'Synthetic run. ' : '') +
-        'Services OFF — model-only run; no response audio. Audio playback is unverified.';
+        'Services OFF — model-only; no response audio. Playback unverified.';
     }
   }
 
@@ -200,10 +217,9 @@
     var row = document.createElement('tr'); row.className = 'empty-row';
     var cell = document.createElement('td'); cell.colSpan = 6; cell.textContent = 'No events. Start a fresh run.';
     row.appendChild(cell); el['event-body'].replaceChildren(row);
-    var empty = document.createElement('span'); empty.className = 'strip-empty'; empty.textContent = 'No state events yet.';
-    el['state-strip'].replaceChildren(empty);
-    el['state-strip'].setAttribute('aria-label', 'No state events yet.');
-    el['current-state'].textContent = 'no run'; el['current-state'].className = 'state-badge state-none';
+    renderTimeline(null);
+    setTally('none', 'no run', 'Choose a source and configuration. Then start a fresh run.');
+    el['run-clock'].textContent = clockText(0);
     ['first-decision', 'first-audible', 'decision-gap'].forEach(function (id) { el[id].textContent = EMPTY; });
     el['run-alert'].textContent = ''; el['run-alert'].className = 'run-alert';
     el['metadata-body'].replaceChildren(); el['summary-body'].replaceChildren();
@@ -235,26 +251,184 @@
     });
     el['event-body'].appendChild(row);
   }
-  function appendStateSegment(run, evt) {
-    if (['speaking', 'silence', 'holding', 'agent'].indexOf(evt.state) < 0) { return; }
-    var empty = el['state-strip'].querySelector('.strip-empty'); if (empty) { empty.remove(); }
-    var previous = el['state-strip'].lastElementChild;
-    if (previous && typeof run.lastT === 'number' && typeof evt.t === 'number') {
-      previous.style.flexGrow = String(Math.max(evt.t - run.lastT, 0.2));
+  function timelineData(run) {
+    var data = { caller: [], agent: [], decisions: [], overlaps: [], holding: [] };
+    if (!run) { return data; }
+    var caller = null; var audio = null; var overlap = null; var holding = null;
+    var audioEnds = new Set(run.events.filter(function (evt) { return evt.name === 'agent_audio_end'; }).map(function (evt) { return evt.t; }));
+    function callerState(name, t) {
+      if (caller && caller.state === name) { return; }
+      if (caller) { caller.end = t; data.caller.push(caller); }
+      caller = { state: name, start: t, end: null };
     }
-    var segment = document.createElement('span'); segment.className = 'strip-seg state-' + evt.state;
-    segment.style.flexGrow = '0.4'; segment.textContent = evt.state + ' @' + fmtT(evt.t) + 's';
-    el['state-strip'].appendChild(segment); run.lastT = evt.t;
-    el['state-strip'].setAttribute('aria-label', 'Turn states: ' + el['state-strip'].textContent);
-    el['current-state'].textContent = evt.state; el['current-state'].className = 'state-badge state-' + evt.state;
+    // Engine events may report an earlier source timestamp after service work.
+    // Sequence order remains the stable tie-breaker for equal timestamps.
+    run.events.slice().sort(function (a, b) { return a.t - b.t; }).forEach(function (evt) {
+      if ((evt.name === 'turn_incomplete' || (evt.kind === 'state' && evt.state === 'holding')) && !holding) { holding = { start: evt.t, end: null }; }
+      if (holding && (evt.name === 'turn_complete' || evt.name === 'speech_start' || evt.name === 'speaker_resumed' || (evt.kind === 'state' && evt.state === 'speaking'))) {
+        holding.end = evt.t; data.holding.push(holding); holding = null;
+      }
+      if (evt.name === 'speech_start' || evt.name === 'speaker_resumed' || (evt.kind === 'state' && evt.state === 'speaking')) { callerState('speaking', evt.t); }
+      // The engine also emits display silence after agent audio ends. That alone
+      // cannot close caller speech; require speech_stop when those times coincide.
+      if (evt.name === 'speech_stop' || (evt.kind === 'state' && evt.state === 'silence' && !audioEnds.has(evt.t))) { callerState('silence', evt.t); }
+      if (evt.name === 'agent_audio_start' && !audio) { audio = { state: 'agent', start: evt.t, end: null }; }
+      if (evt.name === 'overlap' && !overlap) { overlap = { start: evt.t, end: null }; }
+      if (evt.name === 'speech_stop' && overlap) {
+        overlap.end = evt.t; data.overlaps.push(overlap); overlap = null;
+      }
+      if (evt.name === 'agent_audio_end') {
+        if (audio) { audio.end = evt.t; data.agent.push(audio); audio = null; }
+        if (overlap) { overlap.end = evt.t; data.overlaps.push(overlap); overlap = null; }
+      }
+      if (evt.name === 'turn_complete' || evt.name === 'turn_incomplete') { data.decisions.push(evt); }
+    });
+    if (caller) { data.caller.push(caller); }
+    if (audio) { data.agent.push(audio); }
+    if (overlap) { data.overlaps.push(overlap); }
+    if (holding) { data.holding.push(holding); }
+    return data;
+  }
+
+  function renderTimeline(run) {
+    var data = timelineData(run);
+    var latest = run ? run.observedT : 0;
+    var horizon = Math.ceil(Math.max(6, run ? run.duration || 0 : 0, latest) * 2) / 2;
+    var step = Math.max(0.5, Math.ceil(horizon / 200 * 2) / 2);
+    var canvas = document.createElement('div'); canvas.className = 'timeline-canvas';
+    canvas.style.minWidth = Math.min(1800, Math.max(580, horizon * 60 + 70)) + 'px';
+    var accessible = [];
+    function row(className, labelText) {
+      var item = document.createElement('div'); item.className = className;
+      var label = document.createElement('span'); label.className = 'lane-label'; label.textContent = labelText;
+      var plot = document.createElement('div'); plot.className = 'timeline-plot';
+      item.append(label, plot); return { element: item, plot: plot };
+    }
+    function position(node, start, end) {
+      node.style.left = (start / horizon * 100) + '%';
+      node.style.width = (Math.max(0, end - start) / horizon * 100) + '%';
+    }
+    var ruler = row('ruler-row', 'SECONDS');
+    for (var t = 0; t <= horizon + 0.001; t += step) {
+      var tick = document.createElement('span'); tick.className = 'ruler-tick';
+      tick.style.left = (t / horizon * 100) + '%'; tick.dataset.t = String(t);
+      var number = document.createElement('span'); number.textContent = t.toFixed(t % 1 ? 1 : 0);
+      if (t === 0) { tick.classList.add('first'); }
+      if (Math.abs(t - horizon) < 0.001) { tick.classList.add('last'); }
+      tick.appendChild(number); ruler.plot.appendChild(tick);
+    }
+    canvas.appendChild(ruler.element);
+    var decisions = row('decision-row', 'DECISION');
+    data.decisions.forEach(function (evt, index) {
+      var flag = document.createElement('span');
+      flag.className = 'decision-flag ' + (evt.name === 'turn_complete' ? 'complete' : 'incomplete');
+      flag.dataset.t = String(evt.t); flag.dataset.name = evt.name;
+      flag.style.left = (evt.t / horizon * 100) + '%';
+      flag.style.top = (index % 2 ? 27 : 2) + 'px';
+      flag.textContent = evt.name === 'turn_complete' ? 'COMPLETE' : 'WAIT';
+      if (typeof evt.prob === 'number' && isFinite(evt.prob)) { flag.textContent += ' ' + evt.prob.toFixed(2); }
+      flag.title = evt.name + ' at ' + seconds(evt.t) + (evt.trigger ? ' · ' + triggerText(evt.trigger) : '');
+      accessible.push(flag.title); decisions.plot.appendChild(flag);
+    });
+    if (!data.decisions.length) {
+      var undecided = document.createElement('span'); undecided.className = 'track-empty'; undecided.textContent = 'No decision'; decisions.plot.appendChild(undecided);
+    }
+    canvas.appendChild(decisions.element);
+    var tracks = document.createElement('div'); tracks.className = 'timeline-tracks';
+    ['caller', 'agent'].forEach(function (laneName) {
+      var track = row('lane-row', laneName.toUpperCase());
+      track.plot.id = laneName + '-lane'; track.plot.classList.add('timeline-lane'); track.plot.dataset.lane = laneName;
+      track.plot.style.backgroundSize = (step / horizon * 100) + '% 100%';
+      data[laneName].forEach(function (interval) {
+        var segment = document.createElement('span'); segment.className = 'timeline-segment state-' + interval.state;
+        var end = interval.end === null ? Math.max(interval.start, latest) : interval.end;
+        segment.dataset.start = String(interval.start); segment.dataset.end = interval.end === null ? '' : String(interval.end);
+        segment.dataset.state = interval.state;
+        if (interval.end === null) { segment.dataset.open = 'true'; }
+        position(segment, interval.start, end);
+        var label = interval.state === 'speaking' ? 'Speaking' : interval.state === 'agent' ? (isSynthetic() ? 'Synthetic audio' : 'Reported audio') : 'Silence';
+        segment.textContent = label;
+        segment.title = label + ' from ' + seconds(interval.start) + (interval.end === null ? '; end not reported' : ' to ' + seconds(interval.end));
+        accessible.push(segment.title); track.plot.appendChild(segment);
+      });
+      if (!data[laneName].length) {
+        var empty = document.createElement('span'); empty.className = 'track-empty' + (!run && laneName === 'caller' ? ' strip-empty' : '');
+        empty.textContent = laneName === 'caller' ? 'No caller state events' : 'No reported audio'; track.plot.appendChild(empty);
+      }
+      if (laneName === 'caller') {
+        data.holding.forEach(function (interval) {
+          var span = document.createElement('span'); span.className = 'holding-span';
+          span.dataset.start = String(interval.start); span.dataset.end = interval.end === null ? '' : String(interval.end);
+          if (interval.end === null) { span.dataset.open = 'true'; }
+          position(span, interval.start, interval.end === null ? Math.max(interval.start, latest) : interval.end);
+          span.title = (isSynthetic() ? 'Synthetic holding' : 'Holding reported') + ' from ' + seconds(interval.start) +
+            (interval.end === null ? '; end not reported' : ' to ' + seconds(interval.end));
+          accessible.push(span.title); track.plot.appendChild(span);
+        });
+      }
+      tracks.appendChild(track.element);
+    });
+    var collisions = document.createElement('div'); collisions.className = 'collision-overlay';
+    data.overlaps.forEach(function (interval) {
+      var band = document.createElement('span');
+      band.className = interval.end === null ? 'collision-onset' : 'collision-band';
+      band.dataset.start = String(interval.start); band.dataset.end = interval.end === null ? '' : String(interval.end);
+      position(band, interval.start, interval.end === null ? interval.start : interval.end);
+      band.title = (isSynthetic() ? 'Synthetic overlap' : 'Reported overlap') + ' at ' + seconds(interval.start) +
+        (interval.end === null ? '; end not reported' : ' to ' + seconds(interval.end) + ' · ' + seconds(interval.end - interval.start));
+      if (interval.end !== null) {
+        var label = document.createElement('span'); label.className = 'collision-label';
+        label.textContent = (isSynthetic() ? 'FIXTURE ' : 'REPORTED ') + seconds(interval.end - interval.start);
+        band.appendChild(label);
+      }
+      accessible.push(band.title); collisions.appendChild(band);
+    });
+    tracks.appendChild(collisions); canvas.appendChild(tracks);
+    el['state-strip'].replaceChildren(canvas);
+    el['state-strip'].setAttribute('aria-label', (isSynthetic() ? 'Synthetic event timeline. No audio. ' : 'Backend-reported timeline. Playback unverified. ') +
+      (accessible.length ? accessible.join('. ') : 'No state events yet.'));
+    el['state-strip'].tabIndex = 0;
+    updateTimelineScrollHint();
+  }
+
+  function updateTimelineScrollHint() {
+    el['timeline-scroll-hint'].hidden = el['state-strip'].scrollWidth <= el['state-strip'].clientWidth + 1;
+  }
+
+  function recordTimelineEvent(run, evt) {
+    if (typeof evt.t !== 'number' || !isFinite(evt.t) || evt.t < 0) { return; }
+    run.events.push(evt); run.observedT = Math.max(run.observedT, evt.t);
+    el['run-clock'].textContent = clockText(run.observedT);
+    if (evt.kind === 'state' && ['speaking', 'silence', 'holding', 'agent'].indexOf(evt.state) >= 0) {
+      run.lastState = evt.state;
+      if (!run.hadOverlap) {
+        var note = { speaking: 'Caller speaking. The turn stays open.', silence: 'Caller silence reported. Waiting for the next decision.',
+          holding: isSynthetic() ? 'Synthetic incomplete-turn event. Giving the caller room.' : 'The model said incomplete. Giving the caller room.',
+          agent: 'Agent state reported. Audio timing is shown separately.' }[evt.state];
+        setTally(evt.state, evt.state, note);
+      }
+    }
+    if (evt.name === 'speaker_resumed' && !run.hadOverlap) { setTally('speaking', 'speaking', 'Caller resumed after a completion decision.'); }
+    if (evt.name === 'agent_audio_start' && !run.hadOverlap) { setTally('agent', 'agent', isSynthetic() ? 'Synthetic audio-start marker. No audio is playing.' : 'Audio start reported. Speaker playback remains unverified.'); }
+    if (evt.name === 'overlap') {
+      run.hadOverlap = true;
+      setTally('overlap', 'interrupted', isSynthetic() ? 'SYNTHETIC OVERLAP · no audio, not evidence.' : 'OVERLAP REPORTED · audible playback unverified.');
+    }
+    renderTimeline(run);
+  }
+
+  function timingValue(target, value, note) {
+    var number = document.createElement('span'); number.className = 'timing-value'; number.textContent = value;
+    var qualifier = document.createElement('span'); qualifier.className = 'timing-qualifier'; qualifier.textContent = note ? ' ' + note : '';
+    target.replaceChildren(number, qualifier);
   }
   function updateTimingSummary(run) {
-    var qualifier = isSynthetic() ? ' (synthetic)' : '';
-    el['first-decision'].textContent = run.firstDecision === null ? EMPTY : seconds(run.firstDecision) + qualifier + ' · ' + triggerText(run.trigger);
-    el['first-audible'].textContent = run.firstAudible === null ? EMPTY : seconds(run.firstAudible) +
-      (isSynthetic() ? ' (synthetic; no audio)' : ' (backend-reported; playback unverified)');
-    el['decision-gap'].textContent = run.firstDecision !== null && run.firstAudible !== null
-      ? seconds(run.firstAudible - run.firstDecision) + qualifier : EMPTY;
+    timingValue(el['first-decision'], run.firstDecision === null ? EMPTY : seconds(run.firstDecision),
+      run.firstDecision === null ? '' : (isSynthetic() ? 'Synthetic · ' : '') + triggerText(run.trigger));
+    timingValue(el['first-audible'], run.firstAudible === null ? EMPTY : seconds(run.firstAudible),
+      run.firstAudible === null ? '' : isSynthetic() ? 'Synthetic · no audio' : 'Reported · playback unverified');
+    timingValue(el['decision-gap'], run.firstDecision !== null && run.firstAudible !== null ? seconds(run.firstAudible - run.firstDecision) : EMPTY,
+      run.firstDecision === null || run.firstAudible === null ? '' : isSynthetic() ? 'Synthetic timing' : 'Backend timing');
   }
   function showEventAlert(evt) {
     var message = '';
@@ -345,13 +519,14 @@
     }
     stopAdapter(); clearEvents(); refreshChrome();
     var token = {};
-    var run = { token: token, configId: cfg.id, configLabel: cfg.label, lastT: null,
-      firstDecision: null, firstAudible: null, trigger: null, id: null, idNote: '' };
+    var run = { token: token, configId: cfg.id, configLabel: cfg.label,
+      firstDecision: null, firstAudible: null, trigger: null, id: null, idNote: '',
+      events: [], observedT: 0, duration: 0, lastState: null, hadOverlap: false };
     state.run = run;
     el['run-id'].textContent = 'Waiting for backend run identity…';
     el['run-config'].textContent = cfg.label + (cfg.detail ? ' — ' + cfg.detail : '');
     el['source-label'].textContent = source ? 'Requested source: ' + (source.source_id || source.file) : 'Synthetic fixture — no recording and no audio.';
-    setRunPhase('starting');
+    setRunPhase('starting'); setTally('none', 'starting', 'Waiting for the backend to confirm a fresh run.');
     var started = false; var pending = [];
     var guard = function (fn) {
       return function dispatch(value) {
@@ -363,7 +538,7 @@
     var handlers = {
       onEvent: guard(function (evt) {
         appendEventRow(run, evt);
-        if (evt.kind === 'state' && evt.state) { appendStateSegment(run, evt); }
+        recordTimelineEvent(run, evt);
         if (evt.name === 'turn_complete' && run.firstDecision === null && typeof evt.t === 'number') {
           run.firstDecision = evt.t; run.trigger = evt.trigger || null;
         }
@@ -372,11 +547,17 @@
       }),
       onEnd: guard(function (ended) {
         stopAdapter(); renderSummary(ended); setRunPhase('ended');
-        el['current-state'].textContent = 'run ended'; el['current-state'].className = 'state-badge state-none';
+        if (ended && typeof ended.t === 'number') { run.observedT = Math.max(run.observedT, ended.t); }
+        el['run-clock'].textContent = clockText(run.observedT); renderTimeline(run);
+        if (run.hadOverlap || (ended && ended.summary && ended.summary.audible_interruption === true)) {
+          setTally('overlap', 'interrupted', (isSynthetic() ? 'SYNTHETIC OVERLAP · no audio, not evidence.' : 'OVERLAP REPORTED · playback unverified.') +
+            (run.lastState ? ' Final state: ' + run.lastState + '.' : ' Run ended.'));
+        } else { setTally('none', 'run ended', 'Final report below. ' + (isSynthetic() ? 'Synthetic fixture; no audio.' : 'Speaker playback remains unverified.')); }
         setStatus(isSynthetic() ? 'warn' : 'ok', isSynthetic() ? 'Synthetic run ended. No audio or benchmark evidence.' : 'Run ended. Final values below are backend-reported; audio playback is unverified.');
       }),
       onError: guard(function (message) {
         stopAdapter(); setRunPhase('error'); refreshChrome();
+        setTally('none', 'run error', 'Reset or start a fresh run to try again.');
         setStatus('error', 'Run error: ' + String(message));
         appendEventRow(run, { t: NaN, kind: 'error', detail: String(message) });
         el['summary-note'].textContent = 'Run failed. No final summary received.';
@@ -389,12 +570,16 @@
       el['run-id'].textContent = run.id + (run.idNote ? ' (' + run.idNote + ')' : '');
       el['event-caption'].textContent = 'Events attributed to run ' + run.id + ', configuration ' + cfg.label + '. A fresh run clears this table.';
       if (info.sourceRecording) { el['source-label'].textContent = 'Source: ' + info.sourceRecording; }
-      refreshChrome(); renderMetadata(info.metadata);
+      var metadata = info.metadata || {};
+      run.duration = metadata.source && typeof metadata.source.duration_s === 'number' ? metadata.source.duration_s : 0;
+      refreshChrome(); renderMetadata(info.metadata); renderTimeline(run);
+      setTally('none', 'ready', 'Run confirmed. Waiting for source events.');
       setRunPhase('running'); started = true;
       pending.forEach(function (deliver) { deliver(); }); pending = [];
     } catch (error) {
       if (state.run !== run || run.token !== token) { return; }
       stopAdapter(); setRunPhase('error'); refreshChrome();
+      setTally('none', 'start failed', 'Review the connection and try a fresh run.');
       el['run-id'].textContent = 'Not assigned';
       setStatus('error', 'Start failed: ' + valueText(error.message || error));
       el['summary-note'].textContent = 'Run did not start. No final summary received.';
@@ -403,7 +588,7 @@
   function stopRun() {
     if (!isActive()) { return; }
     stopAdapter(); setRunPhase('stopped'); refreshChrome();
-    el['current-state'].textContent = 'stopped'; el['current-state'].className = 'state-badge state-none';
+    setTally('none', 'stopped', 'Run cancelled. The last reported events stay on the timeline.');
     el['summary-note'].textContent = 'Stopped locally. No final summary accepted after cancellation.';
     setStatus('warn', 'Run stopped. Start a fresh run to replay the selected source.');
   }
@@ -419,6 +604,7 @@
   el['btn-start'].addEventListener('click', startRun);
   el['btn-stop'].addEventListener('click', stopRun);
   el['btn-reset'].addEventListener('click', resetAll);
+  window.addEventListener('resize', updateTimelineScrollHint);
   document.addEventListener('keydown', function (event) {
     if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) { return; }
     var target = event.target;
