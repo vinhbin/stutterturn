@@ -1,6 +1,6 @@
 # Team handoff — Saturday evening (Oct 10, ~6 PM EDT)
 
-Written from Vinh's side after absorbing Kareem's lane (he left this afternoon — decision log D-008). Main is at `d6a18b8`; **PR #19 (replay-v2 citation refresh across all surfaces) is open and awaits Vinh's merge**, and a Tiger Data scaffold PR plus a train-harness review are in flight. Everything below is backed by committed artifacts; links are in-repo.
+Written from Vinh's side after absorbing Kareem's lane (he left this afternoon — decision log D-008). Main is at `1c8ae78` (PR #19 merged — every surface now cites replay v2); a Tiger Data scaffold PR plus a train-harness review are in flight. Everything below is backed by committed artifacts; links are in-repo.
 
 ## The site is hosted
 
