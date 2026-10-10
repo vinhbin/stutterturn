@@ -1,8 +1,8 @@
 # StutterTurn presentation site
 
-The landing page, judge screen and run console share the broadcast-console
-identity: local Archivo/JetBrains Mono, warm black surfaces, neutral controls
-and colors reserved for caller/agent state. Plain HTML/CSS/JavaScript; no build
+The landing page, judge guide and live workspace share a cool charcoal/cyan
+studio identity: local Archivo/JetBrains Mono, prominent transport controls,
+and distinct caller/agent states. Plain HTML/CSS/JavaScript; no build
 step or runtime packages.
 
 ## Open locally
@@ -14,10 +14,14 @@ python -m http.server 8041 --bind 127.0.0.1 --directory web
 ```
 
 - `/` introduces the project and the recorded-source comparison.
-- `/judges/` presents the working console and links the saved evidence.
+- `/judge/` guides evaluation: the hypothesis, recorded evidence, comparison
+  steps, architecture, and limitations. It does not embed or start a console.
+- `/live/` presents the operational replay workspace and current run.
+- `/judges/` preserves older links by redirecting to `/judge/`, with a visible
+  link when JavaScript is disabled.
 - `/demo-ui/` opens the console directly, with all run controls and metadata.
 
-The judge page embeds the same console rather than maintaining another adapter
+The live page embeds the same console rather than maintaining another adapter
 or run state. It never connects or starts a run automatically. Open **Connection
 & preview**, check the backend URL, then Connect and Start fresh run.
 
@@ -64,6 +68,8 @@ mock, no audio and not evidence. Stock and patient use identical mock scripts.
 - [Console reference](demo-ui/README.md), [design system](demo-ui/DESIGN.md) and
   [original UI verification](demo-ui/verification.md).
 - [Site design extension](DESIGN.md) and [desktop/mobile captures](screenshots/).
+- [Studio refresh checks](studio-verification.md), including the reproducible
+  site, console, and adapter check commands. Earlier captures are historical.
 - [Backend replay logs, v2](https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2)
   (supersede the first replay, whose model input lacked pre-roll): exploratory
   traces, with unreviewed boundaries and no efficacy claim.

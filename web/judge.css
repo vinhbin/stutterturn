@@ -1,0 +1,109 @@
+.judge-guide .site-header nav { flex-wrap: wrap; }
+.guide-opening { display: grid; grid-template-columns: 1.35fr 0.85fr; gap: 80px; padding-block: 64px 60px; align-items: end; }
+.guide-introduction h1 { font-size: clamp(44px, 5vw, 68px); font-weight: 720; line-height: 1.05; letter-spacing: -0.035em; }
+.guide-deck { max-width: 59ch; margin-top: 26px; color: var(--muted); font-size: 18px; line-height: 1.65; }
+.guide-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.guide-hypothesis { border-top: 1px solid var(--accent); padding-top: 22px; }
+.guide-hypothesis h2 { font-size: 22px; line-height: 1.35; font-weight: 600; letter-spacing: -0.015em; }
+.guide-hypothesis > p { margin-top: 14px; }
+.guide-hypothesis .guide-caveat { margin-top: 18px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.guide-hypothesis > a { margin-top: 22px; }
+.guide-section { padding-block: 52px 56px; border-top: 1px solid var(--border); }
+.guide-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; margin-bottom: 24px; }
+.guide-section h2 { font-size: clamp(28px, 2.8vw, 36px); font-weight: 650; line-height: 1.2; letter-spacing: -0.025em; }
+.guide-section-heading > p { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.snapshot-intro { max-width: 88ch; color: var(--muted); }
+.snapshot-comparison { margin-top: 28px; overflow-x: auto; scrollbar-color: var(--silence) var(--panel); }
+.snapshot-comparison table { width: 100%; border-collapse: collapse; text-align: left; background: var(--panel); }
+.snapshot-comparison caption { text-align: left; color: var(--muted); font-size: 13px; padding-bottom: 12px; }
+.snapshot-comparison th, .snapshot-comparison td { padding: 16px 22px; border-bottom: 1px solid var(--border); }
+.snapshot-comparison thead th { color: var(--muted); font-size: 13px; font-weight: 450; background: var(--bg); padding-top: 0; }
+.snapshot-comparison tbody th { font: 600 18px/1.4 var(--display); }
+.snapshot-comparison tbody td { font: 15px/1.6 var(--mono); font-variant-numeric: tabular-nums; }
+.snapshot-comparison tbody tr:last-child th, .snapshot-comparison tbody tr:last-child td { border-bottom: 0; }
+.snapshot-interpretation { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 24px; color: var(--muted); font-size: 14px; }
+.snapshot-interpretation strong { font-weight: 600; color: var(--fg); }
+.snapshot-provenance { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 26px; }
+.snapshot-provenance > p { color: var(--muted); font-size: 12px; }
+.snapshot-provenance code { font: 12px var(--mono); color: var(--fg); }
+.evaluation-section { display: grid; grid-template-columns: 0.8fr 1.4fr; gap: 80px; }
+.evaluation-intro > p { margin-top: 18px; color: var(--muted); }
+.evaluation-intro > a { margin-top: 22px; }
+.evaluation-steps { padding: 0; margin: 0; list-style: none; }
+.evaluation-steps > li { display: grid; grid-template-columns: 38px 1fr; gap: 18px; border-top: 1px solid var(--rule); padding-block: 24px; }
+.evaluation-steps > li:first-child { border-top: 0; padding-top: 0; }
+.evaluation-steps > li:last-child { padding-bottom: 0; }
+.evaluation-number { font: 13px/1.6 var(--mono); color: var(--accent); padding-top: 4px; }
+.evaluation-steps h3 { font-size: 21px; font-weight: 570; letter-spacing: -0.02em; line-height: 1.4; }
+.evaluation-steps p { margin-top: 10px; color: var(--muted); }
+.architecture-flow { list-style: none; padding: 26px 0 24px; margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--rule); }
+.architecture-flow li { min-width: 0; position: relative; padding-right: 44px; }
+.architecture-flow li + li { padding-left: 24px; }
+.architecture-flow li:last-child { padding-right: 0; }
+.architecture-flow h3 { font-size: 18px; line-height: 1.4; font-weight: 580; }
+.architecture-flow p { color: var(--muted); font-size: 14px; margin-top: 10px; }
+.architecture-flow svg { color: var(--accent); position: absolute; top: 2px; right: 0; }
+.architecture-note { color: var(--muted); font-size: 13px; margin-top: 16px; }
+.scope-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+.scope-columns > div { border-top: 1px solid var(--rule); padding-top: 20px; }
+.scope-columns h3 { font-size: 20px; font-weight: 590; }
+.scope-columns ul { padding-left: 20px; color: var(--muted); margin: 16px 0 0; }
+.scope-columns li { margin-top: 10px; padding-left: 4px; }
+.scope-columns li::marker { color: var(--silence); }
+.guide-next { display: flex; align-items: center; gap: 32px; margin-top: 36px; }
+.guide-next > p { color: var(--muted); font-size: 13px; max-width: 65ch; }
+.guide-next .button { flex-shrink: 0; }
+@media (max-width: 1050px) {
+  .guide-opening { gap: 40px; grid-template-columns: 1.2fr 0.85fr; }
+  .guide-introduction h1 { font-size: 52px; }
+  .guide-deck { font-size: 17px; }
+  .evaluation-section { gap: 40px; }
+  .architecture-flow li { padding-right: 30px; }
+  .architecture-flow li + li { padding-left: 16px; }
+  .architecture-flow h3 { font-size: 17px; }
+  .snapshot-provenance { align-items: flex-start; flex-direction: column; gap: 16px; }
+}
+@media (max-width: 760px) {
+  .judge-guide .site-header { flex-wrap: wrap; padding-block: 18px 10px; }
+  .judge-guide .site-header nav { width: 100%; justify-content: flex-start; gap: 26px; }
+  .guide-opening { grid-template-columns: 1fr; gap: 36px; padding-block: 40px; }
+  .guide-introduction h1 { font-size: 52px; }
+  .guide-deck { margin-top: 22px; }
+  .guide-hypothesis { max-width: 70ch; }
+  .guide-section { padding-block: 36px 40px; }
+  .guide-section-heading { flex-direction: column; gap: 12px; }
+  .guide-section h2 { font-size: 30px; }
+  .snapshot-interpretation { grid-template-columns: 1fr; gap: 16px; }
+  .snapshot-comparison th, .snapshot-comparison td { padding-inline: 16px; }
+  .evaluation-section { grid-template-columns: 1fr; gap: 32px; }
+  .architecture-flow { grid-template-columns: 1fr 1fr; gap: 30px 24px; }
+  .architecture-flow li, .architecture-flow li + li { padding: 0 30px 0 0; }
+  .architecture-flow li:nth-child(2) svg { transform: rotate(90deg); }
+  .architecture-flow li:last-child { padding-right: 0; }
+  .scope-columns { gap: 32px; }
+  .guide-next { align-items: flex-start; flex-direction: column; gap: 18px; }
+}
+@media (max-width: 480px) {
+  .judge-guide .site-header nav { gap: 16px; justify-content: space-between; }
+  .judge-guide .site-header nav a { font-size: 12px; }
+  .judge-guide .site-header nav svg { width: 16px; }
+  .guide-introduction h1 { font-size: 42px; }
+  .guide-actions { flex-direction: column; }
+  .guide-actions .button { width: 100%; }
+  .guide-deck { font-size: 16px; }
+  .guide-section h2 { font-size: 28px; }
+  .snapshot-comparison caption { font-size: 12px; }
+  .snapshot-comparison th, .snapshot-comparison td { padding: 14px 10px; }
+  .snapshot-comparison th:first-child, .snapshot-comparison td:first-child { padding-left: 12px; }
+  .snapshot-comparison thead th { font-size: 12px; }
+  .snapshot-comparison tbody th { font-size: 15px; }
+  .snapshot-comparison tbody td { font-size: 12px; white-space: nowrap; }
+  .evaluation-steps > li { grid-template-columns: 28px 1fr; gap: 12px; }
+  .evaluation-steps h3 { font-size: 20px; }
+  .architecture-flow { grid-template-columns: 1fr; gap: 0; padding-bottom: 0; }
+  .architecture-flow li, .architecture-flow li + li { padding: 0 0 44px; }
+  .architecture-flow li:last-child { padding-bottom: 22px; }
+  .architecture-flow svg, .architecture-flow li:nth-child(2) svg { top: auto; bottom: 12px; left: 0; right: auto; transform: rotate(90deg); }
+  .architecture-flow h3 { font-size: 18px; }
+  .scope-columns { grid-template-columns: 1fr; gap: 28px; }
+}

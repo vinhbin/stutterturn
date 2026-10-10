@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0c0a09">
+<meta name="theme-color" content="#090e14">
 <title>StutterTurn · Call console</title>
 <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -12,12 +12,30 @@
 <body>
 <a class="skip-link" href="#main-content">Skip to console</a>
 <header class="page-header">
-  <div class="identity"><h1>StutterTurn<span class="brand-period" aria-hidden="true">.</span></h1><p>Let people finish.</p></div>
+  <div class="identity"><svg class="brand-mark" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4v16M12 4v16M16 8l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="identity-copy"><h1>StutterTurn</h1><p>Let people finish.</p></div></div>
   <div class="header-meta"><span>CALL CONSOLE</span><div id="connection-chip" class="chip chip-blocked">LIVE INTEGRATION: BLOCKED</div></div>
 </header>
 <div id="preview-banner" class="preview-banner" hidden>DEVELOPMENT PREVIEW — synthetic fixture events. No audio. Not benchmark evidence.</div>
 <main id="main-content" tabindex="-1">
   <div id="status-banner" class="status-banner warn" role="status" aria-atomic="true">Connect a backend or enable the labeled development preview.</div>
+  <div class="workspace-toolbar">
+    <a class="setup-jump" href="#run-setup">Connection &amp; configuration <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <section class="source-control" aria-labelledby="source-heading">
+      <h2 id="source-heading">Source recording</h2>
+      <label class="visually-hidden" for="source-select">Source for next run</label>
+      <select id="source-select" disabled aria-describedby="source-note"><option value="">No backend sources available</option></select>
+      <p class="note" id="source-note">The source list comes from the connected backend.</p>
+    </section>
+    <section class="transport" aria-labelledby="run-heading">
+      <h2 id="run-heading" class="visually-hidden">Run controls</h2>
+      <div class="run-controls">
+        <button id="btn-start" type="button">Start fresh run <svg class="transport-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z" fill="currentColor"/></svg><kbd>S</kbd></button>
+        <button id="btn-stop" type="button" disabled>Stop <kbd>X</kbd></button>
+        <button id="btn-reset" type="button">Reset <kbd>R</kbd></button>
+      </div>
+      <p class="note" id="start-note">Connect a backend or enable development preview.</p>
+    </section>
+  </div>
   <div class="console-grid">
     <section class="monitor" aria-labelledby="state-heading">
       <div class="monitor-heading"><h2 id="state-heading">Call monitor</h2><span id="run-phase" class="phase-label" role="status" aria-atomic="true">idle</span></div>
@@ -40,26 +58,11 @@
       <p class="note audio-note" id="audio-note">Audio timestamps are backend-reported; speaker playback is unverified. No audio plays in this console.</p>
     </section>
 
-    <aside class="control-desk" aria-label="Run setup and controls">
-      <section class="source-control" aria-labelledby="source-heading">
-        <h2 id="source-heading">Source recording</h2>
-        <label class="visually-hidden" for="source-select">Source for next run</label>
-        <select id="source-select" disabled aria-describedby="source-note"><option value="">No backend sources available</option></select>
-        <p class="note" id="source-note">The source list comes from the connected backend.</p>
-      </section>
+    <aside id="run-setup" class="control-desk" tabindex="-1" aria-label="Run setup and controls">
       <section class="config-control" aria-labelledby="config-heading">
         <h2 id="config-heading">Configuration</h2>
         <fieldset id="config-group"><legend class="visually-hidden">Select configuration for the next fresh run</legend></fieldset>
         <p class="desk-note">One configuration per run. Same source for your next comparison.</p>
-      </section>
-      <section class="transport" aria-labelledby="run-heading">
-        <h2 id="run-heading" class="visually-hidden">Run controls</h2>
-        <div class="run-controls">
-          <button id="btn-start" type="button">Start fresh run <kbd>S</kbd></button>
-          <button id="btn-stop" type="button" disabled>Stop <kbd>X</kbd></button>
-          <button id="btn-reset" type="button">Reset <kbd>R</kbd></button>
-        </div>
-        <p class="note" id="start-note">Connect a backend or enable development preview.</p>
       </section>
       <details class="connection-settings" open>
         <summary>Connection &amp; preview</summary>
@@ -100,9 +103,11 @@
   </section>
   <section class="event-section" aria-labelledby="events-heading">
     <div class="section-heading"><h2 id="events-heading">Event ledger</h2><span>SECONDS FROM SOURCE START</span></div>
+    <p id="event-caption" class="note ledger-caption">Events for the current run. A fresh run clears this table.</p>
+    <p class="ledger-scroll-hint"><span>Scroll ledger →</span><span class="ledger-keyboard-tip">Focus the ledger and use Left/Right arrow keys.</span></p>
     <div id="event-scroll" class="event-scroll" tabindex="-1" role="region" aria-labelledby="events-heading">
-      <table id="event-table">
-        <caption id="event-caption">Events for the current run. A fresh run clears this table.</caption>
+      <table id="event-table" aria-describedby="event-caption">
+        <caption class="visually-hidden">Current run events</caption>
         <thead><tr><th scope="col">Run</th><th scope="col">t (s)</th><th scope="col">Event</th><th scope="col">Detail</th><th scope="col">prob</th><th scope="col">model</th></tr></thead>
         <tbody id="event-body"><tr class="empty-row"><td colspan="6">No events. Start a fresh run.</td></tr></tbody>
       </table>
