@@ -40,6 +40,8 @@ Legend: ⬜ assigned · 🟡 in progress · ✅ proved with evidence · ⛔ bloc
 | 4 | **Judges page + freeze** (10 PM–1 AM) | Kareem; all | Every public claim is a button backed by saved results; README current; **1 AM freeze** | ⬜ |
 | 5 | **Video + submit** (1–8:30 AM) | Vinh; Kareem checks | 3–4 h protected for video/Devpost; links checked logged-out; received confirmation by 8:30 | ⬜ |
 
+**Rest and meals (not optional — the demo is judged on evening work):** each person takes one protected 90-minute sleep block between 3 and 10 PM, scheduled at the 3 PM gate. Suggested: Vinh + Kareem 3:00–4:30 (their Phase 1 deliverables land by 3), Guttuu 4:30–6:00 (after integration handoff), Niko 6:00–7:30 if eval is green (the critical path sleeps last, but DOES sleep — a fried Niko at the 10 PM abort gate is how bad calls get made). Real dinner together ~6:30. Vinh has been up since Friday: his 3:00 block is mandatory.
+
 **Build order notes:** Phase 0 is the unblocker (bad labels poison everything). Phase 1's fine-tune is the critical path — Niko gets help before anyone polishes. Phase 2 is the convergence point (model meets telephony); the 10 PM abort gate exists because the benchmark-page fallback is still a submittable project. Phase 5 adds nothing new.
 
 ## Shared contracts
