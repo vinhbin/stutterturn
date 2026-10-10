@@ -80,6 +80,8 @@ One socket can carry several runs one after another; one run at a time.
 {"v":"0.1","type":"error","run_id":"... or null","seq":-1,"message":"..."}
 ```
 
+`run_ended.t` is never earlier than the last emitted event's `t`.
+
 `kind` uses the four values the UI already handles; `name` says exactly what happened.
 
 | kind | name | Meaning |

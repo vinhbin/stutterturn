@@ -241,6 +241,7 @@ class Run:
         self.run_id = (f"{dt.datetime.now(dt.timezone.utc):%Y%m%dT%H%M%SZ}-{config}-"
                        f"{secrets.token_hex(2)}")
         self.seq = 0
+        self.t_max = 0.0   # largest event t emitted (audible events carry scheduled-audio times)
         self.stopped = False
         os.makedirs(RUNS, exist_ok=True)
         self.log_path = os.path.join(RUNS, f"{self.run_id}.jsonl")
@@ -275,6 +276,7 @@ class Run:
         if name:
             msg["name"] = name
         msg.update(fields)
+        self.t_max = max(self.t_max, msg["t"])
         self._send(msg)
 
     def state(self, t, state, **fields):
@@ -492,8 +494,11 @@ class Run:
         summary["services"] = "on" if self.services else "off"
         summary["chars_used"] = self.services.chars_used if self.services else 0
         summary["turns"] = self.turns
+        # Clamp: events carry scheduled-audio times and the final sleep can wake a
+        # few ms early, so the monotonic now() may precede the last emitted event.
         self._send({"v": CONTRACT_VERSION, "type": "run_ended", "run_id": self.run_id,
-                    "seq": self.seq, "t": self.now(), "reason": reason, "summary": summary,
+                    "seq": self.seq, "t": max(self.now(), self.t_max), "reason": reason,
+                    "summary": summary,
                     "log": os.path.relpath(self.log_path, ROOT).replace("\\", "/")})
         self._log.close()
         return summary
