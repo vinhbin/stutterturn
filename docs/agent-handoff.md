@@ -2,14 +2,16 @@
 
 Use this after reading [PLAN.md](../PLAN.md), especially the 2 PM/3 PM decisions. **Two independent builders plus one read-only reviewer** are enough. These are executable task boundaries, not an instruction to start model training, contact people, purchase services or claim a gate passed.
 
+**Current handoffs:** Builder A already has [PR #7](https://github.com/vinhbin/stutterturn/pull/7); Builder B has [PR #8](https://github.com/vinhbin/stutterturn/pull/8). Continue/review those branches instead of starting duplicate scaffolds. PLAN's F1–F4, I1–I2, P1 and E1 rows are the task-status authority. Neither open PR establishes live-agent or model acceptance.
+
 ## All four teammates work in parallel
 
 | Teammate | Branch/worktree lane | Exclusive writes | Starts without waiting for |
 |---|---|---|---|
-| Niko | `niko/model-benchmark` | `model/**`, `benchmark/**` | UI, hosted page or phone number; checkpoint smoke test proceeds while humans label |
+| Niko | `niko/model-benchmark` | `model/**`, `benchmark/**` except the two assigned human CSVs | UI, hosted page or phone number; checkpoint smoke test proceeds while humans label |
 | Guttuu | `guttuu/web-agent` | `agent/**`, including `agent/CONTRACT.md` | Candidate model; use stock and document the proposed event/run contract first |
-| Kareem | `kareem/judges-page` | `web/**` excluding `web/demo-ui/**`; `README.md` | Final metrics; build the shell with labeled previews, replace with real runs later |
-| Vinh | Builder A/B branches below | `web/demo-ui/**`; listed pitch/evidence docs | Tuned weights; UI adapter and pitch checklist proceed while Vinh labels audio |
+| Kareem | `kareem/judges-page` | `web/**` excluding `web/demo-ui/**`; `README.md`; `benchmark/annotations/feasibility/kareem.csv` | Final metrics; build the shell with labeled previews, replace with real runs later |
+| Vinh | Builder A/B branches below; PM changes separately | `web/demo-ui/**`; listed pitch/evidence docs; `benchmark/annotations/feasibility/vinh.csv`; PM owns PLAN/decision log/handoff | Tuned weights; UI adapter and pitch checklist proceed while Vinh labels audio |
 
 Niko owns `model/CONTRACT.md`; Guttuu owns `agent/CONTRACT.md`. Draft these within the first 15 minutes of the sprint, mark unimplemented behavior proposed, and version changes. Consumers can scaffold against that contract before live integration. Keep root manifests/lockfiles out of concurrent writer scopes; Vinh coordinates any required shared-file change. Human annotation is split between Vinh A01–A15 and Kareem B01–B15, five distinct examples per category each; see PLAN.md. One owner merges reviewed increments at a time.
 
@@ -20,6 +22,8 @@ Niko owns `model/CONTRACT.md`; Guttuu owns `agent/CONTRACT.md`. Draft these with
 3. Respect the file ownership below. Shared interface changes go through Guttuu (agent) or Niko (model/evaluation); flag dependency gaps instead of inventing working endpoints or statistics.
 4. Commit only owned changes and open a focused PR with the working command, evidence and remaining blockers. Vinh coordinates merges one at a time against latest `main`; do not merge a teammate's branch automatically.
 5. A UI fixture is allowed only as a clearly labeled development preview, never as live agent output or benchmark evidence. No fabricated speech/metrics and no imitated stuttering.
+6. PR evidence uses **Change / Validation / Remaining acceptance**: exact command and commit, observed result and scope, artifact link, blocker owner and next handoff. Label a local scaffold check separately from an integrated audio run. Leave the parent phase issue open while its broader acceptance is pending; avoid `Closes #...` for a partial scaffold.
+7. Vinh reviews each PR against the latest base and owned paths, then coordinates integration. Guttuu verifies a real replay through UI/agent; Niko verifies the exact export and matched evaluation; Kareem checks the evidence links. A merge updates implementation status only. Capture the first working full interaction before adding optional features.
 
 ## Builder A — minimal demo UI
 
@@ -43,7 +47,7 @@ Niko owns `model/CONTRACT.md`; Guttuu owns `agent/CONTRACT.md`. Draft these with
 
 **Dependencies:** saved verified runs, annotation/split manifests, source references and actual build status. Missing evidence blocks the claim, not preparation of the draft.
 
-**Done when:** every quantitative, novelty, implementation and compatibility claim has a status and source/evidence request; current deliverable wording contains no target represented as an achieved result; the successful-model and fallback scripts match their actual artifacts; links resolve; the spoken script fits three minutes in a timed rehearsal by Vinh. The agent can estimate length but cannot claim that Vinh rehearsed it.
+**Done when:** every quantitative, novelty, implementation and compatibility claim has a status and source/evidence request; current deliverable wording contains no target represented as an achieved result; the successful-model and fallback scripts match their actual artifacts; links resolve; the spoken script fits three minutes in a timed rehearsal by Vinh. The agent can estimate length but cannot claim that Vinh rehearsed it. A matching historical report is insufficient: one-second censoring does not demonstrate a three-second fallback; energy-derived cut points do not establish true turn ends; a harness check schedule does not establish live audible interruptions. Review methodology before marking a claim ready.
 
 ## Reviewer — read only
 
@@ -51,7 +55,7 @@ Niko owns `model/CONTRACT.md`; Guttuu owns `agent/CONTRACT.md`. Draft these with
 
 ## Human tasks and blockers
 
-- **Vinh + Kareem:** listen to and label their disjoint halves of the 30 feasibility examples using context; agents may prepare the annotation sheet and organize files but must not mark human verification complete.
+- **Vinh + Kareem:** listen to and label their disjoint halves of the 30 feasibility examples using context; use PLAN's shared CSV header and assigned files. Agents may prepare the annotation sheet and organize files but must not mark human verification complete. Niko owns validation/combined manifests, not concurrent edits to the two human worksheets.
 - **Vinh:** record the 2 PM and 3 PM scope decisions with the team, review claims and perform rehearsals. Keep tasks open until evidence exists.
 - **Niko/Guttuu:** own training, evaluation and the real audio path; a UI agent cannot certify these by simulating events.
 - Optional sponsor integrations, phone transport and visual polish become eligible after the core proof; the 1 AM freeze still applies.

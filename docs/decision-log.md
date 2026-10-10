@@ -2,6 +2,16 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-007 — Apply evidence, ownership and integration workflow (requested by Vinh)
+
+Vinh asked to apply the reviewed planning/Git practices to StutterTurn. Keep the accepted direction, strong intended pitch and existing 2 PM/3 PM proof gates. PLAN is the single task-status authority; phase issues link deliverables/evidence and remain open until their acceptance gates pass. Vinh coordinates integration; Guttuu verifies full audio behavior and Niko verifies model/evaluation artifacts.
+
+The 1:10 PM EDT repository check found exploratory benchmark work on main `8161223`, UI scaffold PR #7 and pitch/evidence PR #8. No model/export, agent contract/run or human annotation handoff was yet published. This is repository evidence, not a claim about unpushed teammate work. The task table now distinguishes unreported work, scaffold implementation and real acceptance; it names exact annotation files, exclusive writers, consumers, gate evidence and recovery owners. Capture the first real complete run as the backup.
+
+The README is aligned to observed capability and links the intended pitch. Its former confident model/novelty/audible-interruption wording is preserved in Git history and the pitch drafts, not presented as achieved behavior. PR #8's claim statuses require methodological review: copying old figures does not repair incorrect endpoint labels, censored latency, or model-decision versus audible-response distinctions. The claims ledger becomes the single claim-status authority once accepted. Numerical experiment artifacts are unchanged by this workflow update.
+
+The earlier ~11 AM interpretation of 116/200 predictions as a banked interruption baseline, verified novelty and proof that settings cannot work is superseded by D-006's corrections. No implementation PR is merged or gate marked passed by this decision. Optional integrations and polish remain deferred; other independent lanes continue.
+
 ## 2026-10-10 D-006 — Bounded proof and earlier decisions (approved by Vinh)
 
 Vinh approved adding the review's concrete tasks to the plan and GitHub issues: Niko proves the trainable-weight/one-batch/export path (45-minute checkpoint-recovery cap); Guttuu runs a complete web-agent baseline and patient/wait comparison; Vinh + Kareem human-check 30 examples across unfinished blocks, completed stuttered turns and completed fluent turns. The 30 examples are a feasibility set, not the final benchmark.

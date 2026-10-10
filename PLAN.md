@@ -6,15 +6,38 @@
 
 **User outcome:** let a caller who stutters finish speaking, then answer promptly once their turn is complete. The intended demo compares stock and StutterTurn using the same real recording and live agent. Audible improvement and unchanged response delays are goals until measured.
 
+**Task-status authority:** this PLAN. Issues #1–6 group acceptance gates and hold evidence links; PRs carry implementation/review evidence. Do not maintain a second independent task-status table. **Integration owner:** Vinh coordinates one reviewed merge at a time; Guttuu verifies the combined audio path and Niko verifies model/evaluation artifacts.
+
+## Current status — October 10, 1:10 PM EDT repository check
+
+- **On main:** exploratory benchmark scripts and historical results at `8161223`; their labels, comparator and latency interpretation still need the corrections below. No validated efficacy result is available.
+- **Built on branches, awaiting acceptance:** [PR #7](https://github.com/vinhbin/stutterturn/pull/7) contains the passive demo UI; its live adapter is blocked. [PR #8](https://github.com/vinhbin/stutterturn/pull/8) contains the pitch and claims ledger; evidence classifications require review against D-006, not just agreement with the old report. Neither PR proves a working voice interaction.
+- **Not yet reported in the repository:** human-reviewed A/B annotations, trainable checkpoint/export proof, the stock/patient web-agent run, model/agent contracts and a corrected matched evaluation. This does not rule out teammates' unpushed work; owners attach their artifact at the next checkpoint.
+- **Next decision:** the existing 2 PM feasibility gate, followed by the 3 PM development gate. Vinh records the actual result and evidence; no gate is marked passed by this planning change.
+- **Immediate dependency:** Guttuu's agent contract and first complete stock replay unblock live UI integration. Niko's checkpoint proof and the two human listening batches continue independently. Additional UI/pitch expansion waits for these handoffs.
+
+Replace this current summary as evidence arrives. Preserve meaningful previous decisions in [the decision log](docs/decision-log.md), rather than appending competing current snapshots.
+
 ## Current decision — 12:30–2 PM proof, then explicit gates
 
 Vinh approved this bounded proof and task update on October 10. Keep StutterTurn conditional while proving the central interaction; this is not a claim that the whole team has confirmed the pick or that any gate has passed. This section supersedes the earlier telephony-first schedule and 10 PM model-abandon decision. Tasks and evidence remain unchecked until completed.
 
-| Owner | Next task | Evidence required by 2 PM | Task |
-|---|---|---|---|
-| **Niko** | Recover/load trainable Smart Turn weights; compare initial outputs with stock, run one training batch, export and reload. Cap checkpoint recovery at **45 minutes**. | Checkpoint provenance, parity comparison against corresponding stock precision, one-batch log, exported-model inference. Measure actual runtime before budgeting iterations. | [#2](https://github.com/vinhbin/stutterturn/issues/2) |
-| **Guttuu** | Run the complete **web voice agent**; replay real recordings through stock and a patient/wait configuration in the same pipeline. | Input IDs/settings and timestamps for model decision, speech resumption, first audible response, cancellation and timeout/no response. Show whether a premature decision becomes an audible interruption. | [#2](https://github.com/vinhbin/stutterturn/issues/2) |
-| **Vinh + Kareem** | Human-check **30 examples**: 10 unfinished stutter blocks, 10 completed stuttered turns, 10 completed fluent turns. | Annotation sheet with source/context, speaker, onset/resumption or true turn end, category, reviewer and uncertainty. Use surrounding audio; a three-second clip boundary is not proof of a turn end. Exclude ambiguous samples. | [#1](https://github.com/vinhbin/stutterturn/issues/1) |
+### Finishable deliverables and handoffs
+
+The status below describes published evidence, not guesses about local work. Use Ready → Building → Awaiting acceptance → Verified; mark Blocked/Cut explicitly and leave unreported work **Unreported**. A code PR may finish while its parent interaction gate remains open.
+
+| ID / owner | Concrete artifact → consumer | Observable acceptance | Current status / evidence | Checkpoint |
+|---|---|---|---|---|
+| **F1 / Niko** · [#2](https://github.com/vinhbin/stutterturn/issues/2) | `model/CONTRACT.md`, checkpoint provenance, one-batch log and reloaded export → Guttuu | Match initial outputs to the corresponding stock precision, train one batch, export/reload/infer; record runtime and command. **45-minute recovery cap.** | Unreported; no model artifact on reviewed main | 2 PM; on failure use corrected comparison scope |
+| **F2 / Guttuu** · [#2](https://github.com/vinhbin/stutterturn/issues/2) | `agent/CONTRACT.md`, runnable stock/patient replay and saved run log → Vinh UI + Kareem evidence | Same real source/settings; save model decision, speech resumption, first audible response, cancellation, timeout and no response. A model prediction alone does not pass. | Unreported; UI live integration blocked | Contract first; complete run by 2 PM; repair core audio path before extras |
+| **F3 / Vinh** · [#1](https://github.com/vinhbin/stutterturn/issues/1) | `benchmark/annotations/feasibility/vinh.csv`, A01–A15 → Niko | Human listening with context; five examples per category, documented true end/resumption and uncertainty; no ambiguous labels accepted | Unreported; file is an assigned output, not an existing artifact | 2 PM; missing context/category becomes a blocker |
+| **F4 / Kareem** · [#1](https://github.com/vinhbin/stutterturn/issues/1) | `benchmark/annotations/feasibility/kareem.csv`, B01–B15 → Niko | Same check as F3, different source samples; cross-check A/B duplication | Unreported; file is an assigned output | 2 PM; report missing categories |
+| **I1 / Vinh UI builder** · [#4](https://github.com/vinhbin/stutterturn/issues/4) | `web/demo-ui/` → Guttuu adapter + Kareem page | Review scaffold/reset/keyboard/error behavior; separately accept a real replay attributed to the right run/configuration | Awaiting scaffold review in [PR #7](https://github.com/vinhbin/stutterturn/pull/7); **live acceptance blocked on F2**, candidate arm also F1 | Review now; real integration in 3–7 PM block |
+| **P1 / Vinh evidence builder** · [#5](https://github.com/vinhbin/stutterturn/issues/5) | `docs/claims-ledger.md`, pitch/submission wording → Kareem README + Vinh delivery | Every delivered claim has applicable evidence, scope and limits; preserve intended pitch separately. Historical-report agreement alone is insufficient. | Awaiting corrected evidence review in [PR #8](https://github.com/vinhbin/stutterturn/pull/8) | Before merge and before any rehearsal/public use |
+| **I2 / Kareem** · [#3](https://github.com/vinhbin/stutterturn/issues/3) | Judges-page shell outside `web/demo-ui/` → judge entry point | Link/embed I1; real run/evidence links; missing services and fixtures labeled; no duplicated figures | Unreported; shell may proceed, real results wait for F2/E1 | Integrated path by 7 PM |
+| **E1 / Niko; Guttuu supplies audio outcomes** · [#2](https://github.com/vinhbin/stutterturn/issues/2), [#5](https://github.com/vinhbin/stutterturn/issues/5) | Frozen split manifests and immutable matched run records → claims ledger + page | Apply all evaluation repairs below; protect both caller groups, report censored/nonresponses; DEV selects, separate final test supports release | Unreported; old results are exploratory | DEV decision 3 PM; final report before 1 AM freeze |
+
+F3/F4 together supply **30 feasibility examples**: 10 unfinished stutter blocks, 10 completed stuttered turns and 10 completed fluent turns. Annotation CSVs use the same header: `sample_id,source_id,context_ref,speaker_id,category,time_origin,block_onset_s,resumption_s,turn_end_s,reviewer,reviewed_at,uncertainty,accepted`. Times refer to the explicitly named source/context; leave inapplicable fields empty. Unknown speaker identity stays unknown. Niko validates schema, disjoint source samples and usable counts before consuming the files. No audio is committed.
 
 These 30 examples are a **feasibility set**, not the final benchmark. If context or examples are unavailable, record the missing category as a blocker rather than substituting energy-derived labels. A loading/one-batch smoke test can run in parallel with listening; adaptation on newly selected stutter labels waits for their validation.
 
@@ -29,7 +52,7 @@ These 30 examples are a **feasibility set**, not the final benchmark. If context
 
 The A/B sample lists must be disjoint; reviewers can cross-check ambiguous cases without duplicating the whole batch. Contract drafts and scaffolds are allowed during the proof; **polish and optional integrations wait**, not all frontend work. Humans may delegate their independent scaffold tasks while listening. Gate decisions and integration synchronize the lanes; they do not require everyone to work serially.
 
-Each lane owns its branch/worktree and subdirectory. Keep dependencies/configuration inside the owned package where practical; Vinh coordinates any shared root manifest/lockfile change with the other owners before it is made. Merge completed, reviewed increments into `main` one at a time so nobody builds on an unpublished interface. See [agent handoff](docs/agent-handoff.md).
+Each lane owns its branch/worktree and subdirectory. The only annotation write exceptions inside Niko's `benchmark/` lane are F3's `vinh.csv` and F4's `kareem.csv`; Niko owns merged manifests and generated outputs. Keep dependencies/configuration inside the owned package where practical; Vinh coordinates any shared root manifest/lockfile change with the other owners before it is made. Merge completed, reviewed increments into `main` one at a time. Publish draft contracts early and accept their implementation separately. See [agent handoff](docs/agent-handoff.md).
 
 ### 2 PM — feasibility and scope decision (Vinh records, team reviews)
 
@@ -48,6 +71,12 @@ Each lane owns its branch/worktree and subdirectory. Keep dependencies/configura
 
 This is a development decision, not a publishable efficacy result. Freeze a larger, separate final test before checkpoint selection; run stock and the chosen candidate on that same test once selection is complete. Small feasibility-set percentages must not become headline claims.
 
+### Record the decision and first complete run
+
+At each gate Vinh records **time / actual pass or miss / artifact and input IDs / limits / continue or fallback / recovery owner / next checkpoint** in the decision log and refreshes this current summary. An elapsed deadline is not a passed gate. Niko owns checkpoint/evaluation recovery, Guttuu owns audio-path recovery, and Vinh/Kareem own missing listening context. Independent work continues while the relevant failure is repaired.
+
+Capture the first successful stock replay with real input and audible output as a labeled backup; add the matched patient/candidate run when available. Save the run command, commit/configuration, source ID and timing log with it. A fixture animation, model-only inference or recording of an unconnected UI does not satisfy this gate.
+
 ## Evaluation work required before a comparison can pass
 
 **Owner: Niko; Kareem helps organize annotations and evidence without independently changing benchmark interfaces.**
@@ -65,10 +94,10 @@ This is a development decision, not a publishable efficacy result. Freeze a larg
 
 | Owner | Responsibility | Owned paths | Handoff |
 |---|---|---|---|
-| **Niko** | Training, annotations/splits, evaluation and long-block testing | `model/`, `benchmark/` | Versioned model + immutable run records + limits |
+| **Niko** | Training, annotation validation/splits, evaluation and long-block testing | `model/`, `benchmark/` except the two human annotation files assigned above | Versioned model + immutable run records + limits |
 | **Guttuu** | Complete web agent first; optional phone transport after proof | `agent/` | Runnable agent, documented control/event interface and observed timings |
-| **Kareem** | Annotation coordination, judges page, claims/evidence links; optional Tiger Data | `web/` **except `web/demo-ui/`**, `README.md` | Results page whose claims match saved evidence |
-| **Vinh** | Human annotation review, gate decisions, demo UI, pitch, rehearsals, video, Devpost | `web/demo-ui/`, `docs/pitch-and-qa.md`, `docs/submission.md`, `docs/claims-ledger.md` | Three-minute demo and submission with verified claims |
+| **Kareem** | Human B-batch labels, judges page, claims/evidence links; optional Tiger Data | `web/` **except `web/demo-ui/`**, `README.md`, assigned `kareem.csv` | Results page whose claims match saved evidence |
+| **Vinh** | Human A-batch labels, gate decisions, integration, demo UI, pitch, rehearsals, video, Devpost | `PLAN.md`, `docs/decision-log.md`, `docs/agent-handoff.md`, `web/demo-ui/`, the three pitch/evidence docs, assigned `vinh.csv` | Three-minute demo and submission with verified claims |
 
 Vinh can run **two builders in separate worktrees plus a read-only reviewer** using [the agent handoff](docs/agent-handoff.md). One builder owns the minimal demo UI; one owns pitch/evidence preparation. Minimal UI needed to exercise the live agent can proceed in parallel without delaying human listening. Polish follows the proof. No two writers own the same file; Kareem's page work excludes Vinh's UI directory. Shared model/event contract changes coordinate with their owners first.
 
@@ -98,6 +127,8 @@ Nobody imitates stuttering. Use real recordings, clearly identified on screen; c
 | Agent/UI | Guttuu + Vinh | Document command and event contract before wiring controls. Existing proposed event fields `{t, state: speaking\|silence\|holding\|agent, prob, model}` are not evidence of an implemented service. Add run identity, time origin and cancellation/response timings by agreement. |
 | Public claims | Vinh + Kareem | Keep the ambitious pitch draft. Mark each statement ready, target or unsupported in the claims ledger; use only ready claims in the delivered pitch. |
 
+The claims ledger in PR #8 becomes the **single claim-status authority once accepted**; link exact model/run/data/configuration artifacts rather than copying numbers independently into multiple pages. Until then, its readiness labels are under review. A ledger row must distinguish a model output, synthetic/energy-derived control, human-validated endpoint and full-agent audible outcome. “Ready” requires a valid method for the stated conclusion, not merely a matching number in `benchmark/RESULTS.md`.
+
 ## Strong pitch, earned claims
 
 The strong pitch remains the intended destination; it is not being replaced with a tentative research-question script. Vinh + Kareem own the release checklist in [#5](https://github.com/vinhbin/stutterturn/issues/5):
@@ -119,6 +150,4 @@ The strong pitch remains the intended destination; it is not being replaced with
 - [ ] Vinh: label real recordings and recorded fallback video; confirm the submitted video meets event requirements; enter only sponsor prizes backed by actual use.
 - [ ] Team: Vultr credit code `MAJORLEAGUEHACKING` and post-event DEV writing challenge remain optional resources, not proof-gate dependencies.
 
-## Historical status — superseded interpretation, preserved for context
-
-**~11 AM:** initial scripts and saved results were committed; 116/200 completion predictions gave the exploratory 58% figure. Later review found unresolved gap labels, latency censoring, comparator and training-path problems. The earlier “baseline banked,” “novelty verified,” and “no knob fixes it” conclusions are not current gate evidence. See [decision D-006](docs/decision-log.md) and the original saved results; numerical artifacts have not been rewritten by this planning update.
+Historical interpretations and their corrections are preserved in [D-006 and D-007](docs/decision-log.md). Original numerical artifacts remain unchanged; their existence is not final benchmark acceptance.

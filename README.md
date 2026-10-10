@@ -1,130 +1,78 @@
 # StutterTurn
 
-**Voice AI answers real phone calls now — and when the caller stutters, the standard open-source turn-taking model talks over them on 58% of stutter blocks. We measured it. StutterTurn is the first open turn-taking model trained on stuttered speech, with the first public benchmark of how voice agents treat people who stutter.**
+**Let people finish.** StutterTurn's goal is an open turn-taking model that waits through stuttered speech and answers promptly when the speaker finishes.
 
-> We take Apple's own dataset where Apple stopped: Apple fixed this inside Siri and kept it closed. We fix it for the open ecosystem every phone agent is built on, and we publish the benchmark.
+We are building a matched stock-versus-adapted comparison using real recorded speech, a voice agent and evidence covering both premature responses and response delay. The intended contribution is a reusable open model and benchmark. A trained improvement, drop-in compatibility and novelty remain claims to earn with the artifacts below.
 
 | Hacklanta '26 | |
 |---|---|
-| **Main track** | AI/ML |
-| **MLH prize entered** | Best Use of ElevenLabs (their voice runs our live agent; their platform is credited in our results) |
-| **Sponsors doing real work** | Gemini (the agent's brain + its end-of-speech setting benchmarked as a rival) · Vultr (training + hosted benchmark) · ElevenLabs (voice + honest baseline) · Tiger Data (turn-event time series) |
-| **Team** | Vinh · Guttuu · Niko · Kareem |
-| **Demo video** | _link added before submission_ |
-| **Devpost** | _link added before submission_ |
-
-**What works right now is in [Build status](#build-status).** Anything not marked ✅ there is planned, not working.
-
-## The problem
-
-- **AI already answers the phone in healthcare.** One health system's AI agent alone handles **160,000+ patient calls a month** ([WellSpan, Jul 2026](https://www.wellspan.org/articles/2026/07/30/13/05/web---hippocractic-ai-partnership-expansion)); pharmacy refill lines are among the most automated calls in the country.
-- **More than 3 million Americans stutter** ([NIDCD](https://www.nidcd.nih.gov/health/statistics/quick-statistics-voice-speech-language)). A stutter block is a silent pause mid-word or mid-sentence — exactly what turn-taking models read as "the caller is done."
-- **People who stutter already report this.** Apple's study of 61 people who stutter: they want to use speech tech but are "frequently cut off, misunderstood" ([Lea et al., 2023](https://arxiv.org/abs/2302.09044)). A new survey of 53 people who stutter: 58% report interrupted or timed-out input, because speech tech assumes "communication happens at a fluent pace" ([Liu et al., ASSETS 2026](http://www.shaomei.info/pdfs/ASSETS26_speculative_design.pdf)).
-- **We measured it (Oct 10, real recordings, no simulation).** On 200 real stutter-block clips from Apple's SEP-28k dataset, the standard open turn model (Smart Turn v3.2, the pipecat ecosystem default) declared the turn over during **58%** of blocks on its first check — 68% if it keeps checking — while adding only ~0.1 s for fluent callers. Full method and numbers: [benchmark/RESULTS.md](benchmark/RESULTS.md).
-- **No existing knob fixes it.** Waiting 0.8 s still interrupts 20% of blocks and delays every caller by 0.8 s. Raising the model's confidence bar to 0.99 stops interruptions only because the model stops firing — everyone gets ~3 s of dead air. The trade-off is structural; the fix has to be in the model.
-
-## What StutterTurn is
-
-1. **The model:** Smart Turn v3.2 (open, 8M parameters, runs on CPU) fine-tuned on real recordings of people who stutter (SEP-28k), evaluated on both axes at once — interruptions on stutter blocks AND added delay for fluent callers. Target: 58% → under 10%, with fluent latency unchanged.
-2. **The benchmark:** the first public test of how voice-agent turn-taking treats stuttered speech. Any agent builder can run their stack against it. It didn't exist before this weekend.
-3. **The live agent:** a phone agent (Gemini brain, ElevenLabs voice) running our model, so the difference is heard, not just charted.
-4. **A drop-in:** the fine-tuned model loads anywhere stock Smart Turn does.
-
-## Measured results so far
-
-| Arm | Stutter-block interruptions (N=200) | Added delay for fluent callers |
-|---|---|---|
-| Smart Turn v3.2 stock, first check | **58.0%** | ~0.1 s (unchanged baseline) |
-| Smart Turn v3.2 stock, repeated checks | **68.0%** | — |
-| Silence timeout 0.8 s | 20.0% | +0.8 s for everyone |
-| Silence timeout 1.5 s | 0.5%* | +1.5 s for everyone |
-| Confidence bar 0.99 | 0.0% (model stops firing) | ~3 s fallback for everyone |
-| ElevenLabs agents, stock (our live test, n=20) | 5–10% | — |
-| ElevenLabs agents, "patient" (n=20) | 5% | visibly slower; 6/20 got no response in-window |
-| **StutterTurn (fine-tuned)** | **target <10%** | **target: unchanged** |
-
-\* Every block we could test was under 1.6 s (the dataset's clips are 3 s long). Real blocks can last much longer — that regime is untested for every system, including the commercial ones.
-
-**Credit where due:** ElevenLabs' closed platform already handled short blocks well in our small live test. Our target is the open ecosystem — and the untested long-block regime.
-
-## What it can't do (we say this out loud)
-
-- It makes the agent **wait**; it does not recognize stuttered words better (that's ASR, e.g. [AImpower's work](https://aimpower.org/fair-speech-ai/)).
-- All measured blocks were **under 1.6 s** — long blocks (3+ s) are unproven here and everywhere.
-- Our ElevenLabs numbers are our own small unpublished measurement (20 clips, short blocks).
-- Results are on wideband audio; **8 kHz phone-line transfer is untested.**
-- Whether Smart Turn's original training data accidentally includes stuttered speech is unknown (community data, unaudited).
-- The benchmark dataset is **CC BY-NC**: research and demo use with attribution, not commercial use.
-- No person who stutters is on the team; we evaluate on real recorded speech and are seeking community input. This is a research prototype, not a medical or therapeutic tool.
-
-## The demo (3 minutes, nobody imitates stuttering — ever)
-
-A **real recording of a person who stutters** (labeled on screen) is streamed into a **genuinely live** agent call — the agent's turn-taking decisions happen live. A judge presses one toggle: STOCK interrupts the caller mid-block; STUTTERTURN holds, the caller finishes, the agent answers. Then the judge talks to the agent themselves, normally, and feels that nothing got slower. If connectivity dies, a recorded video of the same rig plays — labeled as a recording.
-
-## Run it
-
-```bash
-# Reproduce the benchmark (audio is fetched, not redistributed — see benchmark/README.md)
-cd benchmark
-pip install -r requirements.txt        # added with the first build commit
-python scripts/download_clips.py       # fetches clips via the HF mirror using the official labels
-python scripts/run_model_arm.py        # stock + fine-tuned, both axes
-```
-
-_Live demo and agent instructions are added as each part works._
-
-## Prior work we build on
-
-- **Apple:** SEP-28k dataset and the Siri atypical-speech work ([Lea et al. 2023](https://arxiv.org/abs/2302.09044), [Siri settings](https://support.apple.com/guide/iphone/change-siri-accessibility-settings-iphaff1d606/ios)) — closed, Siri-only.
-- **pipecat-ai [Smart Turn](https://github.com/pipecat-ai/smart-turn)** (BSD-2) — the open model we fine-tune; its README invites exactly this.
-- **[AImpower](https://aimpower.org/fair-speech-ai/)** — stuttered-speech ASR benchmarks (the recognition half of the problem).
-- **ElevenLabs** agents platform — the strongest commercial turn-taking we measured on short blocks.
-
-**What's ours:** the first open stutter-trained turn model, the first public benchmark, and the live two-axis demo.
-
-## Pre-existing work disclosure
-
-Hacklanta requires disclosing anything created before or outside the event window.
-
-- **Before the event:** concept research and planning documents only (AI-assisted, reviewed by the team). The team pivoted to StutterTurn from a different concept on Saturday morning of the event; prior project planning is in the team's earlier repository history.
-- **During the event, AI-assisted:** the benchmark in `benchmark/` (scripts, evaluation, results) was built during the event with AI assistance (Claude), directed and reviewed by the team. All further code is written during the event; the commit history shows when.
-- **Datasets and models:** SEP-28k (Apple, CC BY-NC 4.0, [Lea et al. 2021](https://github.com/apple/ml-stuttering-events-dataset)); clip audio via the `miosipof/sep28k_full` mirror (podcast audio copyright remains with the owners; not redistributed here); Smart Turn v3.2 (BSD-2).
-- **Accounts/APIs:** existing ElevenLabs account; Gemini and Vultr credentials obtained during the event.
-
-## Team
-
-| Name | Role |
-|---|---|
-| Vinh | Demo UI (toggle rig, turn-state display), pitch, video, Devpost |
-| Niko | Fine-tune, two-axis evaluation, the benchmark |
-| Guttuu | Live agent plumbing (telephony, Pipecat), demo rig hardware |
-| Kareem | Judges page with live-run buttons, results database (Tiger Data), README/disclosures |
+| Main track | AI/ML |
+| Team | Vinh · Guttuu · Niko · Kareem |
+| Demo / Devpost | Pending; no working public demo is claimed here |
+| Intended core integrations | Gemini agent responses and ElevenLabs voice, subject to the working-agent proof |
+| Optional after core proof | Phone transport, Vultr hosting/training and Tiger Data; actual use determines sponsor entries |
 
 ## Build status
 
-Legend: ⬜ not started · 🟡 in progress · ✅ working, with saved evidence · ✂️ cut
+**[PLAN.md](PLAN.md#current-status--october-10-110-pm-edt-repository-check) is the current task-status authority.** Read its deliverable table for owners, acceptance checks and blockers. Issues #1–6 group the phase gates; a merged implementation does not automatically pass a gate.
 
-| Capability | Status | Evidence |
-|---|---|---|
-| Benchmark: stock-model baseline measured on real recordings | ✅ | [benchmark/RESULTS.md](benchmark/RESULTS.md) |
-| Label listen-through (human check of ~30 clips) | ⬜ | |
-| Fine-tune beats stock without slowing fluent callers | ⬜ | |
-| Live phone agent running the model | ⬜ | |
-| Judge toggle rig (stock ↔ StutterTurn) | ⬜ | |
-| Long-block test | ⬜ | |
-| Gemini end-of-speech rival arm | ⬜ | needs an API key |
-| Judges page with live-run buttons | ⬜ | |
+At the October 10, 1:10 PM EDT repository check:
 
-## Repo map
+- Main contains exploratory benchmark scripts and saved outputs. Human endpoint labels, split/comparator design and latency interpretation still need correction before efficacy conclusions.
+- [PR #7](https://github.com/vinhbin/stutterturn/pull/7) adds a passive demo UI with explicitly labeled preview events. Real runs are blocked until the agent contract and implementation are available.
+- [PR #8](https://github.com/vinhbin/stutterturn/pull/8) adds the claims ledger and revised pitch. Its readiness classifications require review against the corrected method before acceptance.
+- No trainable-checkpoint/export proof, complete stock/patient agent replay, candidate improvement or human-reviewed annotation handoff is yet published in the repository. Teammates may have unpushed work.
 
+This is an evidence snapshot; follow PLAN for updates rather than maintaining a second status table here.
+
+## What the first complete demonstration must show
+
+Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech.
+
+The candidate arm becomes available only after a real exported model is integrated. If the adaptation gate fails, the deliverable becomes a corrected benchmark and interactive baseline comparison. That fallback still needs validated labels and reproducible runs. A UI fixture or a model prediction alone does not prove either outcome.
+
+Nobody imitates stuttering. A recorded backup must be labeled as a recording; sample audio and its use require appropriate rights. The [intended strong pitch](docs/pitch-and-qa.md) is a draft, not a capability report. Use only evidence-reviewed wording in the delivered pitch.
+
+## Evidence and reproducibility
+
+- [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are model completion predictions under the original harness, **not a validated percentage of callers interrupted**.
+- [D-006 and D-007](docs/decision-log.md) record the methodological corrections. One-second observation/censoring does not establish a three-second fallback; energy-derived cut points do not establish semantic turn ends; repeated harness checks do not prove live-agent behavior.
+- [Required evaluation work](PLAN.md#evaluation-work-required-before-a-comparison-can-pass) includes reviewed endpoints, frozen development/final-test splits, matched model/data/configuration records, both caller groups, audible outcomes, and explicit nonresponse/censoring.
+- The claims ledger in PR #8 will be the single claim-status source once accepted. Headline numbers must link to applicable run evidence; do not promote targets or historical interpretations to measured outcomes.
+
+The existing benchmark setup is incomplete: `benchmark/requirements.txt` is not committed, and no clean reproduction or candidate run is claimed. Niko's handoff includes exact dependencies, checkpoint provenance and a verified command. See [benchmark context](benchmark/README.md).
+
+For the **UI scaffold only**, after checking out PR #7, its documented command is:
+
+```bash
+python -m http.server 8010 --directory web/demo-ui
 ```
-README.md            this file (judges: start here)
-PLAN.md              phases, owners, gates, status (team: start here)
-docs/                decision log, demo + submission plan
-benchmark/           the measured kill test: scripts, data, RESULTS.md
-model/               fine-tune code + eval (added during build)
-agent/               live phone agent (added during build)
-web/                 judges page (added during build)
-```
 
-_License: chosen by the team before publication. The repository stays private until submission._
+Open `http://localhost:8010/`. The preview is synthetic UI data without audio or model output. It is not the live product or benchmark evidence. Real-agent run instructions belong to Guttuu's pending `agent/CONTRACT.md`.
+
+## Scope and limits
+
+- The target is turn-taking, not improved speech recognition or a medical/therapeutic outcome.
+- The original exploratory clips are short; longer stutter blocks and 8 kHz phone transfer remain unvalidated here.
+- No measured custom-model improvement, unchanged response delay, universal “no setting fixes it,” or “first” claim is currently accepted. Ambitious intended wording is preserved separately until supported.
+- No person who stutters is on the team; human endpoint review is not a substitute for user research. Do not imply community endorsement or invented testimony.
+
+## Foundations and disclosure
+
+- **SEP-28k:** [Apple's stuttering-event dataset](https://github.com/apple/ml-stuttering-events-dataset), with CC BY-NC 4.0 annotations. Audio is fetched through the `miosipof/sep28k_full` mirror, not redistributed here; underlying podcast audio rights remain with the owners. Confirm permissions for the intended demo/release.
+- **Smart Turn v3.2:** [pipecat-ai's open turn-taking model](https://github.com/pipecat-ai/smart-turn), the intended adaptation baseline. Preserve the upstream model/code license and disclose modifications.
+- **Existing accessibility work:** [Apple's atypical-speech research](https://arxiv.org/abs/2302.09044) and [AImpower's speech-recognition work](https://aimpower.org/fair-speech-ai/) are relevant prior art. Neither this list nor an unsuccessful search establishes that our contribution is first.
+- **Before the event:** concept research and planning; the team changed direction to StutterTurn on Saturday morning. **During the event:** AI-assisted benchmark development and subsequent implementation, with provenance in Git history. Accounts, external models, datasets and services are not original team work.
+
+## Team and repository
+
+| Owner | Current handoff |
+|---|---|
+| Niko | Trainable checkpoint/export, corrected evaluation and immutable evidence |
+| Guttuu | Runnable stock/patient web agent, control/event contract and real audio timings |
+| Vinh | A-batch human labels, integration decisions, demo UI, pitch/video/submission |
+| Kareem | B-batch human labels, judges page, README and evidence links |
+
+[PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work. `model/` and `agent/` are pending producer handoffs; `web/demo-ui/` is currently in PR #7.
+
+Artifact licensing, publication, accessible demo links and final submission confirmation remain release checks in PLAN. Do not infer a commercial deployment license from research access.
