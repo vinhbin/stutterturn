@@ -48,7 +48,7 @@ Keys come from `agent/.env` (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`); see `agent
 |---|---|
 | `GET /v0/health` | `{"ok": true, "contract": "0.1", "commit": "<sha>"}` |
 | `GET /v0/configurations` | `[{id, label, detail, available, note, model, model_sha256, params}]`; matches the UI's `getConfigurations()` shape |
-| `GET /v0/sources` | `[{source_id, file, duration_s, category, rights_note}]`; only clips present locally |
+| `GET /v0/sources` | `[{source_id, file, duration_s, category, rights_note}]`; only clips present locally. `file` is a **bare file name** (no `/` or `\`, e.g. `HeStutters_4_32.wav`, located in `benchmark/audio/`) and is the value clients send as `source` in `start` |
 | `GET /v0/runs/{run_id}` | The saved run log (JSON lines) |
 
 ## WebSocket `ws://127.0.0.1:8765/v0/ws` (implemented)
