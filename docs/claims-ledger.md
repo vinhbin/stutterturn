@@ -1,6 +1,6 @@
 # StutterTurn claims ledger
 
-Owner: Vinh (pitch builder lane). Last updated: Sat 2026-10-10 afternoon, before the 2 PM gate outcome was recorded.
+Owner: Vinh (pitch builder lane). Last updated: 2026-10-10, evidence-readiness review. No gate outcome is asserted by this update.
 
 Every result-bearing, novelty, implementation or compatibility sentence we might say — at the table, on the page, in the video, on Devpost — has an entry here. **Anything delivered today uses the entry's READY wording only.** Target wording becomes deliverable the moment its listed evidence exists, and not before.
 
@@ -10,7 +10,7 @@ Every result-bearing, novelty, implementation or compatibility sentence we might
 - **target** — intended final wording; blocked until the listed evidence lands. Until then use the paired ready wording or say nothing.
 - **unsupported** — do not deliver in any form; contradicted, on the never-say list, or no evidence path exists.
 
-**Standing interpretation rule (D-006, [PLAN.md](../PLAN.md)):** all 2026-10-10 kill-test numbers are **exploratory**: the eval partition spans all eight SEP-28k shows (show-separated rebuild pending), gap/resume labels are energy-VAD-derived (human listen-through pending), and the measurements are the model's **internal completion predictions**, not observed audible interruptions, call abandonment or hang-ups. Automated waveform inspection does not count as human listening. If the evaluation is rebuilt, stock is rerun; the old 58% is not the comparator for any new number.
+**Standing interpretation rule (D-006, [PLAN.md](../PLAN.md)):** all 2026-10-10 kill-test numbers are **exploratory**: the eval partition spans all eight SEP-28k shows (show-separated rebuild pending), gap/resume labels are energy-VAD-derived (human listen-through pending), the Smart Turn results are **offline completion predictions**, and the ElevenLabs results are separately defined server-event timings. Neither establishes human-validated audible interruption rates, call abandonment or hang-ups. Automated waveform inspection does not count as human listening. If the evaluation is rebuilt, stock is rerun; the old 58% is not the comparator for any new number.
 
 ---
 
@@ -18,98 +18,103 @@ Every result-bearing, novelty, implementation or compatibility sentence we might
 
 ### L-01 — Stock first-check rate ("the 58%")
 
-- **Ready wording:** "On 200 real recordings of people who stutter — clips Apple's annotators labeled as stutter blocks — the standard open turn-taking model, Smart Turn v3.2, predicted 'turn complete' during 58% of the silent gaps on its first check, the moment production agents consult it. That's the model's internal decision; we are validating the audible outcome in a live pipeline, and our own listen-through of the clips, today."
-- **Target wording:** "The standard open model interrupted [S]% of stutter blocks" — where [S]% is stock on the frozen, show-separated final test, with audible interruption measured through the deployed pipeline.
-- **Metric / population:** 58.0% "complete" predictions (N=200; the 116/200 count is stated in [PLAN.md](../PLAN.md)'s historical status, consistent with RESULTS.md's 58.0%) at p > 0.5 on first check, 0.2 s into the silent gap. Population: SEP-28k clips with ≥2/3 annotator Block votes, quality-gated, energy-VAD gap ≥ 300 ms with detected resume; all gaps 0.30–1.59 s; wideband 16 kHz podcast audio; Smart Turn v3.2 int8 CPU with the repo's own preprocessing.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5; `benchmark/data/model_block_results.csv`; exploratory all-eight-show partition.
-- **Status:** ready (ready wording) · target (interruption wording)
-- **To upgrade:** (1) human listen-through / 30-example feasibility labels (issue #1, Vinh + Kareem + Niko); (2) Guttuu's pipeline timestamps showing whether a premature decision becomes an audible interruption; (3) Niko's show-separated partition rebuild + stock rerun. **Never** translate into callers interrupted, hang-ups or abandonment. 58% of tested blocks is not 58% of callers.
+- **Ready wording:** "In an offline check of 200 SEP-28k clips labeled as containing blocks, Smart Turn v3.2 predicted 'turn complete' in 116 of the energy-detected gaps, or 58%, at our first checkpoint. The exact gaps and speaker continuation still need human validation; this is not an audible-interruption rate."
+- **Target wording:** "Stock interrupted [S]% of validated unfinished blocks" — only with measured audible outcomes on the frozen final test.
+- **Metric / population:** 116/200 at p > 0.5, checked 0.2 s after the detected gap starts; selected 16 kHz podcast clips, with detected gaps 0.30–1.59 s. Clip-level Block votes do not locate the block or identify who resumes.
+- **Source / run:** `benchmark/data/model_block_results.csv`, `benchmark/data/block_eval.csv`, [run_model_arm.py](../benchmark/scripts/run_model_arm.py). [RESULTS.md](../benchmark/RESULTS.md) is the historical interpretation, not independent validation.
+- **Status:** ready for the offline observation; target for validated block or audible-interruption claims.
+- **To upgrade:** validate every evaluated boundary and speaker with context; rebuild/freeze partitions and rerun stock; measure decisions and audible outcomes through the same deployed pipeline. The 30-example feasibility set alone cannot validate the old 200-clip result.
 
 ### L-02 — Stock any-check rate (68%)
 
-- **Ready wording:** "Checked repeatedly during the gap — what a streaming agent actually does — the prediction rate rises to 68%."
-- **Metric / population:** 68.0% "complete" on any check before the labeled resume (N=200); same population as L-01.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5; `benchmark/data/model_block_results.csv`.
-- **Status:** ready (as completion predictions, exploratory) · same upgrade path as L-01.
+- **Ready wording:** "On the same clips, 136 of 200, or 68%, crossed the threshold at least once on our repeated offline checkpoint schedule. That schedule has not been shown to reproduce a deployed agent."
+- **Metric / population:** checkpoints +0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2 and 1.5 s, stopping before detected resumption; same population as L-01.
+- **Source / run:** `benchmark/data/model_block_results.csv`; [run_model_arm.py](../benchmark/scripts/run_model_arm.py).
+- **Status:** ready as an offline statistic; unsupported as "what a streaming agent actually does."
+- **To upgrade:** record the deployed VAD/endpoint configuration and actual check events, including cancellation and speech-resumption handling.
 
-### L-03 — Fluent latency axis of stock
+### L-03 — Fluent checkpoint results, not deployed latency
 
-- **Ready wording:** "For fluent callers stock adds a median 0.10 s after end of speech (p90 0.40 s) — but 26% of fluent turns were never judged complete and fell to the 3-second fallback timeout. We report that nonresponse rate; we don't hide it in an average."
-- **Metric / population:** median added latency 0.10 s, p90 0.40 s, on the N=77 fluent latency subset (clips with ≥ 0.5 s trailing silence out of 200 fluent clips); 26% fallback-timeout rate; 100 ms measurement checkpoints.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §3, §5; `benchmark/data/model_fluent_latency.csv`, `benchmark/data/model_fluent_full_curves.json`.
-- **Status:** ready (as worded, exploratory). The pitch line "one tenth of a second" may be used only with the fallback-rate caveat available in Q&A.
-- **To upgrade:** finer-than-100 ms timing (needed before any ±50 ms comparison); rebuilt partition rerun.
+- **Ready wording:** "Of 77 selected clips without labeled stuttered words and with at least half a second of detected trailing silence, 57 crossed the threshold in the tested window. Among those 57, the median first crossing was 0.10 s and p90 0.40 s after the last detected speech. The other 20 were censored; we did not observe their eventual response or timeout."
+- **Metric / population:** 57/77 crossings; 20/77 (26.0%) without a crossing before the clip's available silence or +1.0 s, whichever came first. The quantiles exclude those 20. All 77 clips are from HeStutters. The last energy activity is not a verified conversational turn end.
+- **Source / run:** `benchmark/data/model_fluent_latency.csv`, `benchmark/data/model_fluent_full_curves.json`, `benchmark/data/fluent_eval.csv`; [run_model_arm.py](../benchmark/scripts/run_model_arm.py).
+- **Status:** ready only as this conditional offline statistic. A 26% fallback/nonresponse rate and "stock answers in one tenth of a second" are unsupported.
+- **To upgrade:** human-verified completed turns, representative frozen partitions, the same causal check schedule for each group, fine timing resolution, and observation through the deployed timeout or explicit right censoring. Fluent checks currently start at +0.1 s while block checks start at +0.2 s; this is not a matched runtime-latency comparison.
 
-### L-04 — Stock on fluent speakers' own mid-utterance pauses
+### L-04 — Predictions during gaps in fluent-labeled clips
 
-- **Ready wording:** "Stock also predicted 'complete' at 59.6% of fluent speakers' own mid-utterance pauses in our exploratory run — on conversational audio it endpoints most sub-second pauses, stuttered or not. Many such pauses do follow complete sentences; our human listen-through has to split those before we lean on this number."
-- **Metric / population:** 59.6% of 57 testable pauses (≥ 300 ms with resume) across 51 fluent clips, checked at +0.2–0.3 s of silence.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5; `benchmark/data/model_fluent_pause_results.csv`.
-- **Status:** ready (with the listen-through caveat spoken).
+- **Ready wording:** "The model crossed the threshold in 34 of 57 tested gaps in clips labeled without stuttered words. Those gaps have not been established as unfinished turns; some may follow completed sentences."
+- **Metric / population:** 34/57 (59.6%) checkpoint predictions across 51 clips; this is not a verified fluent-interruption rate.
+- **Source / run:** `benchmark/data/model_fluent_pause_results.csv`; [run_model_arm.py](../benchmark/scripts/run_model_arm.py).
+- **Status:** ready as an offline observation; human-validated continuation labels and matched runtime checks are required for regression claims.
 
-### L-05 — Silence-timeout arms
+### L-05 — Calculated silence-timeout arms
 
-- **Ready wording:** "A silence timeout trades one failure for another in our data: 0.8 s still expires inside 20% of the measured block gaps and adds 0.8 s for every caller on every turn; 1.5 s expires inside almost none of our short-block gaps but adds 1.5 s for everyone. And every gap we could measure was under 1.6 s — so for real multi-second blocks these timeout numbers are lower bounds."
-- **Metric / population:** timeout-expiry-during-gap rates on the N=200 block gap-duration distribution: 0.5 s → 61.5%, 0.8 s → 20.0%, 1.5 s → 0.5%, 3.0 s → 0.0% (censored at 1.59 s max gap).
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §4–5; `benchmark/data/eval_tallies.json`, `benchmark/data/block_eval.csv`.
-- **Status:** ready (censoring caveat is mandatory, not optional).
+- **Ready wording:** "Forty of the 200 detected gaps exceed 0.8 s, and one exceeds 1.5 s. A simple timeout measured from those gap starts would expire inside those gaps. That is a duration calculation, not a live-agent interruption measurement."
+- **Metric / population:** gaps longer than 0.5/0.8/1.5/3.0 s: 61.5%/20.0%/0.5%/0.0%. A pure timeout waits its configured duration after its detected silence onset; actual endpoint and response delays depend on the deployed pipeline.
+- **Source / run:** `benchmark/data/block_eval.csv`; [build_eval_sets.py](../benchmark/scripts/build_eval_sets.py).
+- **Status:** ready as a calculated baseline. These selected short gaps do not establish a real-world lower bound or latency for every caller.
+- **To upgrade:** validated boundaries, longer real samples and a matched deployed timeout arm.
 
-### L-06 — Confidence-threshold arms
+### L-06 — Confidence-threshold sweep
 
-- **Ready wording:** "Raising the model's confidence bar isn't even an exposed knob — it needs a fork — and it fails anyway: at 0.95 it still predicts 'complete' in 22.5% of block gaps while sending 48% of fluent turns to the 3-second fallback; at 0.99 it stops predicting on blocks only because it nearly stops firing at all — 98.7% of fluent turns fall to the fallback, which is a 3-second timeout for everyone."
-- **Metric / population:** threshold 0.9 → 35.5% first / 48.5% any, 40% fluent fallback; 0.95 → 22.5% / 37.0%, 48% fallback; 0.99 → 0.0%, 98.7% fallback. Same populations as L-01/L-03.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5; `benchmark/data/threshold_sweep.json`.
-- **Status:** ready (exploratory).
+- **Ready wording:** "At threshold 0.95, 45 of 200 first checkpoints crossed the threshold; 37 of 77 fluent-labeled clips had no crossing in the tested window. At 0.99, no tested block checkpoint crossed, and 76 of 77 fluent-labeled clips had no crossing in-window. What happened after that window was not measured."
+- **Metric / population:** threshold 0.9: 35.5% first / 48.5% any, 31/77 censored; 0.95: 22.5% / 37.0%, 37/77 censored; 0.99: 0% / 0%, 76/77 censored. The fluent window ends at available silence or +1.0 s, not the deployed timeout.
+- **Source / run:** `benchmark/data/threshold_sweep.json`, `benchmark/data/model_fluent_full_curves.json`; [threshold_sweep.py](../benchmark/scripts/threshold_sweep.py).
+- **Status:** ready as a sweep of saved probabilities. "The model stops firing," a measured three-second fallback rate, and whether changing thresholds requires a fork of a particular runtime remain unsupported here.
+- **To upgrade:** pin the deployed model/runtime/configuration; observe validated completed turns through its timeout, retaining censoring explicitly. Recompute with model-specific caches and matched schedules.
 
 ### L-07 — "No setting fixes it" (aggregate)
 
-- **Ready wording:** "None of the configurations **we tested** — silence timeouts at 0.5/0.8/1.5/3 s, Smart Turn confidence thresholds 0.9/0.95/0.99, and ElevenLabs' patient mode in our own small live test — kept block completion-predictions under 10% without multi-second delay or nonresponse for other callers. That's the configurations we tested, on short blocks, not every possible setting or system."
-- **Unsupported wording:** "No existing knob fixes it" / "no setting fixes it" stated universally.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5, §7, §10.
-- **Status:** ready (narrowed form only) · unsupported (universal form)
-- **To upgrade:** nothing upgrades the universal form; it stays narrowed. Matched baseline comparisons on the rebuilt partition let us drop "exploratory."
+- **Ready wording:** "We saved exploratory timeout and threshold comparisons. They do not yet establish which configurations meet both our interruption and response-delay targets."
+- **Target wording:** "None of the configurations we tested met both targets on this evaluation" — name those configurations, populations, metrics and uncertainty, if a matched evaluation supports it.
+- **Unsupported wording:** "No existing knob fixes it," "the fix has to be in the model," or treating the current experiment as a completed rejection of existing settings.
+- **Source / run:** L-01–L-06 and L-08–L-10; the limitations supersede the verdict in [RESULTS.md](../benchmark/RESULTS.md) §10.
+- **Status:** ready for the limitation statement; target for the scoped comparison conclusion; unsupported as a universal claim.
+- **To upgrade:** the same validated inputs and causal pipeline, completed turns from both groups, real delay/fallback observations, and the simple patient/wait baseline. The ElevenLabs proxy is a different outcome from model-only completion predictions.
 
-### L-08 — ElevenLabs stock (normal) arm
+### L-08 — ElevenLabs normal arm
 
-- **Ready wording:** "In **our own small live test — 20 clips, unpublished, our measurement** — an agent we built on ElevenLabs' platform, stock settings, barged in on 1 of 20 blocks strictly scored (2 of 20 on a looser score). Their closed platform already handles short blocks well, and we credit that. All tested gaps were 0.5–0.96 s; what it does on a real 3–10 s block is unknown."
-- **Metric / population:** 1/20 strict (5%), 2/20 likely (10%); N=20 live ConvAI sessions, block clips with gap ≥ 0.5 s, `turn_eagerness=normal`; 95% CI on 1/20 is roughly 0.1–25%.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §7; `benchmark/data/elevenlabs_normal_results.csv`; agent `agent_9901m4k3jsfyehcry084sqnk3vyv`; `benchmark/scripts/elevenlabs_arm.py`.
-- **Status:** ready (n=20/unpublished/own-measurement labels are mandatory).
+- **Ready wording:** "In our 20-session normal-mode test, the first agent audio/response event arrived before detected resumption in one session; two met our looser timing rule. These are event-timing results against inferred boundaries, not human-validated audible interruption rates."
+- **Metric / population:** 1/20 strict and 2/20 likely under the script's rules; detected gaps 0.5–0.96 s. Three sessions had no response event in the observation window. Text and audio events are both accepted as the first event.
+- **Source / run:** `benchmark/data/elevenlabs_normal_results.csv`; [elevenlabs_arm.py](../benchmark/scripts/elevenlabs_arm.py).
+- **Status:** ready with the event definition and small-sample limitation; no best-in-class or general commercial-platform conclusion.
+- **To upgrade:** validated same-speaker boundaries, audible-response timing and matched completed-turn tests. Our result does not measure anyone's longer-block performance.
 
 ### L-09 — ElevenLabs patient arm
 
-- **Ready wording:** "Their 'patient' setting barged in on 1 of 20 in the same test — but 6 of 20 sessions got no response at all inside our ~6-second window, and the response-time proxy ran about +3.0 s. Patience costs responsiveness there too. The proxy includes ASR, LLM and TTS time, so it is not a clean end-of-speech latency."
-- **Metric / population:** 1/20 strict and likely (5%); 6/20 no response in ~6 s window; mean first-agent-event +2.99 s (proxy); same 20 clips, `turn_eagerness=patient`.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §7; `benchmark/data/elevenlabs_patient_results.csv`.
-- **Status:** ready (same mandatory labels as L-08).
-- **To upgrade:** Niko's planned fluent-latency arm (stream the 77 fluent clips normal vs patient) isolates the patient latency cost from LLM/TTS.
+- **Ready wording:** "In patient mode, one of the same 20 sessions met the script's strict timing rule, and six had no response event in-window. The reported mean after-clip response proxy was 2.99 s versus 2.71 s for normal, calculated on different responding subsets; it does not isolate the setting's latency cost."
+- **Metric / population:** 1/20 strict and likely; 6/20 no event in-window. Means use first events after the three-second clip ends, include ASR/LLM/TTS effects, and exclude nonresponders and earlier events.
+- **Source / run:** `benchmark/data/elevenlabs_patient_results.csv`, `benchmark/data/elevenlabs_normal_results.csv`; [elevenlabs_arm.py](../benchmark/scripts/elevenlabs_arm.py).
+- **Status:** ready as descriptive event statistics, not a proven fluent-latency penalty.
+- **To upgrade:** matched verified completed turns, paired/repeated conditions, explicit censoring and endpoint/audio timestamps. Holding the rest of the pipeline constant reduces confounding; it does not subtract stochastic LLM/TTS time automatically.
 
-### L-10 — Harness sanity controls
+### L-10 — Unvalidated sanity controls
 
-- **Ready wording:** "Three controls order correctly: audio cut mid-word — which should read 'not done' — drew a 'done' prediction 31% of the time; genuine sentence ends, 70%; stutter blocks, 58%. The ordering mid-speech < block < true-end says the harness measures real signal — and that the model treats a block far more like 'done' than like mid-speech."
-- **Metric / population:** 31% (N=49 mid-speech cuts), 70% (N=50 true ends + 0.4 s silence), 58% (N=200 blocks).
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5; `benchmark/scripts/sanity_controls.py`.
-- **Status:** ready. Say "order correctly," not "prove the harness is correct."
+- **Ready wording:** "The historical report gives 31% completion at cuts chosen half a second before the last detected speech, and 70% at cuts 0.4 s after it. These cutpoints were not checked as mid-word speech or genuine turn endings, so the ordering does not validate the labels."
+- **Metric / population:** reported 31% of 49 early cuts and 70% of 50 late cuts. Raw per-control predictions are not saved. Example: `HeStutters_0_17.wav` is cut at 2.5 s, inside its saved detected pause [2.17, 2.9].
+- **Source / run:** [sanity_controls.py](../benchmark/scripts/sanity_controls.py), `benchmark/data/fluent_eval.csv`; historical [RESULTS.md](../benchmark/RESULTS.md) §5.
+- **Status:** ready to describe the reported control attempt and defect; unsupported as a validated semantic control or evidence against label noise.
+- **To upgrade:** select and human-check truly active-speech cuts and genuine completed turns; save per-example predictions and labels.
 
-### L-11 — Stock inference cost
+### L-11 — Reported stock inference cost
 
-- **Ready wording:** "Stock Smart Turn costs about 25 ms per inference on CPU in our runs (mean 25 ms, p95 28 ms, n=1,164) — an 8M-parameter model."
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5 (timing); model size per [README.md](../README.md) / the Smart Turn repo.
-- **Status:** ready (stock only — candidate cost is L-24).
+- **Ready wording:** "The original run report records about 25 ms mean CPU inference time, including preprocessing, with a 28 ms p95 over 1,164 calls. That is compute time, not time until the agent answers."
+- **Source / run:** [RESULTS.md](../benchmark/RESULTS.md) §5; timing code in [run_model_arm.py](../benchmark/scripts/run_model_arm.py). Per-call timing output is not committed.
+- **Status:** ready as a reported exploratory measurement, stock only. A reproducible timing log is needed for a performance comparison; candidate cost is L-24.
 
-### L-12 — Spot-check of eval structure
+### L-12 — Automated spot-check
 
-- **Ready wording:** "Automated RMS spot-checks of 10 eval clips all show the expected speech → gap → resumption structure. That's waveform inspection, not human listening — the team listen-through is running today and nothing graduates past exploratory until it's done."
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §6; `benchmark/data/spotcheck/block_spotcheck_rms.png`.
-- **Status:** ready (only with the "not human listening" clause).
-- **Unsupported wording:** "we listened to the clips" / "human-verified labels" — until issue #1's annotation sheet exists.
+- **Ready wording:** "The saved plot shows energy profiles for ten selected clips. It does not establish which silence is a block, who resumes, or whether the turn was unfinished. Human annotation is pending."
+- **Source / run:** `benchmark/data/spotcheck/block_spotcheck_rms.png`; [spotcheck.py](../benchmark/scripts/spotcheck.py).
+- **Status:** ready as automated inspection only. Do not assert listening is underway or completed without the reviewer log.
 
-### L-13 — Gap durations and censoring
+### L-13 — Gap durations and selection limits
 
-- **Ready wording:** "Every block gap we could measure was under 1.6 seconds, because the dataset's clips are 3 seconds long — median gap 0.58 s. Real blocks can last many seconds. That regime is untested for every system, including ours, including the commercial ones."
-- **Metric / population:** N=200 gaps; median 0.58 s, p90 0.93 s, max 1.59 s; 79 further block clips excluded as right-censored.
-- **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §4; `benchmark/data/eval_tallies.json`.
-- **Status:** ready — and **mandatory** alongside any timeout or ElevenLabs number.
+- **Ready wording:** "The 200 selected detected gaps range from 0.30 to 1.59 s, with a median of 0.58 s. Three-second clips and the requirement for detected resumption exclude longer or censored cases. Our experiment has no result for multi-second blocks."
+- **Metric / population:** N=200 gaps; p90 0.93 s; 79 candidate clips rejected because sustained resumption was not found. Those rejected silences are not themselves validated ongoing blocks.
+- **Source / run:** `benchmark/data/block_eval.csv`, `benchmark/data/eval_tallies.json`; [build_eval_sets.py](../benchmark/scripts/build_eval_sets.py).
+- **Status:** ready as a limit of our experiment, not "untested everywhere."
 
 ## B. External sources (not our measurements — attribute, never blend with ours)
 
@@ -133,15 +138,16 @@ Every result-bearing, novelty, implementation or compatibility sentence we might
 
 ### L-17 — Apple / Siri prior art
 
-- **Ready wording:** "Apple's published work cut Siri's premature cut-offs by roughly 79% — shipped as Siri-only accessibility settings, model closed. Nothing comparable exists in the open agent stack."
-- **Source:** Lea et al. 2023 (arXiv, linked in README); Siri accessibility settings page.
-- **Status:** ready ("nothing comparable exists" is scoped by our documented search, L-26/L-27 — say "we searched and found none," not "none exists anywhere").
+- **Ready wording:** "Apple's published work on Siri and atypical speech is relevant prior art; we use its SEP-28k dataset to investigate turn-taking in open voice agents."
+- **Source:** Lea et al. 2023 and Siri accessibility settings, linked in [README.md](../README.md).
+- **Status:** ready for this scoped attribution. The exact ~79% reduction and a claim that a particular research result shipped as a particular setting need direct source/definition checks before use; no absence claim follows from Apple's work.
 
-### L-18 — "0.2 s is the production default" / Smart Turn is the open-stack default
+### L-18 — Harness checkpoint versus deployed configuration
 
-- **Ready wording:** "Pipecat consults the turn model when its VAD reports 0.2 s of silence (default `stop_secs` 0.2) — that's the first-check moment we test. Smart Turn is the pipecat ecosystem's standard open turn model."
-- **Source:** pipecat defaults recorded in [benchmark/RESULTS.md](../benchmark/RESULTS.md) §5; Smart Turn repo (BSD-2) linked in README.
-- **Status:** ready.
+- **Ready wording:** "Our block experiment checks Smart Turn at +0.2 s after detected silence. We still need to pin and trace the deployed agent to establish when it checks or acts."
+- **Source:** [run_model_arm.py](../benchmark/scripts/run_model_arm.py); proposed runtime evidence in [PLAN.md](../PLAN.md).
+- **Status:** ready for the harness setting; production-default and runtime-equivalence claims are unverified.
+- **To upgrade:** versioned runtime configuration, actual VAD/check events and cancellation behavior. A library default alone does not establish an end-to-end agent's behavior.
 
 ### L-19 — "Pharmacy refill lines are among the most automated calls in the country"
 
@@ -189,21 +195,22 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 
 ### L-26 — "First open stutter-trained turn-taking model"
 
-- **Ready wording (today):** "To our knowledge no open turn-taking model trained on stuttered speech exists — we searched ElevenLabs docs/changelog, the Smart Turn repo and its public fine-tunes, LiveKit/Deepgram/AssemblyAI docs, papers and hackathon galleries, and documented it ([decision log D-003](decision-log.md)). We're building the first one we know of."
-- **Target wording:** "StutterTurn is, to our knowledge, the first **open** turn-taking model trained on stuttered speech" — only once the model exists (L-20 evidence).
-- **Status:** target (model must exist) · the search-scoped absence statement is ready.
-- **Never:** "first ever," unscoped; a search finding nothing is not proof of universal absence.
+- **Ready wording (today):** "Our goal is an openly available turn-taking model evaluated on stuttered speech."
+- **Target wording:** "To our knowledge, the first [precisely scoped contribution]" — only after the artifact exists and a current, documented prior-art review supports that scope.
+- **Source / status:** [D-006](decision-log.md) supersedes D-003's earlier novelty conclusion. **Target**, not a verified absence claim.
+- **To upgrade:** save primary-source links, search date and relevant alternatives; distinguish stutter-specific work from broader turn-taking benchmarks and adjustable existing systems. A search cannot establish universal absence.
 
 ### L-27 — "First public benchmark of voice-agent turn-taking on stuttered speech"
 
-- **Ready wording (today):** "We found no public benchmark of how voice-agent turn-taking treats stuttered speech (search documented, D-003). We built one this weekend and will publish it."
-- **Target wording:** "…the first **public** benchmark…" — only once the repo/benchmark is actually public with the corrected method (show-separated splits, validated labels) and license/permissions resolved (issue #5).
-- **Status:** target (publication + corrected method pending) · search-scoped version ready.
+- **Ready wording (today):** "We have saved exploratory evaluation scripts and outputs; our goal is a reproducible public benchmark with validated labels."
+- **Target wording:** a narrowly scoped "first" claim, only if current prior-art evidence supports it and the corrected benchmark is publicly usable.
+- **Status:** target; the earlier D-003 search conclusion is not current validation under D-006.
+- **To upgrade:** scoped primary-source review, corrected labels/splits, verified reproduction and resolved publication terms. Keep all existing general turn-taking benchmarks in the comparison.
 
-### L-28 — "Apple fixed this inside Siri and kept it closed; we take Apple's dataset where Apple stopped"
+### L-28 — "Apple fixed this inside Siri and kept it closed"
 
-- **Ready wording:** as written, with "fixed" scoped: "Apple's published work cut Siri's cut-offs ~79%, shipped as Siri-only settings; no open model was released. We use Apple's own dataset — SEP-28k — where Apple stopped."
-- **Status:** ready (rhetoric is fine; the factual load sits on L-17, which is sourced).
+- **Ready wording:** "We build on Apple's SEP-28k dataset to study turn-taking in open voice agents."
+- **Status:** ready for the dataset attribution. "Fixed this," the ~79% figure and the research-to-shipped-setting link require the checks in L-17; use the narrower wording meanwhile.
 
 ### L-29 — "It didn't exist before this weekend"
 
@@ -240,16 +247,18 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 
 | ID | Limit | Source |
 |---|---|---|
-| L-35 | Long blocks (3+ s) untested **everywhere, including by us** — all measured gaps < 1.6 s | RESULTS §4 censoring caveat |
+| L-35 | Long blocks (3+ s) untested **in our evaluation** — all selected detected gaps < 1.6 s | RESULTS §4 censoring caveat |
 | L-36 | English-only, blocks-only: other languages and other disfluency types (repetitions, prolongations, interjections) untested; model card must say "English fine-tune — use stock for other languages" | RESULTS; Q&A |
 | L-37 | Wideband 16 kHz audio only; 8 kHz narrowband phone channel untested | RESULTS §9 |
-| L-38 | SEP-28k annotations CC BY-NC 4.0: research/demo with attribution; weights (if released) research + non-commercial; never "fully open" without the qualifier; no commercial deployment promise | RESULTS §1 |
-| L-39 | No one on the team stutters; nobody imitates stuttering, ever; real recordings only, labeled; research prototype, not a medical or therapeutic tool; it makes the agent wait — it does not recognize stuttered words better | README, D-004 |
+| L-38 | SEP-28k annotations are CC BY-NC 4.0; audio/demo permissions and trained-weight release terms need separate resolution before distribution; no unrestricted commercial-use promise | RESULTS §1 |
+| L-39 | No one on the team stutters; nobody imitates stuttering, ever; real recordings only, labeled; research prototype, not a medical or therapeutic tool; it makes the agent wait — it does not recognize stuttered words better | README, D-004; model behavior remains a target |
 
 ## G. Never-say list (hard rules — no upgrade path)
 
 - "All voice agents fail" (contradicted by our own L-08).
 - Any medical, diagnostic or therapeutic claim. "We solved stuttering."
+- One-second censoring described as a measured three-second fallback; conditional crossing times described as full-population response latency.
+- Energy-derived cutpoints described as verified mid-word cuts or semantic turn ends; repeated offline checks described as a traced deployed schedule.
 - The 58% as **callers interrupted**, **call abandonment**, or **hang-ups** — it is exploratory internal completion predictions on tested blocks. 58% of tested blocks ≠ 58% of callers.
 - "We rehearsed it" before rehearsals happen; "we listened to the clips" before the listen-through is logged.
 - Any target, plan or placeholder voiced in past tense as an achieved result.
@@ -264,8 +273,8 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 
 1. **Immutable candidate artifact + run records:** `stutterturn-vN.onnx` (never overwritten), with run ID, model hash, data-manifest hash, config, counts, per-group premature decisions, median/tail delay, fallback/nonresponse and censoring — per the PLAN evaluation contract. Unblocks L-20–L-25.
 2. **Show-separated train/DEV/final-test manifests** + **stock rerun** on the new final test. Unblocks the [S]%→[X]% comparison; without it no stock-vs-candidate sentence is quotable.
-3. **Human listen-through log** (10 spot-check clips + HeStutters_21_144 + feasibility-set share) and the 30-example annotation sheet status from issue #1. Upgrades L-01/L-02/L-12 from "exploratory" and unblocks "validated" language.
-4. **Fine timing resolution** (better than 100 ms) for completed-turn delay, both groups. Required before any ±50 ms sentence (L-21).
+3. **Human annotation manifests** for every evaluated boundary and completed/unfinished-turn label, with context and speaker identity. Track the separate 30-example feasibility sheet from issue #1; that subset does not validate the old 200 examples or establish final-test efficacy (L-01/L-10/L-12).
+4. **Matched causal timing and observation through the deployed timeout**, or explicit censoring; use finer than 100 ms resolution for the +50 ms target, both groups. Rebuild active-speech/true-end controls and save per-example outputs (L-02/L-03/L-06/L-10/L-21).
 5. **`benchmark/requirements.txt` + pinned env + one verified rerun command** (README already points at it; it doesn't exist). Unblocks L-33's "reproducible" wording.
 6. **Candidate inference timing** on the exported ONNX (L-24).
 7. **Gemini Live arm**: run it (needs GOOGLE_API_KEY) or confirm we strike every "Gemini benchmarked as a rival" phrase from submitted text (L-34).
@@ -286,4 +295,4 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 3. **"Pharmacy refill lines…" (L-19):** source it or cut it.
 4. **README sponsor table vs build status** (L-34): present-tense sponsor claims with nothing built — coordinate with Kareem before submission.
 5. **Whether the exploratory 58% headlines the public benchmark page** before the partition rebuild and listen-through land, or the page waits for rebuilt numbers.
-6. **Rehearsal:** both scripts are length-estimated only (word count ÷ ~150 wpm). Nobody has rehearsed; issue #4 requires three rehearsals with an unscripted participant before 10 PM.
+6. **Rehearsal:** the revised templates need timing with their actual interaction. No rehearsal is asserted; issue #4 requires three rehearsals with an unscripted participant before 10 PM.
