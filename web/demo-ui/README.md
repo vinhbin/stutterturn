@@ -101,9 +101,10 @@ Serve `web/` and link `/demo-ui/`, or embed:
 
 ## Validation and real acceptance
 
-Development test harnesses stay outside the repository, as requested in the
-builder handoff. The stdlib contract mock is the only repository test helper.
-See [verification notes](verification.md) for the original fixture checks and the
+The original development harnesses ran from local scratch; a committed,
+reproducible check suite now lives in [dev/checks/](dev/checks/README.md)
+(Node adapter checks plus Playwright browser checks against the stdlib mock).
+See [verification notes](verification.md) for the fixture check record and the
 [current handoff review](../handoff-2026-10-10.md) for real-server integration.
 F2/I1 still need verified playback and attributable audible interaction evidence.
 Candidate acceptance also
