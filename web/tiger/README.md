@@ -7,11 +7,12 @@ into TigerData (managed Postgres/TimescaleDB), asks the judge questions as
 named SQL views, and renders the answers on a static chart block whose every
 number traces back to those queries over real committed logs.
 
-**Status: credential-gated.** Everything here runs today except the live
-database connection. Until a service URL exists, `ingest.py --dry-run`
-validates the logs and `snapshot.py --offline` computes the same numbers
-locally — and the chart visibly labels that snapshot "LOCAL SNAPSHOT — NOT
-YET SERVED FROM TIGERDATA". Nothing claims TigerData is serving until it is.
+**Status: embedded at `/judge/`; database path remains unverified.**
+`ingest.py --dry-run` validates the logs and `snapshot.py --offline` computes
+the per-run numbers locally. The committed chart visibly labels this source
+"Local snapshot · No Tiger Data query" on every figure. A saved database
+export is labeled "Snapshot from Tiger Data queries"; neither label reports
+a current database connection or backend health.
 
 ## Files
 
@@ -21,8 +22,8 @@ YET SERVED FROM TIGERDATA". Nothing claims TigerData is serving until it is.
 | `ingest.py` | Loads every `agent/evidence/**/*.jsonl`; `--dry-run` needs no DB or deps. |
 | `snapshot.py` | Runs the views, writes `snapshot.json`; `--offline` for the labeled local fallback. |
 | `chart.js` / `chart.css` | Self-contained block (no libraries) that renders `snapshot.json`. |
-| `EMBED.md` | The 3-line judges-page snippet and where it goes. |
-| `preview.html` / `preview.png` | Dev-only preview page and its captured render. Not a judge route. |
+| `EMBED.md` | The judge-page integration and source-status behavior. |
+| `preview.html` | Dev-only preview page. Not a judge route; `preview.png` is the original pre-integration capture. |
 | `requirements.txt` | `psycopg[binary]` only — needed only for a live connection. |
 
 ## Setup (once, tonight)
@@ -50,10 +51,13 @@ python web/tiger/snapshot.py --offline  # same JSON from the JSONLs, labeled off
 python -m http.server --directory web   # then open /tiger/preview.html
 ```
 
-Re-running any of these is safe: the schema is `IF NOT EXISTS`, ingest
-upserts on `(run_id, seq)`, and the snapshot is regenerated whole. After a
-real ingest + snapshot, the chart's label flips to "Served from TigerData
-queries" by itself — do not flip anything by hand.
+The dry run and offline snapshot never connect to a database. The non-dry
+ingest creates database objects and upserts logs on `(run_id, seq, ts)`;
+run it only against the intended service. Snapshot generation replaces
+`snapshot.json` in either mode. After a real ingest and database snapshot,
+the chart's label changes to "Snapshot from Tiger Data queries" from the
+generated provenance — do not flip it by hand. This remains a static export,
+not a live database connection from the browser.
 
 ## Why a hypertable
 
@@ -77,12 +81,30 @@ own `run_ended` summaries (`run_outcomes`).
 - **Superseded data stays marked.** The 2026-10-10-first-replay logs (faulty
   model input, per its README) are ingested with `superseded = true` and
   excluded from analysis views — visible, never silently dropped.
-- **No rates from n=5.** Five clips, one run each: per-clip values only,
+- **No rates from n=5.** Five clips, one run per configuration per clip: per-clip values only,
   with the caveats rendered beside them.
 - **Decision framing.** These are turn decisions and cancelled replies, not
-  observed audible interruptions; first audio is scheduled-play time
-  including Gemini + ElevenLabs latency, not measured speaker output.
+  observed audible interruptions; first audio is the reported
+  `agent_audio_start` event, including Gemini + ElevenLabs latency. Speaker
+  playback remains unverified; the chart does not play audio. These excerpts
+  do not establish completed-turn response delay.
 - **Offline fallback is always labeled**, on every figure.
+- **Unknown provenance does not imply database use.** Missing source metadata
+  shows an unavailable-data message; no figure or database badge is drawn.
+- **Later decisions have a distinct marker.** The snapshot does not carry
+  their triggers, so they are not labeled as model decisions or fallbacks.
+
+## Local verification (2026-10-10)
+
+- `python web/tiger/ingest.py --dry-run`: 20 logs / 302 events parsed; 10
+  current runs / 150 events and 10 superseded runs / 152 events. No DB touched.
+- `python web/tiger/snapshot.py --offline`: five clips, ten current runs,
+  ten superseded runs excluded; saved values remain from replay v2.
+- `node web/demo-ui/dev/checks/site-checks.mjs`: 52/52 passed, including chart
+  data, missing-data and missing-provenance handling, an injected database
+  snapshot response, no-JavaScript fallback, and phone/desktop containment.
+  The injected response checks the label branch only; it is not a database
+  integration test. Requests are limited to loopback and no backend is used.
 
 ## Devpost disclosure (paste when — and only when — the live path has run)
 

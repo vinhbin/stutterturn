@@ -1,10 +1,12 @@
 # Committed demo-ui check suite
 
 Reproducible checks for the call console, replacing the PR #12 scratch-directory
-harnesses that nobody else could re-run. Everything here drives **synthetic
-fixtures only**: a pass verifies adapter/UI contract handling and honest
-labeling, and is never audio, model, efficacy or benchmark evidence. F2/I1 and
-candidate acceptance gates are unaffected.
+harnesses that nobody else could re-run. The adapter and console suites drive
+**synthetic fixtures only**. Site checks also render the committed replay
+snapshot and inject unavailable/malformed/database-provenance responses to
+exercise chart states. A pass verifies UI behavior and honest labeling; it is
+never new audio, model, efficacy, database-use or benchmark evidence. F2/I1
+and candidate acceptance gates are unaffected.
 
 No `package.json` or other manifest exists or is needed. Run both suites from
 the **repository root**.
@@ -76,7 +78,7 @@ no Python server, agent backend, API credentials, or paid services are involved.
 External requests and WebSocket connections are blocked and fail the check.
 No screenshots are captured.
 
-The 48 checks cover:
+The 52 checks cover:
 
 - Reduced-motion initial state, explicit Play, keyboard Pause, and native range
   scrubbing to Pause/Continuing/Reply while playback is active.
@@ -92,6 +94,11 @@ The 48 checks cover:
 - The guide's dated replay-v2 facts, separate execution/artifact revisions, and
   label/playback limitations. This checks the published snapshot against its
   fixed expected values; it does not rerun or validate the experiment.
+- The embedded run-log chart's ten saved runs and per-figure offline labels,
+  reported-audio limits, and distinct later-decision markers. Missing data or
+  provenance produces no chart or database claim. An injected database export
+  checks the saved-snapshot label only; it does not query a database. The
+  no-JavaScript guide links directly to saved JSON evidence.
 - Landing, judge guide, live workspace, and standalone console containment at
   360, 390, 1280, and 1440 pixels, including header navigation.
 - At 360/390 pixels: the visible setup jump moves keyboard focus to its target;
@@ -113,7 +120,7 @@ pixels. It does not establish real playback, voice-agent efficacy, or visual
 quality. Exit codes match the browser suite: 0 passed, 1 check failure, 2 missing
 Playwright/Chromium. On October 10, 2026, the first studio-refresh run passed
 30/30, the expanded review-fix suite passed 38/38, and the judge/live route-split
-suite passed 48/48.
+suite passed 48/48. The Tiger chart integration suite passed 52/52.
 
 ## Recorded results
 
