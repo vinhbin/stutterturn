@@ -80,8 +80,10 @@ adapter.disconnect();
 `getConfigurations()`/`getSources()` return discovery data. Connection/start waits
 are bounded, versions validated, sequence disorder surfaced and stale-run events
 discarded. Reconnection never replays a source by itself. Runtime strings are
-rendered as text. `health.mock: true` selects mock labeling; mock socket messages
-must also carry `mock: true`.
+rendered as text. Mock provenance is a UI-side convention honored by the committed
+dev mock, not part of agent contract v0.1: `health.mock: true` switches the adapter
+to mode `mock`, and every socket message's `mock` flag must then match that mode —
+a mismatch in either direction fails the run.
 
 ## Keyboard and embedding
 
