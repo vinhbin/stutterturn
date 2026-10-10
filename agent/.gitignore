@@ -4,3 +4,5 @@
 runs/
 # Downloaded VAD/model weights
 models/
+# Local virtual environment
+.venv/
