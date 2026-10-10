@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-10T20:42:12Z",
+  "generated_utc": "2026-10-10T20:44:20Z",
   "offline_fallback": true,
   "source_note": "Computed directly from committed run logs by snapshot.py --offline; no TigerData service has been queried yet. See web/tiger/README.md.",
   "evidence": {
@@ -23,6 +23,7 @@
       "configs": {
         "stock": {
           "run_id": "20261010T194710Z-stock-3dd9",
+          "source_duration_s": 3.0,
           "first_complete_t": 4.864,
           "trigger": "fallback_timeout",
           "prob": null,
@@ -38,6 +39,7 @@
         },
         "patient": {
           "run_id": "20261010T194722Z-patient-c821",
+          "source_duration_s": 3.0,
           "first_complete_t": 4.864,
           "trigger": "fallback_timeout",
           "prob": null,
@@ -58,6 +60,7 @@
       "configs": {
         "stock": {
           "run_id": "20261010T194736Z-stock-b728",
+          "source_duration_s": 3.0,
           "first_complete_t": 2.176,
           "trigger": "smart_turn",
           "prob": 0.72,
@@ -73,6 +76,7 @@
         },
         "patient": {
           "run_id": "20261010T194748Z-patient-31bf",
+          "source_duration_s": 3.0,
           "first_complete_t": 4.0,
           "trigger": "smart_turn",
           "prob": 0.969,
@@ -93,6 +97,7 @@
       "configs": {
         "stock": {
           "run_id": "20261010T194800Z-stock-bec1",
+          "source_duration_s": 3.0,
           "first_complete_t": 1.12,
           "trigger": "smart_turn",
           "prob": 0.85,
@@ -108,6 +113,7 @@
         },
         "patient": {
           "run_id": "20261010T194813Z-patient-3064",
+          "source_duration_s": 3.0,
           "first_complete_t": 4.992,
           "trigger": "fallback_timeout",
           "prob": null,
@@ -128,6 +134,7 @@
       "configs": {
         "stock": {
           "run_id": "20261010T194825Z-stock-9916",
+          "source_duration_s": 3.0,
           "first_complete_t": 0.768,
           "trigger": "smart_turn",
           "prob": 0.954,
@@ -143,6 +150,7 @@
         },
         "patient": {
           "run_id": "20261010T194838Z-patient-dd02",
+          "source_duration_s": 3.0,
           "first_complete_t": 5.024,
           "trigger": "fallback_timeout",
           "prob": null,
@@ -163,6 +171,7 @@
       "configs": {
         "stock": {
           "run_id": "20261010T194851Z-stock-27bf",
+          "source_duration_s": 3.0,
           "first_complete_t": 0.512,
           "trigger": "smart_turn",
           "prob": 0.817,
@@ -178,6 +187,7 @@
         },
         "patient": {
           "run_id": "20261010T194903Z-patient-50d1",
+          "source_duration_s": 3.0,
           "first_complete_t": 6.016,
           "trigger": "fallback_timeout",
           "prob": null,

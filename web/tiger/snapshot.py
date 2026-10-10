@@ -69,6 +69,7 @@ def per_run_from_log(item: dict) -> dict:
         "run_id": run["run_id"],
         "source_id": run["source_id"],
         "config": run["config"],
+        "source_duration_s": r3(run["source_duration_s"]),
         "first_complete_t": r3(first["t"]) if first else None,
         "trigger": first["trigger"] if first else None,
         "prob": r3(first["prob"]) if first else None,
@@ -109,7 +110,7 @@ def rows_live(url: str) -> tuple[list[dict], dict]:
         cancels = {r["run_id"]: r for r in cur.fetchall()}
         cur.execute("SELECT * FROM run_outcomes WHERE NOT superseded")
         outcomes = {r["run_id"]: r for r in cur.fetchall()}
-        cur.execute("SELECT run_id, config, source_id, commit_sha, evidence_dir, superseded FROM runs")
+        cur.execute("SELECT run_id, config, source_id, source_duration_s, commit_sha, evidence_dir, superseded FROM runs")
         runs = cur.fetchall()
 
     rows = []
@@ -120,6 +121,7 @@ def rows_live(url: str) -> tuple[list[dict], dict]:
             "run_id": rid,
             "source_id": run["source_id"],
             "config": run["config"],
+            "source_duration_s": r3(run["source_duration_s"]),
             "first_complete_t": r3(f and f["first_complete_t"]),
             "trigger": f["trigger"] if f else None,
             "prob": r3(f and f["prob"]),
