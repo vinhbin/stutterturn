@@ -1,5 +1,7 @@
 # Demo and submission plan
 
+**Devpost fields and story:** [copy-ready current-prototype draft](devpost.md). Refresh its pending work and evidence links before submitting; this document remains the demo/release checklist.
+
 **Format we're planning for: 3 minutes, ~2 judges at the table.** Confirm the actual format/rubric from the opening-ceremony materials and adjust.
 
 **Gate alignment ([PLAN.md](../PLAN.md), issues #2/#4/#6):** 2 PM feasibility/scope decision → 3 PM DEV improvement decision (model continue **or** corrected-benchmark commit happens then, not later) → 10 PM demo-variant lock → Sun 1 AM feature freeze → submit 8:30 AM. This page keeps two conditional run-of-show templates until the 10 PM lock; neither is evidence that its rig or results exist. Every result-bearing sentence below follows [docs/claims-ledger.md](claims-ledger.md): ready wording only in anything delivered; placeholders stay bracketed until Niko's immutable run evidence lands; the Smart Turn numbers are exploratory offline predictions and the ElevenLabs numbers are separately defined server-event timings, not validated audible-interruption or hang-up rates.
