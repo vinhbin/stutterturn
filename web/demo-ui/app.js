@@ -83,7 +83,7 @@
     el['timeline-mode'].textContent = isSynthetic() ? 'SYNTHETIC · NO AUDIO' : state.run ? 'REPORTED EVENTS' : 'Awaiting events';
     el['agent-contract-status'].textContent = isConnected()
       ? (mock ? 'Mock transport connected; real replay acceptance pending.' : 'Transport connected; real audio playback acceptance pending.')
-      : 'Proposed v0.1 contract; real server and replay acceptance pending.';
+      : 'Agent contract v0.1; backend disconnected. Real audio playback acceptance pending.';
     var candidate = state.configs.find(function (cfg) { return cfg.id === 'candidate' || cfg.id === 'stutterturn'; });
     el['model-contract-status'].textContent = preview ? 'Preview labels only; no model artifact is exercised.' :
       candidate && candidate.available ? 'Candidate reported available by the backend; exact model is recorded per run.' :

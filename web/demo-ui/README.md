@@ -1,9 +1,9 @@
 # StutterTurn call console
 
 Vinh's comparison surface. Plain HTML/CSS/JavaScript, no build or runtime packages.
-Owned paths: `web/demo-ui/**`; Kareem owns the surrounding judges page.
+The surrounding [landing and judge pages](../README.md) reuse this console.
 
-Targets Guttuu's [proposed v0.1 contract](https://github.com/vinhbin/stutterturn/blob/a229787/agent/CONTRACT.md).
+Targets Guttuu's [implemented v0.1 contract](https://github.com/vinhbin/stutterturn/blob/3ed3786/agent/CONTRACT.md).
 UI checks and fixtures do not establish a working voice agent, audible output,
 trained candidate or matched evaluation. PLAN.md remains the task-status authority.
 
@@ -31,7 +31,7 @@ for overlap, holding, cancellation, timeout, no-response and disconnect scenario
 The separate preview requires no server and also remains labeled synthetic.
 
 A real server must permit the page's HTTP origin for discovery. An HTTPS page
-needs an HTTPS/WSS backend. Never put API keys in the page or URL. The proposed
+needs an HTTPS/WSS backend. Never put API keys in the page or URL. The
 contract carries events, **not browser audio**.
 
 ## Reading the display
@@ -42,7 +42,7 @@ contract carries events, **not browser audio**.
   completion is agent logic rather than a model prediction.
 - Audio onset means `agent_audio_start`, not `agent_audio_end` or `overlap`.
   Timings are **backend-reported, playback unverified**: at inspected engine commit
-  `a229787`, onset means first PCM received, with no output playback implemented.
+  `3ed3786`, onset means first PCM received, with no output playback implemented.
 - `services: off` means model-only with no generated response. Mock/preview audio
   events only illustrate UI states and prove no playback or interruption.
 - Cancellation, resumption, timeouts, no response and final summary stay visible.
@@ -101,9 +101,10 @@ Serve `web/` and link `/demo-ui/`, or embed:
 
 Development test harnesses stay outside the repository, as requested in the
 builder handoff. The stdlib contract mock is the only repository test helper.
-See [verification notes](verification.md) for recorded checks and their scope. F2/I1
-still need an actual server, real source replay and playback, stop/reset/reconnect
-against that service, and attributable saved evidence. Candidate acceptance also
+See [verification notes](verification.md) for the original fixture checks and the
+[current handoff review](../handoff-2026-10-10.md) for real-server integration.
+F2/I1 still need verified playback and attributable audible interaction evidence.
+Candidate acceptance also
 needs Niko's export and compatibility proof. A fixture pass satisfies neither gate.
 
 ## Fonts and design reference

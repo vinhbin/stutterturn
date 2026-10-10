@@ -1,5 +1,9 @@
 # UI verification — October 10, 2026
 
+This is the historical Phase A/B report. The later landing/judge extension and
+real-backend verification are recorded in the [current handoff review](../handoff-2026-10-10.md).
+The producer status below describes the earlier inspection, not the latest backend.
+
 This report covers the console and **synthetic contract fixtures**. It does not
 pass F2/I1, validate speech labels, establish efficacy or prove audible output.
 
@@ -86,7 +90,7 @@ earlier-caller-stop regression has a 0.30 s interval; neither is an audio result
 Page content fits phone width; the timeline and event ledger scroll internally
 to preserve readable labels and shared time coordinates.
 
-## Real integration handoff
+## Earlier real integration handoff (superseded)
 
 Inspected producer revision: `origin/guttuu/web-agent` at `a229787`. It contains
 `engine.py` and `run.py`, but no `server.py` or saved accepted replay. The contract
@@ -106,7 +110,7 @@ Producer items to resolve before real acceptance:
 - Verify stop/reset/reconnection on the real service, then replay matched real
   sources and save the complete interaction evidence separately.
 
-## Scope
+## Original Phase A/B scope
 
 All implementation and development helpers remain under `web/demo-ui/`. No
 teammate backend, model, benchmark, judges-page or root manifest is changed.
