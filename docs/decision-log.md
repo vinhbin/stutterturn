@@ -2,6 +2,12 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-009 — Keep the reserved test untouched (confirmed by Vinh)
+
+Vinh asked to keep the reserved test untouched for later testing. Do not run [Niko's proposed stock-only final comparison](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102597230) or inspect test outcomes. Preserve the frozen test items and hashes in [`benchmark/items/v1/manifest.json`](../benchmark/items/v1/manifest.json): `test.jsonl` SHA-256 `6bddc5b6b59ad2b929b0542828199d13c0130cd450b57394f7ac2488b6c26d32`, and `test_end_of_window.jsonl` SHA-256 `1cd7140f67bffbc30c315b6818b0464a54b8f024674bf2697de691798ab5c5fd`.
+
+This reserves the test; it does not select a model or authorize more training. Vinh remains undecided about [Guttuu's v3 proposal](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102568699), so the existing no-v3 rule and 20:00 hard stop remain unchanged. Training v1 and v2 both returned `dev_nothing_passes`; no final scope choice is recorded by this entry.
+
 ## DRAFT — team decision not yet recorded — continue/fallback gate entry template (prepared 2026-10-10 evening)
 
 **This is a prepared template, not a decision.** No gate is recorded as passed, missed or decided here. Vinh records the actual continue/fallback outcome with the team, per D-006/D-007; when recorded, this draft becomes a numbered entry with the fields below filled in.
