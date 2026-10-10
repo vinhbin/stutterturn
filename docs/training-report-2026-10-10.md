@@ -1,6 +1,8 @@
 # StutterTurn: model training and evaluation report
 
-**Evidence snapshot: October 10, 2026, 18:45 EDT.** Prepared for judge questions and team handoff. Training v1 and v2 were run; neither produced a qualifying candidate. Training v3 is proposed and paused. The current demonstration uses stock/patient behavior, not an accepted fine-tuned model. This report checks repository methods against the executor's published results; it does not independently reproduce the training runs.
+**Evidence snapshot: October 10, 2026, 18:45 EDT.** Prepared for judge questions and team handoff. Training v1 and v2 were run; neither produced a qualifying candidate. Training v3 was proposed and paused at that snapshot. The current demonstration uses stock/patient behavior, not an accepted fine-tuned model. This report checks repository methods against the executor's published results; it does not independently reproduce the training runs.
+
+**Execution update, approximately 19:00 EDT:** Vinh [approved W3 only](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431) under D-011. The protocol amendment is merged in PR #28; the reserved test remains sealed and the 20:00 stop remains. This approval does not supply a start confirmation, v3 score, or passing result. The results below remain the v1/v2 evidence snapshot.
 
 ## The 30-second explanation
 

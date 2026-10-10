@@ -2,7 +2,17 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-011 — Resume W3 only, keep the test sealed (approved by Vinh)
+
+At approximately 19:00 EDT, Vinh explicitly approved the single W3 experiment with “ok do it” after the bounded recommendation. [Approval was posted on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431), tagging Guttuu and Niko. This supersedes D-010's training pause and the earlier no-v3 rule for W3 only; **D-009's reserved-test seal is unchanged**.
+
+Execute the [reconciled protocol](../model/specs/training-v3.md), merged in PR #28: stock FP32 initialization; frozen data-v2; 80% original replay / 10% SEP unfinished / 10% SEP completed proxies; learning rate 1e-5; seed 0; two weighted epochs; existing checkpoints and threshold grid. W1/W2/W4 and v4 remain excluded. Preflight, every selection constraint, and additional promotion checks remain mandatory. No final-test run or automatic demo promotion follows a development pass.
+
+Guttuu owns execution and saved audio acceptance; Niko owns selection and the matched input comparison. Target prescreen at resume +20 minutes and full selection at resume +40 minutes, with the unchanged **20:00 EDT hard stop on October 10**. Failed inputs/checks or insufficient remaining time mean report the failure and retain stock/patient, not extend or relax the protocol. Record actual start, run/artifact identities, result, and limitations. **Approval is not evidence of a run starting, completing, or passing.** No start acknowledgment was available when this entry was prepared.
+
 ## 2026-10-10 D-010 — Training mixture preference and pause (confirmed by Vinh)
+
+Historical pause; superseded for W3 only by D-011 above.
 
 Vinh clarified that 80/20 means 80% original Smart Turn training examples and 20% stutter-focused adaptation examples, then explicitly said to wait. Subsequent requests ask for a v3 recommendation, a judge-facing training report, and a Git push so Guttuu can read them. Training remains paused; the report and push do not authorize a run. D-009 continues to keep the reserved final test sealed.
 

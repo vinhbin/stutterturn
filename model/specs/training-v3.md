@@ -1,6 +1,6 @@
 # Spec: StutterTurn candidate training v3 (replay-protected)
 
-**Owner:** Niko (spec, selection) · **Executor:** Guttuu · **Status:** pre-registered 18:20 EDT, reviewed and amended 18:3x, then **amended at 18:5x to W3 only per D-010** (Vinh: 80% original replay / 20% adaptation; [recommendation](../../docs/v3-recommendation-2026-10-10.md)). All of this happened **before any v3 run**. **Training is paused (D-010): nothing runs until Vinh explicitly resumes.**
+**Owner:** Niko (spec, selection) · **Executor:** Guttuu · **Status:** pre-registered 18:20 EDT, reviewed and amended 18:3x, then **amended at 18:5x to W3 only per D-010** (Vinh: 80% original replay / 20% adaptation; [recommendation](../../docs/v3-recommendation-2026-10-10.md)). These amendments preceded execution approval. **Vinh explicitly resumed W3 only at approximately 19:00 EDT under [D-011](../../docs/decision-log.md), recorded on [issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431).** Pre-run checks, promotion checks, the 20:00 hard stop, and D-009's test seal remain. Approval does not establish a started or successful run.
 
 ## 0. Why v3, and what it must disclose
 
@@ -10,7 +10,7 @@
 
 **v3 changes one thing: the mixture shares.** No data, rule, metric, constraint or threshold changes.
 
-**Disclosure, required in every v3 description:** dev has now served **three** pre-registered attempts (v1 and v2 both `dev_nothing_passes`; v3 was designed after seeing v2's dev and guard results). The test set stays sealed under **D-009**. No efficacy claim is possible from dev, and a v3 candidate does **not** authorize a test run. Only a later, explicit unseal decision by Vinh could do that.
+**Disclosure, required in every v3 description:** executing v3 would make this the **third adaptive attempt** on the same dev/guard data. v1 and v2 both gave `dev_nothing_passes`; v1's M3 rule was added after training and an initial prescreen, and v3 was designed after seeing v2's dev and guard results. The v3 protocol was recorded before its execution. The test set stays sealed under **D-009**. No efficacy claim is possible from dev, and a v3 candidate does **not** authorize a test run. Only a later, explicit unseal decision by Vinh could do that.
 
 ## 2d. Mixture and runs (replaces the v2 §2d shares and the v2 §4 run grid)
 
@@ -66,9 +66,9 @@ Missing or failed checks mean no promotion, even if the selector passes.
 | on Vinh's explicit resume | the stock-only `sel-v3` stage starts; W3 trains (one run) |
 | resume + 20 min | pre-screen done (`prescreen-v3.json`); exports and full guard evals |
 | resume + 40 min | full `sel-v3` stage done; `decision.md` posted on issue #2 |
+| **20:00** | **hard stop, unchanged.** If no v3 candidate passes, the fallback scope stands. **There is no v4.** |
 
 **If the resume comes after about 19:15, there isn't time:** don't compress checks or move the stop.
-| **20:00** | **hard stop, unchanged.** If no v3 candidate passes, the fallback scope stands. **There is no v4.** |
 
 ## 10. Risks (in addition to v2 §10)
 
