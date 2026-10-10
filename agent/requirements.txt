@@ -1,0 +1,9 @@
+# Matches docs/proofs/model-mechanics/requirements-lock.txt where shared.
+numpy==2.2.6
+onnxruntime==1.29.0
+transformers==5.19.0
+huggingface-hub==2.2.0
+soundfile
+aiohttp
+google-genai
+python-dotenv

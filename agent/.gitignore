@@ -1,0 +1,8 @@
+# Root .gitignore ignores .env.*; keep the key template tracked.
+!.env.example
+# Raw run logs; evidence runs are copied to agent/evidence/ and committed.
+runs/
+# Downloaded VAD/model weights
+models/
+# Local virtual environment
+.venv/
