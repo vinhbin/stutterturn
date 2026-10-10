@@ -1,6 +1,6 @@
 # StutterTurn agent
 
-**Owner: Guttuu.** Replays a real SEP-28k recording through VAD + an end-of-turn model (stock, patient or Niko's candidate), optionally answers with Gemini + ElevenLabs, and logs when it decided and when it was audible. Interface: [CONTRACT.md](CONTRACT.md). First evidence: [evidence/2026-10-10-first-replay](evidence/2026-10-10-first-replay/README.md).
+**Owner: Guttuu.** Replays a real SEP-28k recording through VAD + an end-of-turn model (stock, patient or Niko's candidate), optionally answers with Gemini + ElevenLabs, and logs when it decided and when it was audible. Interface: [CONTRACT.md](CONTRACT.md). Current evidence: [evidence/2026-10-10-replay-v2](evidence/2026-10-10-replay-v2/README.md) (supersedes the first replay, whose model input was faulty).
 
 ## Setup (Windows, Python 3.11)
 

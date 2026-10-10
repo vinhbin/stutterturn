@@ -1,6 +1,6 @@
 # Agent contract
 
-**Owner: Guttuu** · **Version: 0.1** · **Status: implemented on `guttuu/web-agent` (engine `8e47dad`, services `a229787`, server `18229dc`)** except where a section still says proposed. First evidence: `agent/evidence/2026-10-10-first-replay/`.
+**Owner: Guttuu** · **Version: 0.1** · **Status: implemented on `guttuu/web-agent` (engine `8e47dad`, services `a229787`, server `18229dc`)** except where a section still says proposed. Current evidence: `agent/evidence/2026-10-10-replay-v2/` (fixed model input, `bcf50d1`; supersedes `2026-10-10-first-replay/`).
 
 This is the interface between the voice agent (`agent/`) and its consumers: Vinh's demo UI (`web/demo-ui/adapter.js`), Kareem's judges page and Niko's evaluation (E1). Consumers may build against it now. Each section is marked **proposed** until a committed run proves it, then **implemented** with the commit. Breaking changes bump the version and are announced in issue #2 first.
 
