@@ -56,3 +56,16 @@ For later confirmation, obtain different authentic recordings with reviewed endp
 - **Guttuu:** execute only after approval, record the environment/artifacts and exact outcome, and verify audible behavior before any candidate integration.
 
 If no candidate qualifies, retain the stock/patient demonstration and report the failed adaptation honestly. Its human-label, audio and hosting acceptance work still has to be completed. The [judge-facing training report](training-report-2026-10-10.md) explains the current evidence and limitations.
+
+## Follow-on: more authentic training data
+
+Vinh also asked about data beyond the current sources. These are researched options, not downloaded inputs or amendments to the frozen v3 recipe:
+
+| Source | Why it is useful | What must happen first |
+|---|---|---|
+| [AImpower English Stuttered Speech, Mozilla Data Collective](https://mozilladatacollective.com/datasets/cms4tcqvl01lyo207p6j1ykng) | 44 participant folders; adult English speakers who stutter; spontaneous conversations and read commands, with timestamped semantic/verbatim transcripts and stutter-event annotations. Best prospective match for conversational turn-taking. | Verify practical access: the listing provides CC BY-SA 4.0 information but also describes sharing with approved partners under data-use agreements. Access has not been tested. Respect withheld participants and withdrawals. |
+| [UCLASS, University College London](https://www.uclass.psychol.ucl.ac.uk/) | Downloadable real stuttered speech, including conversational material; longer context can support endpoint review. Transcripts are available for some files. | Follow its stated research/teaching and attribution conditions; assess age/task coverage for our intended users. No audio has been downloaded. |
+
+Prioritize reviewed conversational endpoints over simply increasing clip count. Stutter annotations and timestamped transcripts still do not directly supply the complete/incomplete turn labels our task needs. Group all sessions/crops from the same speaker into one partition before creating examples, check duplicate and near-duplicate audio against existing sources, and document unresolved speaker identities. A source that looks new is not automatically an independent test.
+
+For a later version, build a small reviewed real-speech pilot first, then freeze a new training manifest and separate development/confirmation speakers. Keep original replay in the mixture and retain both incomplete and completed adaptation examples. Do not insert these sources into W3 at the last minute: changing data and mixture together would change the proposed experiment. No new training, download, or final-test run is authorized by this source list.
