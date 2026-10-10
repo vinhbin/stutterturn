@@ -2,6 +2,16 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## DRAFT — team decision not yet recorded — continue/fallback gate entry template (prepared 2026-10-10 evening)
+
+**This is a prepared template, not a decision.** No gate is recorded as passed, missed or decided here. Vinh records the actual continue/fallback outcome with the team, per D-006/D-007; when recorded, this draft becomes a numbered entry with the fields below filled in.
+
+Evidence available to the decision as of Saturday evening:
+
+- [Replay v2](../agent/evidence/2026-10-10-replay-v2/README.md) (executed on `bcf50d1`, on main via [PR #14](https://github.com/vinhbin/stutterturn/pull/14); supersedes the first replay, whose model input lacked the pre-roll): 5 SEP-28k block clips × stock/patient, 10 logs. Stock decided "complete" inside the labelled gap in 4 of 5 clips; 3 of those replies were cancelled before any audio; the fourth clip was too short to observe overlap; patient made no early in-gap decision; no audible interruption in any run — reply delay, not demonstrated safety. Labels exploratory, energy-derived, not human-reviewed; 5 clips support no rates.
+- Niko's training work is in progress on `niko/model-benchmark`; **no candidate artifact** (`stutterturn-vN.onnx`) or matched evaluation exists in the repository.
+- To fill at decision time, per the PLAN recording rule: time · actual pass or miss · artifact and input IDs · limits · continue or fallback · recovery owner · next checkpoint.
+
 ## 2026-10-10 D-008 — Kareem's departure and lane transfer (confirmed by Vinh)
 
 Kareem left the team on Saturday afternoon; Vinh confirmed the departure. No reason is recorded here. The lane transfers as follows: the landing page, judge view and evidence index had already been delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12) and, together with root `README.md` upkeep and disclosures, are now maintained by Vinh's side. The B-batch label cross-check (F4's independence check) needs a new human reviewer — flagged for reassignment to Guttuu or Niko; that reassignment is a pending team decision, not made by this entry. The optional Tiger Data integration is unstaffed and likely cut; also a pending team decision. Gate criteria, evidence standards and the claims ledger are unchanged by this staffing update.

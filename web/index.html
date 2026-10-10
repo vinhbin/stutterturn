@@ -91,17 +91,18 @@
     </section>
 
     <section id="evidence" class="evidence-section shell" aria-labelledby="evidence-title" data-reveal>
-      <div class="section-intro"><h2 id="evidence-title">Inspect what<br>we have.</h2><p>The first replay handoff checks the recording-to-event path. It is an engineering check, with human review and model evaluation still ahead.</p></div>
+      <div class="section-intro"><h2 id="evidence-title">Inspect what<br>we have.</h2><p>The replay-v2 handoff checks the recording-to-event path. It is an engineering check, with human review and model evaluation still ahead.</p></div>
       <div class="evidence-card">
-        <div class="evidence-heading"><h3>First recorded-source replay</h3><span class="revision">2026-10-10 · Handoff 3ed3786<br>Saved logs executed on a229787</span></div>
+        <div class="evidence-heading"><h3>Recorded-source replay v2</h3><span class="revision">2026-10-10 · Replay v2 supersedes the first replay<br>Saved logs executed on bcf50d1</span></div>
         <dl class="evidence-facts">
           <div><dt><span class="dot dot-recorded"></span>Sources</dt><dd>5 SEP-28k recordings</dd></div>
           <div><dt><span class="dot dot-recorded"></span>Runs</dt><dd>10 replay logs across stock and patient</dd></div>
           <div><dt><span class="dot dot-recorded"></span>Setting changed</dt><dd>Silence gate: 0.2 s → 1.0 s</dd></div>
+          <div><dt><span class="dot dot-recorded"></span>Observed</dt><dd>Stock decided “complete” inside the labelled gap on 4 of 5 clips; 3 of those replies were cancelled before any audio</dd></div>
           <div><dt><span class="dot dot-pending"></span>Candidate model</dt><dd>None exists yet; the console lists one only when the backend supplies it</dd></div>
         </dl>
         <p class="evidence-limit">Labels have not been human-reviewed. These runs do not establish improved interruption rates or response delay. Audio receipt is logged; speaker playback is unverified.</p>
-        <a class="button button-quiet evidence-link" href="https://github.com/vinhbin/stutterturn/tree/3ed3786/agent/evidence/2026-10-10-first-replay">Inspect the pinned replay evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a>
+        <a class="button button-quiet evidence-link" href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2">Inspect the pinned replay evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a>
       </div>
     </section>
 

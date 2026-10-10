@@ -7,3 +7,5 @@ soundfile
 aiohttp
 google-genai
 python-dotenv
+# --play only (laptop-speaker demo playback)
+sounddevice

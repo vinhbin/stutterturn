@@ -1,6 +1,9 @@
 # First stock/patient replay: 5 block clips
 
 > **Correction (Oct 10, after review of Niko's questions on PR #11): these runs used a faulty model input.** At commit `a229787` the engine opened a turn only when speech was confirmed (7 frames after it began) and kept just the last 6 frames as "pre-roll", so the model saw **no audio before the speech and missed the first speech frame**, not the documented 0.2 s pre-roll. Fixed on `guttuu/niko-review`. A dry rerun (no services) with the fixed input changes two stock results: **2_57** becomes `turn_complete` at 2.176 s (p 0.72, before the 2.82 s resume) and **5_150** becomes `turn_complete` at 0.512 s (p 0.82, before the 0.93 s resume). Stock would then decide early in **4 of 5** clips, not 2 of 5; patient still makes no early decision. The tables below are kept as recorded and are **superseded** by [2026-10-10-replay-v2](../2026-10-10-replay-v2/README.md) (same clips and configs, fixed engine `bcf50d1`).
+>
+> **Log timing footnote (PR #15):** in 3 of these logs `run_ended.t` is a few milliseconds earlier than the last `agent_audio_end` (`stock-77f2`: 9.375 vs 9.378, `patient-597f`: 8.469 vs 8.470, `stock-4c2b`: 9.234 vs 9.245), because the final sleep can wake early on Windows. The engine now clamps `run_ended.t` to the last event time; these logs are kept as recorded, so readers should use `max(run_ended.t, last event t)`. Replay v2 was recorded before that clamp too, but none of its 10 logs end before their last event (checked).
+
 **Recorded:** Saturday Oct 10, 2026, about 2:58–3:00 PM EDT, by Guttuu's agent on a Windows 11 laptop (CPU). **Commit:** `a229787` on `guttuu/web-agent`. **Contract:** agent v0.1.
 
 ## What ran

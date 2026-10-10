@@ -116,6 +116,9 @@ Agreement on a clip-level Block label does not establish where the block occurs 
 **Q: You tested wideband podcast audio. Phone lines are 8 kHz.**
 Known and untested — it's in the limits list and the plan (replay through the real phone path). If results shift on narrowband, the benchmark reports both conditions; the demo can run on a 16 kHz web call with that stated.
 
+**Q: Your own agent replay showed no audible interruption — doesn't that mean stock is fine?**
+No. In the saved [replay v2](../agent/evidence/2026-10-10-replay-v2/README.md) (5 SEP-28k block clips × stock/patient, executed on `bcf50d1`; it supersedes the first replay, whose model input lacked the pre-roll), stock decided "complete" inside the labelled gap in 4 of 5 clips. In 3 of those, the speaker resumed before the reply arrived and it was cancelled before any audio; in the fourth, the 3 s clip ended before overlap could be observed. The roughly 1.6–3.5 s reply delay is what hid those premature decisions — a faster reply path or a longer block would make them audible, and that was not tested. Patient made no early in-gap decision on these 5 clips, but 5 clips support no rates, and this does not show that the patient configuration prevents interruptions. Labels remain exploratory, energy-derived and not human-reviewed.
+
 ## Q&A — the fine-tune and how we test against other models
 
 **Q: Your fine-tuned number doesn't exist yet. What if it fails?**
