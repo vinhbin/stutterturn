@@ -7,10 +7,12 @@ import asyncio
 import datetime as dt
 import hashlib
 import io
+import inspect
 import json
 import os
 import secrets
 import subprocess
+import threading
 import time
 
 import numpy as np
@@ -176,6 +178,7 @@ class SmartTurn:
         so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         self.sess = ort.InferenceSession(path, sess_options=so, providers=["CPUExecutionProvider"])
         self.fe = WhisperFeatureExtractor(chunk_length=8)
+        self._predict_lock = threading.Lock()
         self.sha256 = got
 
     @classmethod
@@ -196,7 +199,10 @@ class SmartTurn:
     def predict(self, audio):
         """Returns (probability, inference milliseconds including feature extraction)."""
         t = time.perf_counter()
-        prob = float(self.sess.run(None, {"input_features": self.features(audio)})[0][0].item())
+        # Stopping a run releases its await but cannot stop native inference. A
+        # restarted run must not reuse the cached feature extractor concurrently.
+        with self._predict_lock:
+            prob = float(self.sess.run(None, {"input_features": self.features(audio)})[0][0].item())
         return prob, round((time.perf_counter() - t) * 1000, 1)
 
 def list_sources():
@@ -255,7 +261,10 @@ class Services:
         return self.voice_id
 
     async def stream_tts(self, text, on_chunk):
-        """Calls on_chunk(bytes) per PCM chunk; returns total bytes."""
+        """Calls on_chunk(bytes), awaiting async callbacks for bounded playback.
+
+        Synchronous callbacks remain supported. Returns total received bytes.
+        """
         import aiohttp
         if self.chars_used + len(text) > self.max_chars:
             raise CreditCapReached()
@@ -272,7 +281,9 @@ class Services:
                     raise RuntimeError(f"ElevenLabs HTTP {r.status}: {(await r.text())[:200]}")
                 async for chunk in r.content.iter_chunked(3200):
                     total += len(chunk)
-                    on_chunk(chunk)
+                    result = on_chunk(chunk)
+                    if inspect.isawaitable(result):
+                        await result
         return total
 
 
@@ -319,10 +330,14 @@ class Run:
         self.reply_task = None
         self.agent_audio_start = None   # t
         self.agent_audio_end = None     # t (scheduled)
+        self._accepted_audio_end = None
         self.agent_audible = False
         self.play = play                # laptop-speaker playback (agent/playback.py)
         self.player = None
-        self._pcm_rest = b""            # odd byte left over between TTS chunks
+        self._generation = 0
+        self._player_generation = None
+        self._stop_event = asyncio.Event()
+        self._device_error_count = 0
 
     # -- emit
     def now(self):
@@ -348,24 +363,77 @@ class Run:
         self.event(t, "state", state=state, **fields)
 
     def stop(self):
+        if self.stopped:
+            return
         self.stopped = True
+        self._stop_event.set()
+        self._generation += 1
+        if self.reply_task and not self.reply_task.done():
+            self.reply_task.cancel()
+        if self.player is not None:
+            index = self.player.abort()
+            self._report_device_errors()
+            if self.agent_audible:
+                self._end_cancelled_audio(index / SR, "stopped", index)
+        elif self.agent_audible:
+            self._end_cancelled_audio(self.now(), "stopped")
+
+    def _report_device_errors(self):
+        if self._log is None or self._log.closed:
+            return
+        for error in self.player.errors[self._device_error_count:]:
+            self.event(self.now(), "info", "playback_error", code="device_cleanup", detail=error[:200])
+        self._device_error_count = len(self.player.errors)
+
+    async def _until_stopped(self, awaitable):
+        """Release the run when stopped; a native inference thread may finish later."""
+        work = asyncio.ensure_future(awaitable)
+        stopped = asyncio.create_task(self._stop_event.wait())
+        try:
+            await asyncio.wait((work, stopped), return_when=asyncio.FIRST_COMPLETED)
+            if self.stopped:
+                work.cancel()
+                return None
+            return await work
+        finally:
+            stopped.cancel()
+            if not work.done():
+                work.cancel()
+            await asyncio.gather(stopped, work, return_exceptions=True)
 
     # -- reply
     def _start_reply(self, t, turn_audio):
+        if self.stopped:
+            return
         if self.services is None:
             self.event(t, "info", "response_requested", detail="services off")
             return
         self.event(t, "info", "response_requested", detail=f"gemini {self.services.gemini_model}")
-        self.reply_task = asyncio.create_task(self._reply(np.concatenate(turn_audio)))
+        self._generation += 1
+        self._player_generation = self.player.begin_agent() if self.player else None
+        self.agent_audio_start = self.agent_audio_end = self._accepted_audio_end = None
+        self.agent_audible = False
+        self.reply_task = asyncio.create_task(self._reply(np.concatenate(turn_audio),
+                                                        self._generation,
+                                                        self._player_generation))
 
-    async def _reply(self, audio):
+    async def _reply(self, audio, generation, player_generation):
+        def current():
+            return not self.stopped and generation == self._generation
+
+        pcm_rest = b""
+        accepted_samples = 0
         try:
             t_req = time.monotonic()
             try:
                 text = await asyncio.wait_for(self.services.reply_text(audio), timeout=10)
             except asyncio.TimeoutError:
+                if not current():
+                    return
                 self.event(self.now(), "info", "timeout", service="gemini")
                 self.s["timeouts"].append("gemini")
+                return
+            if not current():
                 return
             self.s["llm_latency_s"] = round(time.monotonic() - t_req, 3)
             self.s["reply_text"] = text
@@ -375,34 +443,56 @@ class Run:
                 return
             t_tts = time.monotonic()
 
-            self._pcm_rest = b""
-
-            def on_chunk(chunk):
-                if self.player is not None:
-                    data = self._pcm_rest + chunk
-                    cut = len(data) - len(data) % 2
-                    self._pcm_rest = data[cut:]
-                    pcm = np.frombuffer(data[:cut], dtype="<i2").astype(np.float32) / 32768.0
-                    first = self.agent_audio_start is None
-                    idx = self.player.add_agent(pcm, int(round(self.now() * SR)) if first else None)
-                    if not first or idx is None:
-                        return
-                    t = idx / SR   # play mode: position on the shared speaker timeline
-                elif self.agent_audio_start is None:
-                    t = self.now()
-                else:
+            async def on_chunk(chunk):
+                nonlocal pcm_rest, accepted_samples
+                if not current():
                     return
-                if self.agent_audio_start is None:
-                    self.agent_audio_start = t
-                    self.agent_audible = True
-                    self.s["first_agent_audio_t"] = self.s["first_agent_audio_t"] or t
-                    self.s["tts_first_audio_s"] = round(time.monotonic() - t_tts, 3)
-                    self.event(t, "audible", "agent_audio_start", detail=text)
-                    self.state(t, "agent")
+                from playback import GUARD, MAX_PENDING, PendingAudioFull
+                data = pcm_rest + chunk
+                cut = len(data) - len(data) % 2
+                pcm_rest = data[cut:]
+                pcm = np.frombuffer(data[:cut], dtype="<i2").astype(np.float32) / 32768.0
+                piece_size = MAX_PENDING - GUARD
+                for offset in range(0, len(pcm), piece_size):
+                    piece = pcm[offset:offset + piece_size]
+                    while current():
+                        first = self.agent_audio_start is None
+                        if self.player is not None:
+                            try:
+                                idx = self.player.add_agent(
+                                    piece, int(round(self.now() * SR)) if first else None,
+                                    generation=player_generation)
+                            except PendingAudioFull:
+                                await asyncio.sleep(.01)
+                                continue
+                            if idx is None:
+                                return
+                            t = idx / SR
+                        else:
+                            t = self.now()
+                        accepted_samples += len(piece)
+                        if first:
+                            self.agent_audio_start = t
+                            self.agent_audible = True
+                            if self.s["first_agent_audio_t"] is None:
+                                self.s["first_agent_audio_t"] = t
+                            self.s["tts_first_audio_s"] = round(time.monotonic() - t_tts, 3)
+                            self.event(t, "audible", "agent_audio_start", detail=text,
+                                       timing={"v": "playback-v1", "basis":
+                                               "scheduled_output_samples" if self.player else
+                                               "pcm_receipt", "generation": generation})
+                            self.state(t, "agent")
+                        self._accepted_audio_end = ((idx + len(piece)) / SR if self.player else
+                                                    self.agent_audio_start + accepted_samples / SR)
+                        break
+                    else:
+                        return
 
             try:
-                total = await asyncio.wait_for(self.services.stream_tts(text, on_chunk), timeout=10)
+                await asyncio.wait_for(self.services.stream_tts(text, on_chunk), timeout=10)
             except asyncio.TimeoutError:
+                if not current():
+                    return
                 self.event(self.now(), "info", "timeout", service="elevenlabs")
                 self.s["timeouts"].append("elevenlabs")
                 return
@@ -411,35 +501,75 @@ class Run:
                            detail="local character cap reached")
                 self.s["timeouts"].append("elevenlabs")
                 return
-            if self.agent_audio_start is not None:
-                if self.player is not None and self.player.agent_next is not None:
-                    self.agent_audio_end = self.player.agent_next / SR  # includes late-chunk gaps
-                else:
-                    self.agent_audio_end = self.agent_audio_start + total / 2 / SR
+            if current() and pcm_rest:
+                self.event(self.now(), "info", "playback_error", code="malformed_pcm",
+                           detail="TTS ended with an incomplete PCM16 sample")
         except asyncio.CancelledError:
             raise
         except Exception as e:
-            self.event(self.now(), "info", "timeout", service="reply", detail=str(e)[:200])
-            self.s["timeouts"].append("reply")
+            if current():
+                if isinstance(e, BufferError):
+                    self.event(self.now(), "info", "playback_error", code="timeline_capacity",
+                               detail=str(e)[:200])
+                else:
+                    self.event(self.now(), "info", "timeout", service="reply", detail=str(e)[:200])
+                    self.s["timeouts"].append("reply")
+        finally:
+            if current():
+                if self.agent_audio_start is not None:
+                    self.agent_audio_end = (self.player.agent_next / SR if self.player is not None
+                                            and self.player.agent_next is not None else
+                                            self.agent_audio_start + accepted_samples / SR)
+                self._generation += 1
+
+    def _end_cancelled_audio(self, t, reason, cut_sample=None):
+        if self.agent_audio_start is None:
+            return
+        end = self._cut_end(t)
+        self.agent_audible = False
+        self.agent_audio_end = end
+        self.event(end, "audible", "agent_audio_end", reason=reason,
+                   timing={"v": "playback-v1", "basis": "software_cut",
+                           "accepted_cut_sample": cut_sample,
+                           "acoustic_stop_t": None})
+
+    def _cut_end(self, t):
+        accepted_end = (self.player.agent_next / SR if self.player is not None
+                        and self.player.agent_next is not None else self._accepted_audio_end)
+        if accepted_end is not None:
+            t = min(t, accepted_end)
+        return max(self.agent_audio_start, t)
 
     def _maybe_end_agent_audio(self, t):
         if self.agent_audible and self.agent_audio_end is not None and t >= self.agent_audio_end:
             self.agent_audible = False
-            self.event(self.agent_audio_end, "audible", "agent_audio_end")
+            self.event(self.agent_audio_end, "audible", "agent_audio_end",
+                       timing={"v": "playback-v1", "basis": "scheduled_output_samples"
+                               if self.player else "pcm_receipt_plus_duration"})
             self.state(self.agent_audio_end, "silence")
 
     def _barge_in(self, t_resume, vad_start_s):
         task = self.reply_task
+        self._generation += 1
+        cut_index = None
+        requested_stop = t_resume + vad_start_s
+        if self.player is not None:
+            cut_index = self.player.cut_agent(int(round(requested_stop * SR)),
+                                               generation=self._player_generation)
         if self.agent_audible:
-            t_stop = t_resume + vad_start_s
-            if self.player is not None:
-                self.player.cut_agent(int(round(t_stop * SR)))
-            self.event(t_resume, "audible", "overlap")
+            t_stop = cut_index / SR if cut_index is not None else requested_stop
+            t_stop = self._cut_end(t_stop)
             self.agent_audible = False
-            overlap = round(t_stop - t_resume, 3)
-            self.event(t_stop, "audible", "agent_audio_end", overlap_s=overlap)
-            self.event(t_stop, "info", "cancelled", before_audible=False)
-            self.s["audible_interruption"] = True
+            overlap = round(max(0.0, t_stop - max(t_resume, self.agent_audio_start)), 3)
+            if overlap:
+                self.event(max(t_resume, self.agent_audio_start), "audible", "overlap")
+            self.event(t_stop, "audible", "agent_audio_end", overlap_s=overlap,
+                       timing={"v": "playback-v1", "basis": "software_cut",
+                               "requested_cut_sample": int(round(requested_stop * SR)),
+                               "accepted_cut_sample": cut_index, "acoustic_stop_t": None})
+            self.event(t_stop, "info", "cancelled",
+                       before_audible=t_stop <= self.agent_audio_start)
+            self.s["audible_interruption"] |= bool(overlap)
             self.s["overlap_s"] = overlap
             self.s["cancelled"] = True
             if task and not task.done():
@@ -458,13 +588,19 @@ class Run:
             return await self._run()
         finally:
             if self.player is not None:
-                await asyncio.sleep(0.25)   # let the device drain its last buffer
-                self.player.close()
+                self.player.abort()  # no-op after orderly drain; abort on exceptions
+            self._generation += 1
+            if self.reply_task and not self.reply_task.done():
+                self.reply_task.cancel()
+                await asyncio.gather(self.reply_task, return_exceptions=True)
+            if self._log is not None and not self._log.closed:
+                self._log.close()
 
     async def _run(self):
         cfg = self.cfg
-        model = await asyncio.to_thread(SmartTurn.load, self.model_path, self.model_sha256)
-        vad = SileroVAD()
+        model = await self._until_stopped(asyncio.to_thread(SmartTurn.load, self.model_path,
+                                                           self.model_sha256))
+        vad = SileroVAD() if not self.stopped else None
         self._log = open(self.log_path, "w", encoding="utf-8", newline="\n")
         trailing = np.zeros(int(TRAILING_SILENCE_S * SR), dtype=np.float32)
         stream = np.concatenate([self.audio, trailing])
@@ -474,18 +610,20 @@ class Run:
         stop_n = int(np.ceil(cfg["vad_stop_s"] / FRAME_S - 1e-9))
         fallback_n = int(np.ceil(cfg["fallback_s"] / FRAME_S - 1e-9))
 
-        if self.play:
+        self.t0 = time.monotonic()
+        if self.play and not self.stopped:
             from playback import Player
             self.player = Player(stream)
-            self.player.start()   # timeline sample 0 = source sample 0, aligned with t0
-        self.t0 = time.monotonic()
+            self.t0 = time.monotonic()
+            self.player.start()
+            start_elapsed = time.monotonic() - self.t0
         self._send({"v": CONTRACT_VERSION, "type": "run_started", "run_id": self.run_id,
                     "seq": self.seq, "config": self.config,
                     "params": {"vad_stop_s": cfg["vad_stop_s"], "vad_start_s": cfg["vad_start_s"],
                                "threshold": self.threshold, "fallback_s": cfg["fallback_s"],
                                "frame_s": FRAME_S, "trailing_silence_s": TRAILING_SILENCE_S,
                                "pre_roll_s": round(pre_roll_n * FRAME_S, 3), "time_origin": "source_audio_start"},
-                    "model": self.model_name, "model_sha256": model.sha256,
+                    "model": self.model_name, "model_sha256": model.sha256 if model else None,
                     "source": {"source_id": self.source_name,
                                "duration_s": round(len(self.audio) / SR, 3),
                                "source_offset_s": 0},
@@ -493,7 +631,9 @@ class Run:
                     "t0_wall": dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds")
                                .replace("+00:00", "Z"),
                     "services": "on" if self.services else "off",
-                    "playback": self.player.info() if self.player else None})
+                    "playback": {**self.player.info(), "stream_start_call_s": round(start_elapsed, 6),
+                                 "pending_policy": "await_device_consumption"}
+                                if self.player else None})
 
         in_speech = False
         speech_run = silence_run = 0
@@ -511,7 +651,10 @@ class Run:
             target = self.t0 + i * FRAME_S
             delay = target - time.monotonic()
             if delay > 0:
-                await asyncio.sleep(delay)
+                await self._until_stopped(asyncio.sleep(delay))
+            if self.stopped:
+                reason = "stopped"
+                break
             ft = i * FRAME_S
             self._maybe_end_agent_audio(ft)
             frame = stream[i * FRAME:(i + 1) * FRAME]
@@ -557,8 +700,12 @@ class Run:
                     self.state(stt, "silence")
                     if turn_audio is not None and not decided and not checked:
                         checked = True
-                        prob, infer_ms = await asyncio.to_thread(model.predict,
-                                                                 np.concatenate(turn_audio))
+                        result = await self._until_stopped(asyncio.to_thread(
+                            model.predict, np.concatenate(turn_audio)))
+                        if self.stopped:
+                            reason = "stopped"
+                            break
+                        prob, infer_ms = result
                         common = {"model": self.model_name, "model_id": self.model_name,
                                   "prob": round(prob, 4), "threshold": self.threshold,
                                   "complete": prob > self.threshold,
@@ -592,12 +739,36 @@ class Run:
             if reason == "stopped":
                 self.reply_task.cancel()
             try:
-                await asyncio.wait_for(asyncio.shield(self.reply_task), timeout=15)
-            except (asyncio.TimeoutError, asyncio.CancelledError):
-                pass
-        if self.agent_audible and self.agent_audio_end is not None:
-            await asyncio.sleep(max(0.0, self.t0 + self.agent_audio_end - time.monotonic()))
-            self._maybe_end_agent_audio(self.agent_audio_end)
+                await self._until_stopped(asyncio.wait_for(asyncio.shield(self.reply_task),
+                                                          timeout=15))
+            except asyncio.TimeoutError:
+                self.reply_task.cancel()
+                await asyncio.gather(self.reply_task, return_exceptions=True)
+                self.event(self.now(), "info", "timeout", service="reply",
+                           detail="run completion deadline exceeded")
+                self.s["timeouts"].append("reply")
+            except asyncio.CancelledError:
+                if not self.stopped:
+                    raise
+        if not self.stopped and self.agent_audible and self.agent_audio_end is not None:
+            await self._until_stopped(asyncio.sleep(
+                max(0.0, self.t0 + self.agent_audio_end - time.monotonic())))
+            if not self.stopped:
+                self._maybe_end_agent_audio(self.agent_audio_end)
+        if self.player is not None and not self.stopped:
+            target = max(len(stream), self.player.agent_next or 0)
+            deadline = time.monotonic() + max(1., (target - self.player.position()) / SR + 1.)
+            while not self.stopped and self.player.position() < target:
+                if time.monotonic() >= deadline:
+                    self.event(self.now(), "info", "playback_error", code="output_stalled",
+                               detail="device callback did not consume the scheduled output")
+                    self.player.abort()
+                    break
+                await self._until_stopped(asyncio.sleep(.01))
+            self.player.close()
+            self._report_device_errors()
+        if self.stopped:
+            reason = "stopped"
 
         summary = dict(self.s)
         summary["services"] = "on" if self.services else "off"
@@ -605,6 +776,7 @@ class Run:
         summary["turns"] = self.turns
         if self.player is not None:
             summary["playback_late_chunks"] = self.player.gaps
+            summary["playback_device_errors"] = list(self.player.errors)
         # Clamp: events carry scheduled-audio times and the final sleep can wake a
         # few ms early, so the monotonic now() may precede the last emitted event.
         self._send({"v": CONTRACT_VERSION, "type": "run_ended", "run_id": self.run_id,
