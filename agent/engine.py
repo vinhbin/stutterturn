@@ -283,7 +283,7 @@ class CreditCapReached(Exception):
 # ---------------------------------------------------------------- run
 
 class Run:
-    def __init__(self, config, source, services=None, listener=None):
+    def __init__(self, config, source, services=None, listener=None, play=False):
         if config not in CONFIGS:
             raise ValueError(f"unknown config {config!r}")
         self.config = config
@@ -320,6 +320,9 @@ class Run:
         self.agent_audio_start = None   # t
         self.agent_audio_end = None     # t (scheduled)
         self.agent_audible = False
+        self.play = play                # laptop-speaker playback (agent/playback.py)
+        self.player = None
+        self._pcm_rest = b""            # odd byte left over between TTS chunks
 
     # -- emit
     def now(self):
@@ -372,9 +375,24 @@ class Run:
                 return
             t_tts = time.monotonic()
 
+            self._pcm_rest = b""
+
             def on_chunk(chunk):
-                if self.agent_audio_start is None:
+                if self.player is not None:
+                    data = self._pcm_rest + chunk
+                    cut = len(data) - len(data) % 2
+                    self._pcm_rest = data[cut:]
+                    pcm = np.frombuffer(data[:cut], dtype="<i2").astype(np.float32) / 32768.0
+                    first = self.agent_audio_start is None
+                    idx = self.player.add_agent(pcm, int(round(self.now() * SR)) if first else None)
+                    if not first or idx is None:
+                        return
+                    t = idx / SR   # play mode: position on the shared speaker timeline
+                elif self.agent_audio_start is None:
                     t = self.now()
+                else:
+                    return
+                if self.agent_audio_start is None:
                     self.agent_audio_start = t
                     self.agent_audible = True
                     self.s["first_agent_audio_t"] = self.s["first_agent_audio_t"] or t
@@ -394,7 +412,10 @@ class Run:
                 self.s["timeouts"].append("elevenlabs")
                 return
             if self.agent_audio_start is not None:
-                self.agent_audio_end = self.agent_audio_start + total / 2 / SR
+                if self.player is not None and self.player.agent_next is not None:
+                    self.agent_audio_end = self.player.agent_next / SR  # includes late-chunk gaps
+                else:
+                    self.agent_audio_end = self.agent_audio_start + total / 2 / SR
         except asyncio.CancelledError:
             raise
         except Exception as e:
@@ -411,6 +432,8 @@ class Run:
         task = self.reply_task
         if self.agent_audible:
             t_stop = t_resume + vad_start_s
+            if self.player is not None:
+                self.player.cut_agent(int(round(t_stop * SR)))
             self.event(t_resume, "audible", "overlap")
             self.agent_audible = False
             overlap = round(t_stop - t_resume, 3)
@@ -431,6 +454,14 @@ class Run:
 
     # -- main loop
     async def run(self):
+        try:
+            return await self._run()
+        finally:
+            if self.player is not None:
+                await asyncio.sleep(0.25)   # let the device drain its last buffer
+                self.player.close()
+
+    async def _run(self):
         cfg = self.cfg
         model = await asyncio.to_thread(SmartTurn.load, self.model_path, self.model_sha256)
         vad = SileroVAD()
@@ -443,6 +474,10 @@ class Run:
         stop_n = int(np.ceil(cfg["vad_stop_s"] / FRAME_S - 1e-9))
         fallback_n = int(np.ceil(cfg["fallback_s"] / FRAME_S - 1e-9))
 
+        if self.play:
+            from playback import Player
+            self.player = Player(stream)
+            self.player.start()   # timeline sample 0 = source sample 0, aligned with t0
         self.t0 = time.monotonic()
         self._send({"v": CONTRACT_VERSION, "type": "run_started", "run_id": self.run_id,
                     "seq": self.seq, "config": self.config,
@@ -457,7 +492,8 @@ class Run:
                     "commit": _commit(),
                     "t0_wall": dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds")
                                .replace("+00:00", "Z"),
-                    "services": "on" if self.services else "off"})
+                    "services": "on" if self.services else "off",
+                    "playback": self.player.info() if self.player else None})
 
         in_speech = False
         speech_run = silence_run = 0
@@ -567,6 +603,8 @@ class Run:
         summary["services"] = "on" if self.services else "off"
         summary["chars_used"] = self.services.chars_used if self.services else 0
         summary["turns"] = self.turns
+        if self.player is not None:
+            summary["playback_late_chunks"] = self.player.gaps
         # Clamp: events carry scheduled-audio times and the final sleep can wake a
         # few ms early, so the monotonic now() may precede the last emitted event.
         self._send({"v": CONTRACT_VERSION, "type": "run_ended", "run_id": self.run_id,

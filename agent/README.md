@@ -27,7 +27,13 @@ agent\.venv\Scripts\python.exe agent/run.py --config stock --source HeStutters_4
 # server for the demo UI / judges page
 agent\.venv\Scripts\python.exe agent/server.py            # http://127.0.0.1:8765, services on
 agent\.venv\Scripts\python.exe agent/ws_client_check.py stock HeStutters_4_32.wav
+
+# live demo: judges hear the recording and the agent's reply on the laptop speakers
+agent\.venv\Scripts\python.exe agent/server.py --play
+agent\.venv\Scripts\python.exe agent/run.py --config stock --source HeStutters_4_32.wav --services on --play
 ```
+
+`--play` needs `sounddevice` (in `requirements.txt`). Pick the output device in Windows sound settings before the demo; the run log records which device was used and its reported latency.
 
 Each run writes `agent/runs/<run_id>.jsonl` (gitignored). Runs used as evidence are copied to `agent/evidence/<date>-<name>/` with a README giving the command, commit and limits.
 
@@ -39,10 +45,11 @@ Each run writes `agent/runs/<run_id>.jsonl` (gitignored). Runs used as evidence 
 | `run.py` | Command-line runs |
 | `server.py` | HTTP + WebSocket per CONTRACT.md |
 | `ws_client_check.py` | Minimal client to check the server |
+| `playback.py` | `--play`: shared speaker timeline for the source and agent speech |
 | `fetch_assets.py` | Pinned weights and source clips |
 | `check_features.py` | Same clip through the benchmark's `predict()` and the agent; must match |
 | `IMPLEMENTATION_STEPS.md` | Build steps and rules for this lane |
 
 ## Not covered
 
-Live microphone input, phone transport, laptop speaker playback and its delay, and a real candidate model have not been tested.
+Live microphone input, phone transport and a real candidate model have not been tested. Speaker playback works on the Windows dev laptop (Realtek speakers); its acoustic delay is reported by the driver, not measured, and other demo machines or devices have not been tried.

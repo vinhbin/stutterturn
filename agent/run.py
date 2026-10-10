@@ -40,6 +40,8 @@ async def main():
     g.add_argument("--source")
     g.add_argument("--all", action="store_true")
     ap.add_argument("--services", choices=["on", "off"], default="off")
+    ap.add_argument("--play", action="store_true",
+                    help="play the source and agent speech on the laptop speakers")
     a = ap.parse_args()
 
     services = engine.Services() if a.services == "on" else None
@@ -47,7 +49,7 @@ async def main():
     if not sources:
         sys.exit("no sources in benchmark/audio/; run agent/fetch_assets.py")
     for src in sources:
-        run = engine.Run(a.config, src, services=services, listener=print_msg)
+        run = engine.Run(a.config, src, services=services, listener=print_msg, play=a.play)
         await run.run()
 
 
