@@ -52,14 +52,16 @@ The lifecycle increment fences retired reply generations, bounds pending agent
 output to 8,000 samples (500 ms), paces fast TTS via an awaitable chunk callback,
 reports timeline exhaustion/malformed PCM, and aborts source plus agent output on
 stop even during inference. Normal completion drains accepted samples before
-closing. See [CONTRACT.md](CONTRACT.md#playback-lifecycle-increment-october-10-deterministic-checks-only)
+closing. See [CONTRACT.md](CONTRACT.md#playback-lifecycle-increment-october-10-softwareruntime-checks)
 for timing provenance, cancellation, capacity and remaining measurement limits.
 
 `--services off --play` still plays the caller recording; it generates no agent
 response. Without `--play`, timestamps describe PCM receipt/duration and no device
 opens. Scheduled sample indices and software cut positions are not acoustic
-measurements. This increment has not been validated with real playback or a paid
-provider; prior laptop evidence does not automatically validate the changed path.
+measurements. The [current-code runtime packet](../docs/proofs/playback-runtime/README.md)
+records device source stop/restart and one real provider reply at `42b86d0`.
+Human listening and active-reply acoustic cancellation remain pending with
+Guttuu's requested acceptance handoff; these runs do not establish them.
 
 ## Files
 
@@ -76,4 +78,4 @@ provider; prior laptop evidence does not automatically validate the changed path
 
 ## Not covered
 
-Live microphone input, phone transport and a real candidate model have not been tested. Earlier Windows device/CLI checks reported the Realtek driver's output latency; they did not measure acoustic delay. The changed playback lifecycle still requires real-device playback and human listening acceptance, and other demo machines or devices have not been tried.
+Live microphone input, phone transport and a real candidate model have not been tested. Earlier Windows device/CLI checks reported the Realtek driver's output latency; they did not measure acoustic delay. The new HyperX device checks establish software output delivery and source stop/restart, while human listening, active-reply acoustic cancellation, callback underrun telemetry and acceptance on Guttuu's demo machine remain pending.
