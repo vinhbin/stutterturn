@@ -1,7 +1,7 @@
 {
-  "generated_utc": "2026-10-10T21:04:22Z",
-  "offline_fallback": true,
-  "source_note": "Computed directly from committed run logs by snapshot.py --offline; this snapshot did not query Tiger Data.",
+  "generated_utc": "2026-10-10T21:43:03Z",
+  "offline_fallback": false,
+  "source_note": "Saved snapshot generated from Tiger Data queries over committed run logs; not live database status.",
   "evidence": {
     "dirs": [
       "agent/evidence/2026-10-10-first-replay",

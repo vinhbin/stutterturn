@@ -7,7 +7,7 @@ sys.path.insert(0, "agent"); import engine
 async def nosleep(d): return None
 engine.asyncio.sleep = nosleep
 m = engine.SmartTurn.load(engine.STOCK_MODEL); F, SR = engine.FRAME, engine.SR
-w = csv.writer(open(sys.argv[1], "w", newline="")); w.writerow(["clip_key","onset_s","onset_frame","input_start_sample","cut_sample","p_turn_onset_int8_macos"])
+w = csv.writer(open(sys.argv[1], "w", newline=""), lineterminator="\n"); w.writerow(["clip_key","onset_s","onset_frame","input_start_sample","cut_sample","p_turn_onset_int8_macos"])
 for r in csv.DictReader(open("/Users/niyakoabajebel/Documents/GitHub/stutterturn/benchmark/data/block_eval.csv")):
     evs=[]; run=engine.Run("stock", r["file"]); run.listener=evs.append; asyncio.run(run.run())
     st=[e["t"] for e in evs if e.get("name")=="speech_start"]

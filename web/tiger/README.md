@@ -7,12 +7,16 @@ into TigerData (managed Postgres/TimescaleDB), asks the judge questions as
 named SQL views, and renders the answers on a static chart block whose every
 number traces back to those queries over real committed logs.
 
-**Status: embedded at `/judge/`; database path remains unverified.**
-`ingest.py --dry-run` validates the logs and `snapshot.py --offline` computes
-the per-run numbers locally. The committed chart visibly labels this source
-"Local snapshot · No Tiger Data query" on every figure. A saved database
-export is labeled "Snapshot from Tiger Data queries"; neither label reports
-a current database connection or backend health.
+**Status: embedded at `/judge/`; the committed snapshot came from Tiger Data.**
+Niko reports a live ingest of 20 runs / 302 events in
+[PR #26](https://github.com/vinhbin/stutterturn/pull/26). The resulting
+`snapshot.json`, generated at `2026-10-10T21:43:03Z`, was committed as
+`5d4ee9c` and merged with that PR. It contains ten current runs over five
+clips, excluding ten superseded runs; the values match the previous offline
+snapshot. The chart labels it "Snapshot from Tiger Data queries". This saved
+export does not report a current database connection or backend health.
+`snapshot.py --offline` remains available and labels its output
+"Local snapshot · No Tiger Data query"; it replaces the saved snapshot.
 
 ## Files
 
@@ -96,6 +100,10 @@ own `run_ended` summaries (`run_outcomes`).
 
 ## Local verification (2026-10-10)
 
+- **Database export:** Niko's [PR #26](https://github.com/vinhbin/stutterturn/pull/26)
+  reports live ingestion and SQL snapshot generation; the committed snapshot
+  records database provenance. The checks below describe the earlier local
+  fallback verification, not a second database run.
 - `python web/tiger/ingest.py --dry-run`: 20 logs / 302 events parsed; 10
   current runs / 150 events and 10 superseded runs / 152 events. No DB touched.
 - `python web/tiger/snapshot.py --offline`: five clips, ten current runs,
@@ -106,7 +114,7 @@ own `run_ended` summaries (`run_outcomes`).
   The injected response checks the label branch only; it is not a database
   integration test. Requests are limited to loopback and no backend is used.
 
-## Devpost disclosure (paste when — and only when — the live path has run)
+## Devpost disclosure (supported by the database run in PR #26)
 
 > **Tiger Data:** our replay agent's run logs (turn decisions, cancellations,
 > speech events and first-audio timings from the committed evidence runs) are
@@ -115,6 +123,6 @@ own `run_ended` summaries (`run_outcomes`).
 > that service (`web/tiger/`). Superseded runs are kept but flagged; the
 > five-clip evidence set is shown as per-clip values, not rates.
 
-If the live ingest has not actually run by submission time, do **not** enter
-the Tiger Data prize or paste the sentence above — per `docs/claims-ledger.md`
-L-34, only sponsor integrations with actual disclosed use are entered.
+Keep the saved-export limitation in the submission: the browser does not
+query Tiger Data directly. Per `docs/claims-ledger.md` L-34, sponsor entries
+must describe actual use and comply with the event's prize requirements.

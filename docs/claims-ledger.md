@@ -156,7 +156,7 @@ Every result-bearing, novelty, implementation or compatibility sentence we might
 
 ## C. Candidate / fine-tune claims — all placeholders until Niko's immutable evidence
 
-No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry below is **target**; the placeholder text is what the docs carry today.
+Training v1 and v2 ran, but both returned `dev_nothing_passes`; no fine-tuned model is selected for the demo. The [development write-up](model-results-2026-10-10.md) and [official selection report](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102500044) document the rejected candidates. The release/improvement claims below remain **target**. Vinh has kept the reserved test sealed; the v3 proposal remains undecided.
 
 ### L-20 — Headline improvement
 
@@ -179,7 +179,7 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 ### L-23 — "Drop-in: loads anywhere stock Smart Turn does"
 
 - **Status:** target.
-- **Evidence needed:** Niko's export→reload→output-comparison evidence (issue #2) **plus** the candidate actually loading and running in Guttuu's pipeline. `model/CONTRACT.md` (not yet created) must mark compatibility verified, not proposed.
+- **Evidence needed:** Niko's export→reload→output-comparison evidence (issue #2) **plus** the candidate actually loading and running in Guttuu's pipeline. The existing `model/CONTRACT.md` must distinguish verified compatibility from the proposed interface.
 
 ### L-24 — Candidate inference cost ("no slower than stock")
 
@@ -220,13 +220,13 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 
 ### L-30 — Live-demo claims ("decisions happen live," "judge presses the toggle," fresh call per press, reset < 60 s)
 
-- **Status:** target — no demo rig exists yet (issue #4, 7–10 PM). Until the rig runs: these sentences are run-of-show **plans**, not descriptions.
+- **Status:** partial implementation verified. The local recorded-source agent and `/live/` console exist; [Guttuu's listening check](https://github.com/vinhbin/stutterturn/issues/3#issuecomment-6102558836) verifies source/reply audibility, explicit Stop and clean restart on his laptop. It also verifies cancellation before audible output followed by a later reply. Public browser audio, three rehearsals, reset under 60 seconds, and audible cancellation on natural source resumption remain unaccepted; do not claim them from the software tests.
 - **Evidence needed:** Guttuu's working agent + toggle rig; saved endpoint/resume/cancellation/TTS timestamps from the actual demo recording; verified one-tap reset; fresh-session-per-toggle confirmed. If only the internal decision differs audibly, present the trace accurately — do not stage an audible interruption.
 - **Mandatory disclosures whenever delivered:** the caller is a **real recording** of a person who stutters (SEP-28k), labeled on screen; nobody imitates stuttering; any connectivity-failure video is **labeled as a recording** of the same rig.
 
 ### L-31 — "Judge talks to the agent and nothing got slower"
 
-- **Ready form:** the judge's call establishes **liveness** only.
+- **Conditional form:** if a microphone path is implemented and tested, a judge's call can establish **liveness** only. The present browser controls recorded-source replay; it does not accept a judge's microphone.
 - **Status:** the latency claim itself is target (L-21) — one interaction does not establish unchanged responsiveness for every caller; cite measured completed-turn results or say "feel the speed; the measured number is on the page."
 
 ### L-32 — "Live phone agent" / telephony
@@ -236,11 +236,12 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 ### L-33 — "Reproducible from benchmark/"
 
 - **Ready wording:** "Scripts, eval CSVs and results are saved in [benchmark/](../benchmark/) with the method in RESULTS.md."
-- **Status:** ready (as "saved and documented") · target (as "reproducible end-to-end"): `benchmark/requirements.txt` referenced by the README **does not exist yet**, and a pinned environment + one-command rerun is not verified. Evidence request to Niko below.
+- **Status:** ready as saved/documented. `benchmark/requirements.txt` exists; the [eval-runner spec](../benchmark/specs/eval-runner-v1.md) records reproduction of the historical 116/200 and 136/200 decisions. PR #26 records split/item checks and the selector's 34-check self-test. This does not establish final-test evaluation or full deployment reproduction.
 
 ### L-34 — Sponsor-usage claims (Gemini, Vultr, Tiger Data)
 
-- **Status:** target/unsupported today. Gemini Live arm **not run** (no API key — RESULTS §8); Vultr training/hosting **not built**; Tiger Data time series **not built**. ElevenLabs is the only sponsor integration with saved evidence (L-08/L-09).
+- **Ready wording:** "Gemini generates replies and ElevenLabs supplies speech in our recorded-source replay agent. Tiger Data stores the saved run events; the judge chart displays a snapshot generated from database queries. Vultr hosts an earlier static site build."
+- **Evidence / limits:** [replay v2](../agent/evidence/2026-10-10-replay-v2/) and the [runtime packet](proofs/playback-runtime/README.md) record actual Gemini/ElevenLabs use. [PR #26](https://github.com/vinhbin/stutterturn/pull/26) reports Niko's Tiger ingest of 20 runs / 302 events; the [snapshot](../web/tiger/snapshot.json) is a saved SQL export, not live database status. PLAN records the last Vultr site check. The Gemini Live **rival arm**, Vultr training and hosted audio backend remain unimplemented/unverified; ordinary Gemini replies do not establish the rival arm.
 - **Rule:** enter and list only prizes backed by actual, disclosed use at submission time. README now distinguishes intended core integrations from optional additions; verify actual usage again before submission.
 
 ## F. Scope limits — must-say list (all ready; deliver proactively)
@@ -281,10 +282,10 @@ No `stutterturn-vN.onnx` exists in the repo as of this writing. Every entry belo
 ### To Niko (model, evaluation)
 
 1. **Immutable candidate artifact + run records:** `stutterturn-vN.onnx` (never overwritten), with run ID, model hash, data-manifest hash, config, counts, per-group premature decisions, median/tail delay, fallback/nonresponse and censoring — per the PLAN evaluation contract. Unblocks L-20–L-25.
-2. **Show-separated train/DEV/final-test manifests** + **stock rerun** on the new final test. Unblocks the [S]%→[X]% comparison; without it no stock-vs-candidate sentence is quotable.
+2. **Future final-test evidence, only after an explicit unseal decision:** preserve the show-separated manifests now. [D-009](decision-log.md) keeps the reserved test untouched; no stock rerun or candidate evaluation on it is authorized. A later approved final comparison would need matched stock/candidate runs on its frozen items before any final-test [S]%→[X]% claim.
 3. **Human annotation manifests** for every evaluated boundary and completed/unfinished-turn label, with context and speaker identity. Track the separate 30-example feasibility sheet from issue #1; that subset does not validate the old 200 examples or establish final-test efficacy (L-01/L-10/L-12).
 4. **Matched causal timing and observation through the deployed timeout**, or explicit censoring; use finer than 100 ms resolution for the +50 ms target, both groups. Rebuild active-speech/true-end controls and save per-example outputs (L-02/L-03/L-06/L-10/L-21).
-5. **`benchmark/requirements.txt` + pinned env + one verified rerun command** (README already points at it; it doesn't exist). Unblocks L-33's "reproducible" wording.
+5. **Final reproduction packet:** requirements and the legacy rerun now exist (L-33); preserve exact commands, environment, input hashes and immutable selection records for the release scope.
 6. **Candidate inference timing** on the exported ONNX (L-24).
 7. **Gemini Live arm**: run it (needs GOOGLE_API_KEY) or confirm we strike every "Gemini benchmarked as a rival" phrase from submitted text (L-34).
 8. **`model/CONTRACT.md`** with proposed vs verified compatibility marked (L-23).

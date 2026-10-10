@@ -52,22 +52,44 @@ node web/demo-ui/dev/checks/site-checks.mjs
    human accepts the B cross-check. Worksheets and energy proxies do not pass
    this requirement.
 2. Guttuu/Niko complete the bounded selection work and publish a candidate only
-   if it passes. The v2 harness is pushed at `0d44829`; Niko explicitly approved
-   the input-length rule amendment at `c20fa8a`, resolving that check's blocker.
-   V1 failed selection. Keep the corrected comparison ready and record
+   if it passes. Guttuu now reports full v2 training and two prescreen survivors in
+   `a8f9607`; his branch is at `a78f21b`. The final selection decision and
+   artifact/hash handoff remain unpublished. V1 failed selection. Keep the
+   corrected comparison ready and record
    the actual scope decision by the existing 20:00 EDT stop.
-3. After playback code acceptance, use a backend running that exact revision,
-   verify the laptop's audible output and cancellation, then save fresh matched
-   evidence. The existing service on port 8765 still reports `3ed3786`; its older
-   receipt-only run is not validation of the new playback path.
+3. Guttuu's requested handoff is to listen locally and test audible output,
+   stopping an active reply, cancellation and restart. Vinh is on remote desktop
+   and cannot accept listening. The new [runtime packet](proofs/playback-runtime/README.md)
+   records three runs at `42b86d0`: real-device source stop/restart and one real
+   Gemini/ElevenLabs reply, with 29 characters under a 120-character cap. No
+   timeout, late chunk or cleanup error was reported. The 6.01 ms source-stop
+   observation is client request to terminal message, not acoustic latency.
+   The temporary server closed; the older service on port 8765 was preserved.
 4. Configure the Tiger Data connection locally, then separately verify real
    schema/ingestion/query behavior. No connection file was present during this
    continuation; offline verification does not establish database integration.
 5. Review/merge the branch, deploy the accepted site revision, rehearse three
    times with reset under 60 seconds, and finish video/submission within the
    existing freeze and submission buffer. The hosted UI still predates PR #21
-   at inspection. No merge, deployment, provider generation, database write or
-   human/acoustic acceptance was performed in this increment.
+   at inspection (`/judges/` and `/demo-ui/` work; `/judge/` and `/live/` are 404).
+   Windows HTTPS validation succeeds; the separate Python error was local trust
+   chain selection. No merge, deployment, database write or human/acoustic
+   acceptance was performed. The bounded real provider generation above happened
+   after the initial offline-only increment.
+
+The isolated execution worktree now also has its own ignored Python environment,
+all three pinned model/VAD assets and ten source clips. All 26 deterministic
+tests passed there, and whole-clip feature/probability parity passed on ten
+sources × stock INT8/FP32 with zero difference. This is preprocessing parity,
+not a completed model comparison. Niko's selector and LF fixture repair are at
+`8f732d7`. Guttuu's `a8f9607` commit message reports V1?V4 training runs and
+prescreen survivors `V3/ckpt-e0.51` and `V2/ckpt-e2.00`; head `a78f21b` also
+incorporates main. These reports still need the selection/immutable artifact
+handoff before the demo can use an accepted candidate.
 
 Current status and links should be refreshed in PLAN as those outputs arrive;
-this dated handoff records what was actually checked.
+this dated handoff records what was actually checked. PR #23 was merged at
+`d8cdef4` while this follow-up was being prepared. PR #24 on
+`codex/stutterturn-runtime-handoff` carries the new runtime evidence and README
+updates, including Kareem's team/contribution credit. The README remains a
+working status document; the final submission rewrite is still future work.

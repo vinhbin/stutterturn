@@ -7,10 +7,10 @@ In our exploratory measurement on real recordings, the standard open model's INT
 | Hacklanta '26 | |
 |---|---|
 | Main track | AI/ML |
-| Team | Vinh · Guttuu · Niko — Kareem departed during the event |
+| Team | Vinh · Guttuu · Niko · Kareem |
 | Demo / Devpost | Pending; no working public demo is claimed here |
 | Intended core integrations | Gemini agent responses and ElevenLabs voice — both ran in the [saved replay v2](agent/evidence/2026-10-10-replay-v2/) |
-| Optional after core proof | Phone transport, Vultr hosting/training and Tiger Data (unstaffed since Kareem's departure — see [PLAN](PLAN.md#current-status)); actual use determines sponsor entries |
+| Other integrations | Vultr hosts an earlier site build. Niko ingested the saved logs into Tiger Data and generated the [judge chart snapshot](web/tiger/snapshot.json), merged in [PR #26](https://github.com/vinhbin/stutterturn/pull/26); this is a saved database export, not live connection status. Phone transport and Vultr training remain optional. See [PLAN](PLAN.md#current-status). |
 
 ## Build status
 
@@ -26,16 +26,16 @@ Legend: ✅ on main with saved evidence · ⬜ no repo evidence yet
 | Stock-weight recovery, synthetic update and ONNX export/reload parity (mechanics only, not adaptation) | ✅ | [docs/proofs/model-mechanics/](docs/proofs/model-mechanics/README.md) |
 | Frozen show-separated split manifests v1 and matched eval-runner spec | ✅ | [benchmark/splits/v1/](benchmark/splits/v1/) · [benchmark/specs/](benchmark/specs/) · [PR #9](https://github.com/vinhbin/stutterturn/pull/9) |
 | Human label listen-through (A/B feasibility batches) | ⬜ | |
-| Fine-tuned candidate model and matched evaluation | ⬜ | |
+| Training v1/v2 development evaluation; no candidate passed selection | ✅ | [Model results and limits](docs/model-results-2026-10-10.md); no accepted model or final-test efficacy result |
 | Long-block (3+ s) evaluation | ⬜ | |
-| Gemini end-of-speech rival arm | ⬜ | needs an API key |
+| Gemini end-of-speech rival arm | ⬜ | Separate from Gemini's working reply-generation role |
 | Phone transport (8 kHz) — the current agent replays web audio; no phone path | ⬜ | |
 
-In the saved replay v2 — which supersedes the first replay after a model-input fix restored the missing pre-roll — stock decided "complete" inside the labelled gap in 4 of 5 clips; 3 of those replies were cancelled before any audio, the fourth clip ended too soon to observe overlap, and no audible interruption occurred in any of the 10 runs. That reflects the pipeline's reply delay, not demonstrated safety, and these are model completion decisions on exploratory energy-derived labels. Five clips support no rates. The reviewed passive demo UI and corrected claims/pitch documents merged earlier via [PR #7](https://github.com/vinhbin/stutterturn/pull/7) and [PR #8](https://github.com/vinhbin/stutterturn/pull/8). Follow PLAN for live-agent, model and annotation acceptance; a merged PR does not pass a gate.
+In the saved replay v2 — which supersedes the first replay after a model-input fix restored the missing pre-roll — stock decided "complete" before the energy-labelled speech resumption in 4 of 5 clips (one decision preceded the labelled gap), versus 0 of 5 for patient. Three replies were cancelled before reported audio; no response-audio overlap was reported in the ten runs. Physical playback was not verified for that packet, and five clips support no interruption rate. Separately, [Guttuu's human listening check](https://github.com/vinhbin/stutterturn/issues/3#issuecomment-6102558836) heard a source and generated reply, verified explicit Stop and restart, and heard only the later reply after an earlier reply was cancelled before playback. Natural resumption during an already audible reply and acoustic timing remain untested. Follow PLAN for remaining acceptance; a merged PR does not pass a gate.
 
 ## What the first complete demonstration must show
 
-Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech. The [saved replay v2](agent/evidence/2026-10-10-replay-v2/) does exactly this for five clips under exploratory labels — separating completion decisions from audible outcomes and recording cancellations; human-validated labels and more sources are still required before any rate is quoted.
+Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech. The [saved replay v2](agent/evidence/2026-10-10-replay-v2/) separates completion decisions, reported audio events and cancellations for five clips under exploratory labels; it does not establish true completed-turn delay or acoustic outcomes. Human-validated labels and more sources are still required before any rate is quoted.
 
 The candidate arm becomes available only after a real exported model is integrated. If the adaptation gate fails, the deliverable becomes a corrected benchmark and interactive baseline comparison. That fallback still needs validated labels and reproducible runs. A UI fixture or a model prediction alone does not prove either outcome.
 
@@ -43,13 +43,14 @@ Nobody imitates stuttering. A recorded backup must be labeled as a recording; sa
 
 ## Evidence and reproducibility
 
-- [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are the INT8 CPU build's completion predictions under the original harness, **not a validated percentage of callers interrupted**. A precision-baseline (FP32) comparison is in progress and will be published with saved runs.
+- [Judge-facing training report](docs/training-report-2026-10-10.md): what we trained, v1/v2 results, data and leakage qualifications, and answers to judge questions. The [80/20 v3 recommendation](docs/v3-recommendation-2026-10-10.md) is a proposed next experiment; training remains paused and the reserved test sealed.
+- [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are the INT8 CPU build's completion predictions under the original harness, **not a validated percentage of callers interrupted**. The [current model results](docs/model-results-2026-10-10.md) report matched stock INT8/FP32 development comparisons and the failed v1/v2 candidate selections, with proxy-label limits.
 - Exploratory comparisons are saved for the configurations we tested — including silence timeouts of 0.8 s and 1.5 s and a 0.99 confidence threshold. They do not yet establish which configurations meet both our interruption and response-delay targets; no universal "no setting fixes it" claim is made.
 - [D-006 and D-007](docs/decision-log.md) record the methodological corrections. One-second observation/censoring does not establish a three-second fallback; energy-derived cut points do not establish semantic turn ends; repeated harness checks do not prove live-agent behavior.
 - [Required evaluation work](PLAN.md#evaluation-work-required-before-a-comparison-can-pass) includes reviewed endpoints, frozen development/final-test splits, matched model/data/configuration records, both caller groups, audible outcomes, and explicit nonresponse/censoring.
 - The [claims ledger](docs/claims-ledger.md) is the single claim-status source. Headline numbers must link to applicable run evidence; do not promote targets or historical interpretations to measured outcomes.
 
-`benchmark/requirements.txt` is now committed, and the [eval-runner spec](benchmark/specs/eval-runner-v1.md) records a verified rerun reproducing the historical 116/200 and 136/200 decisions on the same items. No candidate run is claimed. See [benchmark context](benchmark/README.md).
+`benchmark/requirements.txt` is committed, and the [eval-runner spec](benchmark/specs/eval-runner-v1.md) records a verified rerun reproducing the historical 116/200 and 136/200 decisions on the same items. Candidates were evaluated on development data, but none passed every selection constraint. Vinh has kept the reserved test sealed for later testing; the additional-training proposal remains undecided. See [benchmark context](benchmark/README.md).
 
 For the presentation site and run console, from current main:
 
@@ -57,7 +58,7 @@ For the presentation site and run console, from current main:
 python -m http.server 8041 --bind 127.0.0.1 --directory web
 ```
 
-`/` is the landing page, `/judges/` the judge view and `/demo-ui/` the run console. Without a backend, the preview is synthetic UI data and labeled as such. With Guttuu's local backend running (`python agent/server.py`, setup in [agent/README.md](agent/README.md)), the console runs real local model decisions against the same recordings — see [web/README.md](web/README.md) and the [saved model-only runs](web/evidence/2026-10-10-ui-integration/). The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
+`/` is the landing page, `/judge/` the guided judge view and `/live/` the run console; `/judges/` and `/demo-ui/` remain legacy routes. Vultr still serves the earlier build, so the new routes await deployment. Without a backend, the preview is synthetic UI data and labeled as such. With Guttuu's local backend running (`python agent/server.py`, setup in [agent/README.md](agent/README.md)), the console runs real local model decisions against the same recordings — see [web/README.md](web/README.md) and the [saved model-only runs](web/evidence/2026-10-10-ui-integration/). The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
 
 ## Scope and limits
 
@@ -80,8 +81,8 @@ python -m http.server 8041 --bind 127.0.0.1 --directory web
 | Niko | Trainable checkpoint/export, corrected evaluation and immutable evidence — splits v1 and the eval-runner spec are on main |
 | Guttuu | Runnable stock/patient web agent, control/event contract and real audio timings — contract v0.1 and replay v2 (superseding the first replay) are on main |
 | Vinh | A/B human labels, integration decisions, demo UI, site/README upkeep, pitch/video/submission |
-| Kareem | Departed during the event (Saturday afternoon). His lane — judges page, README and evidence links — is now maintained by Vinh's side; the pages and evidence index were delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12). Open reassignments are in [PLAN](PLAN.md#current-status). |
+| Kareem | Judges page, README and evidence links; pages and evidence index delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12). Current maintenance and task ownership are tracked in [PLAN](PLAN.md#current-status). |
 
-[PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work plus frozen split manifests and run specs. `agent/` (contract v0.1 and the replay agent) and the `web/` site are on main; `model/` holds its contract, with the trained candidate still pending.
+[PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work plus frozen split manifests and run specs. `agent/` (contract v0.1 and the replay agent) and the `web/` site are on main; `model/` holds its contract and training specs. No fine-tuned model is selected for the demo.
 
 Artifact licensing, publication, accessible demo links and final submission confirmation remain release checks in PLAN. Do not infer a commercial deployment license from research access.

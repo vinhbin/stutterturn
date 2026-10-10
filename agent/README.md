@@ -14,6 +14,21 @@ agent\.venv\Scripts\python.exe agent/fetch_assets.py 5
 
 For real replies, copy `agent/.env.example` to `agent/.env` and fill in `GEMINI_API_KEY` and `ELEVENLABS_API_KEY`. `agent/.env` is gitignored; never put keys in `.env.example`. Optional: `GEMINI_MODEL` (default `gemini-3.8-flash`), `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MAX_CHARS` (default 3000 per process, protects credits), `CANDIDATE_MODEL` (path to Niko's ONNX export; its metadata JSON beside it supplies `sha256` and `threshold`, or set `CANDIDATE_SHA256`). A model whose hash does not match is refused.
 
+## Reply policy
+
+Gemini receives the reply policy as a system instruction and the caller audio
+as user content. It should answer clear meaning in one short sentence without
+unsolicited comments about pauses, speech delivery or a recording ending.
+For an unclear fragment, the policy requests exactly: "What would you like
+help with?" It must not invent missing intent. An explicit question about
+speech or audio can still receive a relevant answer.
+
+The [reply-policy smoke check](../docs/proofs/reply-policy/README.md) records
+four live Gemini replies on two captured turn slices plus two text-only
+probes. This is a bounded behavior check, not a guarantee of future responses
+or evidence about end-of-turn accuracy. The offline regression checks that
+the policy reaches the system field and audio reaches user content.
+
 ## Run
 
 ```bash
@@ -52,14 +67,20 @@ The lifecycle increment fences retired reply generations, bounds pending agent
 output to 8,000 samples (500 ms), paces fast TTS via an awaitable chunk callback,
 reports timeline exhaustion/malformed PCM, and aborts source plus agent output on
 stop even during inference. Normal completion drains accepted samples before
-closing. See [CONTRACT.md](CONTRACT.md#playback-lifecycle-increment-october-10-deterministic-checks-only)
+closing. See [CONTRACT.md](CONTRACT.md#playback-lifecycle-increment-october-10-softwareruntime-checks)
 for timing provenance, cancellation, capacity and remaining measurement limits.
 
 `--services off --play` still plays the caller recording; it generates no agent
 response. Without `--play`, timestamps describe PCM receipt/duration and no device
 opens. Scheduled sample indices and software cut positions are not acoustic
-measurements. This increment has not been validated with real playback or a paid
-provider; prior laptop evidence does not automatically validate the changed path.
+measurements. The [current-code runtime packet](../docs/proofs/playback-runtime/README.md)
+records device source stop/restart and one real provider reply at `42b86d0`.
+[Guttuu's later listening report](https://github.com/vinhbin/stutterturn/issues/3#issuecomment-6102558836)
+passed source/reply audibility, explicit Stop during source and reply, and
+clean restart on his demo laptop. Cancellation before audio followed by a
+later audible reply also passed. Natural source resumption during an already
+audible reply and acoustic timing remain untested. These are his reported
+listening results; his raw run logs are still local.
 
 ## Files
 
@@ -76,4 +97,4 @@ provider; prior laptop evidence does not automatically validate the changed path
 
 ## Not covered
 
-Live microphone input, phone transport and a real candidate model have not been tested. Earlier Windows device/CLI checks reported the Realtek driver's output latency; they did not measure acoustic delay. The changed playback lifecycle still requires real-device playback and human listening acceptance, and other demo machines or devices have not been tried.
+Live microphone input, phone transport and a selected candidate model have not been tested. Earlier Windows device/CLI checks reported the driver's output latency; they did not measure acoustic delay. Natural source resumption while a reply is already audible, callback underrun telemetry and the provider-cap path remain unverified. The browser controls audio on the backend laptop; browser audio delivery for a hosted backend is not implemented.
