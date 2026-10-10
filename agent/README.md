@@ -37,6 +37,30 @@ agent\.venv\Scripts\python.exe agent/run.py --config stock --source HeStutters_4
 
 Each run writes `agent/runs/<run_id>.jsonl` (gitignored). Runs used as evidence are copied to `agent/evidence/<date>-<name>/` with a README giving the command, commit and limits.
 
+## Offline playback checks
+
+```powershell
+agent\.venv\Scripts\python.exe -m unittest discover -s agent/tests -v
+```
+
+These checks need NumPy and the Python standard library, with no model files,
+credentials, `.env` reads, network calls or real audio devices. They exercise the
+actual player/engine against controlled PCM, fake sounddevice callbacks and fake
+providers. Synthetic PCM here tests buffering, not stuttering or model efficacy.
+
+The lifecycle increment fences retired reply generations, bounds pending agent
+output to 8,000 samples (500 ms), paces fast TTS via an awaitable chunk callback,
+reports timeline exhaustion/malformed PCM, and aborts source plus agent output on
+stop even during inference. Normal completion drains accepted samples before
+closing. See [CONTRACT.md](CONTRACT.md#playback-lifecycle-increment-october-10-deterministic-checks-only)
+for timing provenance, cancellation, capacity and remaining measurement limits.
+
+`--services off --play` still plays the caller recording; it generates no agent
+response. Without `--play`, timestamps describe PCM receipt/duration and no device
+opens. Scheduled sample indices and software cut positions are not acoustic
+measurements. This increment has not been validated with real playback or a paid
+provider; prior laptop evidence does not automatically validate the changed path.
+
 ## Files
 
 | File | Purpose |
@@ -52,4 +76,4 @@ Each run writes `agent/runs/<run_id>.jsonl` (gitignored). Runs used as evidence 
 
 ## Not covered
 
-Live microphone input, phone transport and a real candidate model have not been tested. Speaker playback works on the Windows dev laptop (Realtek speakers); its acoustic delay is reported by the driver, not measured, and other demo machines or devices have not been tried.
+Live microphone input, phone transport and a real candidate model have not been tested. Earlier Windows device/CLI checks reported the Realtek driver's output latency; they did not measure acoustic delay. The changed playback lifecycle still requires real-device playback and human listening acceptance, and other demo machines or devices have not been tried.

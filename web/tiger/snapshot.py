@@ -34,10 +34,11 @@ import ingest  # noqa: E402  (shared parsing, connection resolution, superseded 
 OUT_PATH = Path(__file__).resolve().parent / "snapshot.json"
 
 CAVEATS = [
-    "5 clips, one run each, one show (HeStutters). Per-clip values only; no rates or aggregates.",
+    "5 clips, one run per configuration for each clip, one show (HeStutters). Per-clip values only; no rates or aggregates.",
     "gap_start/resume labels in the evidence README are energy-derived and not human-reviewed.",
     "Each run appends 5 s of synthetic silence; fallback decisions on these 3 s clips happen during that padding.",
-    "First agent audio is when the first sample was scheduled to play; Gemini + ElevenLabs latency included, speaker playback delay not measured.",
+    "First agent audio is the reported agent_audio_start event; Gemini + ElevenLabs latency included. Speaker playback remains unverified, and this chart plays no audio.",
+    "The clips are 3 s excerpts, usually ending mid-turn; these runs cannot establish completed-turn response delay.",
     "These are turn decisions and cancelled replies, not observed audible interruptions.",
 ]
 
@@ -167,9 +168,9 @@ def assemble(rows: list[dict], meta: dict, offline: bool) -> dict:
         "offline_fallback": offline,
         "source_note": (
             "Computed directly from committed run logs by snapshot.py --offline; "
-            "no TigerData service has been queried yet. See web/tiger/README.md."
+            "this snapshot did not query Tiger Data."
             if offline else
-            "Generated from TigerData queries over committed run logs; see web/tiger/README.md"
+            "Saved snapshot generated from Tiger Data queries over committed run logs; not live database status."
         ),
         "evidence": meta,
         "clips": clips,

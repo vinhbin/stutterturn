@@ -44,8 +44,9 @@
     var wrap = el('div', 'tgr-legend');
     [['tgr-mark-complete', 'complete — model decision'],
      ['tgr-mark-fallback', 'complete — 3.0 s silence fallback'],
-     ['tgr-mark-cancel', 'reply cancelled before audio'],
-     ['tgr-mark-audio', 'first agent audio (scheduled play)']
+     ['tgr-mark-later', 'later completion before reported audio'],
+     ['tgr-mark-cancel', 'reply cancelled before reported audio'],
+     ['tgr-mark-audio', 'first agent audio (reported)']
     ].forEach(function (item) {
       var s = el('span');
       s.appendChild(el('i', 'tgr-mark ' + item[0]));
@@ -69,12 +70,17 @@
   }
 
   function offlineBadge() {
-    return el('span', 'tgr-badge', 'Local snapshot — not yet served from TigerData');
+    return el('span', 'tgr-badge', 'Local snapshot · No Tiger Data query');
+  }
+
+  function sourceBadge(snap) {
+    return snap.offline_fallback ? offlineBadge()
+      : el('span', 'tgr-badge tgr-badge-live', 'Snapshot from Tiger Data queries');
   }
 
   function figureFooter(snap) {
     var f = el('div');
-    if (snap.offline_fallback) f.appendChild(offlineBadge()).style.cssText = 'display:inline-block;margin-top:12px;';
+    f.appendChild(sourceBadge(snap)).style.cssText = 'display:inline-block;margin-top:12px;';
     f.appendChild(provenance(snap)).style.marginTop = '10px';
     return f;
   }
@@ -90,14 +96,14 @@
       ? 'model' + (run.prob !== null && run.prob !== undefined ? ' p ' + run.prob.toFixed(2) : '')
       : '3.0 s fallback';
     add('complete', secs(run.first_complete_t) + ' (' + how + ')');
-    if (run.cancelled_before_audio) add('cancelled before audio', secs(run.cancelled_t), true);
+    if (run.cancelled_before_audio) add('cancelled before reported audio', secs(run.cancelled_t), true);
     if (run.answered_decision_t !== null && run.answered_decision_t !== run.first_complete_t) {
-      add('answered complete', secs(run.answered_decision_t), true);
+      add('later complete', secs(run.answered_decision_t), true);
     }
     if (run.first_audio_t !== null && run.first_audio_t !== undefined) {
-      add('audio', secs(run.first_audio_t), true);
+      add('reported audio', secs(run.first_audio_t), true);
     } else {
-      v.appendChild(document.createTextNode(' → no agent audio'));
+      v.appendChild(document.createTextNode(' → no reported agent audio'));
     }
     return v;
   }
@@ -122,15 +128,15 @@
     }
     if (run.cancelled_before_audio && run.cancelled_t !== null) {
       track.appendChild(mark('tgr-mark-cancel', run.cancelled_t, tmax,
-        markTitle('Speaker resumed; pending reply cancelled before any audio', run, run.cancelled_t)));
+        markTitle('Speaker resumed; pending reply cancelled before reported audio', run, run.cancelled_t)));
     }
     if (run.answered_decision_t !== null && run.answered_decision_t !== run.first_complete_t) {
-      track.appendChild(mark('tgr-mark-complete', run.answered_decision_t, tmax,
-        markTitle('Completion decision the audio answered', run, run.answered_decision_t)));
+      track.appendChild(mark('tgr-mark-later', run.answered_decision_t, tmax,
+        markTitle('Later completion before reported audio (trigger not shown)', run, run.answered_decision_t)));
     }
     if (run.first_audio_t !== null && run.first_audio_t !== undefined) {
       track.appendChild(mark('tgr-mark-audio', run.first_audio_t, tmax,
-        markTitle('First agent audio scheduled to play', run, run.first_audio_t)));
+        markTitle('First reported agent audio; speaker playback unverified', run, run.first_audio_t)));
     }
     row.appendChild(track);
     row.appendChild(valuesLine(run));
@@ -167,10 +173,10 @@
 
   function gapFigure(snap, gmax) {
     var fig = el('section', 'tgr-figure');
-    fig.appendChild(el('h4', 'tgr-figtitle', 'Decision → first agent audio, per run'));
+    fig.appendChild(el('h4', 'tgr-figtitle', 'Decision → first reported audio, per run'));
     fig.appendChild(el('p', 'tgr-fignote',
-      'Time from the completion decision the audio actually answered to the first agent audio sample ' +
-      'scheduled to play (Gemini + ElevenLabs latency included, reported beside each bar). ' +
+      'Time from the latest completion decision before the first reported agent audio event ' +
+      '(Gemini + ElevenLabs latency included, reported beside each bar). Speaker playback remains unverified. ' +
       'Per-run values from 5 clips — not a latency benchmark.'));
     snap.clips.forEach(function (clip) {
       var group = el('div', 'tgr-clip');
@@ -194,7 +200,7 @@
           v.appendChild(document.createTextNode(
             ' (LLM ' + secs(run.llm_latency_s) + ' · TTS first audio ' + secs(run.tts_first_audio_s) + ')'));
         } else {
-          v.textContent = 'no agent audio in this run';
+          v.textContent = 'no reported agent audio in this run';
         }
         row.appendChild(v);
         group.appendChild(row);
@@ -215,6 +221,10 @@
   }
 
   function render(mount, snap) {
+    if (!snap || typeof snap.offline_fallback !== 'boolean' || !snap.source_note ||
+        !snap.generated_utc || !snap.evidence || !Array.isArray(snap.clips) || !snap.clips.length) {
+      throw new Error('Snapshot provenance or run data missing');
+    }
     var tmax = 1, gmax = 0.5;
     snap.clips.forEach(function (clip) {
       Object.keys(clip.configs).forEach(function (cfg) {
@@ -231,10 +241,8 @@
     var block = el('section', 'tgr-block');
     block.setAttribute('aria-label', 'Run-log time series: stock vs patient replay evidence');
     var head = el('header', 'tgr-head');
-    head.appendChild(el('h3', 'tgr-title', 'Every run is a time series'));
-    head.appendChild(snap.offline_fallback
-      ? offlineBadge()
-      : el('span', 'tgr-badge tgr-badge-live', 'Served from TigerData queries'));
+    head.appendChild(el('h3', 'tgr-title', 'Run events over time'));
+    head.appendChild(sourceBadge(snap));
     head.appendChild(provenance(snap));
     block.appendChild(head);
     block.appendChild(timelineFigure(snap, tmax));
@@ -242,16 +250,17 @@
     block.appendChild(caveats(snap));
     mount.textContent = '';
     mount.appendChild(block);
+    mount.setAttribute('aria-busy', 'false');
   }
 
-  function showError(mount, msg) {
+  function showError(mount) {
     mount.textContent = '';
     var block = el('section', 'tgr-block');
     block.appendChild(el('p', 'tgr-note tgr-error',
-      'Run-log chart: could not load snapshot.json (' + msg + '). ' +
-      'Generate it with: python web/tiger/snapshot.py --offline (or with TigerData credentials, ' +
-      'python web/tiger/ingest.py then python web/tiger/snapshot.py). Nothing is shown in its place.'));
+      'The saved run-log chart is unavailable. Reload this page or inspect the linked evidence files. ' +
+      'No chart or database status can be shown from this snapshot.'));
     mount.appendChild(block);
+    mount.setAttribute('aria-busy', 'false');
   }
 
   function boot() {
@@ -259,11 +268,13 @@
     if (!mount) return;
     var src = mount.getAttribute('data-snapshot') ||
       (script && script.src ? new URL('snapshot.json', script.src).href : 'snapshot.json');
+    mount.textContent = '';
+    mount.setAttribute('aria-busy', 'true');
     mount.appendChild(el('p', 'tgr-note', 'Loading run-log snapshot…'));
     fetch(src, { cache: 'no-cache' })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (snap) { render(mount, snap); })
-      .catch(function (err) { showError(mount, err.message); });
+      .catch(function () { showError(mount); });
   }
 
   if (document.readyState === 'loading') {

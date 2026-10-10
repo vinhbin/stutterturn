@@ -26,6 +26,8 @@
 .snapshot-provenance { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 26px; }
 .snapshot-provenance > p { color: var(--muted); font-size: 12px; }
 .snapshot-provenance code { font: 12px var(--mono); color: var(--fg); }
+#run-log-evidence #tiger-chart { margin-top: 28px; }
+.run-log-links { display: flex; flex-wrap: wrap; gap: 12px 26px; margin-top: 20px; color: var(--muted); font-size: 13px; }
 .evaluation-section { display: grid; grid-template-columns: 0.8fr 1.4fr; gap: 80px; }
 .evaluation-intro > p { margin-top: 18px; color: var(--muted); }
 .evaluation-intro > a { margin-top: 22px; }
