@@ -1,4 +1,4 @@
-/* Proposed agent contract v0.1 transport. This UI plays no audio. */
+/* Agent contract v0.1 transport. This UI plays no audio. */
 'use strict';
 
 var DEMO_ARMS = [
@@ -8,7 +8,7 @@ var DEMO_ARMS = [
 ];
 function BlockedAdapter() {
   this.mode = 'blocked';
-  this.sourceLabel = 'Disconnected — proposed v0.1 contract published; backend not connected';
+  this.sourceLabel = 'Disconnected — agent contract v0.1; backend not connected';
 }
 BlockedAdapter.prototype.getConfigurations = function () {
   return DEMO_ARMS.map(function (arm) {
@@ -84,6 +84,13 @@ function abortError() { var error = new Error('Operation cancelled'); error.name
 function isObject(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 function nonempty(value) { return typeof value === 'string' && value.length > 0 && value.length <= 4096; }
 function validTime(value) { return typeof value === 'number' && Number.isFinite(value) && value >= 0; }
+function validSourceFile(value) {
+  if (!nonempty(value) || /[\\:\u0000-\u001f\u007f?#%]/.test(value)) { return false; }
+  // The backend lists basenames or relative paths, never URLs or filesystem roots.
+  return value.split('/').every(function (part) {
+    return part.length > 0 && part !== '.' && part !== '..' && part.trim() === part && !part.endsWith('.');
+  });
+}
 function bounded(promise, milliseconds, signal, label) {
   return new Promise(function (resolve, reject) {
     var timer = setTimeout(function () { finish(new Error(label + ' timed out')); }, milliseconds);
@@ -158,8 +165,8 @@ LiveAdapter.prototype.connect = function () {
     })) { throw new Error('Invalid configuration discovery response'); }
     var files = new Set();
     if (!Array.isArray(sources) || !sources.every(function (source) {
-      if (!isObject(source) || !nonempty(source.source_id) || !nonempty(source.file) ||
-          /[/\\\u0000-\u001f]/.test(source.file) || !validTime(source.duration_s) || files.has(source.file)) { return false; }
+      if (!isObject(source) || !nonempty(source.source_id) || !validSourceFile(source.file) ||
+          !validTime(source.duration_s) || files.has(source.file)) { return false; }
       files.add(source.file); return true;
     })) { throw new Error('Invalid source discovery response'); }
     self._health = health;

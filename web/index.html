@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0a09">
+  <meta name="description" content="StutterTurn makes a voice agent's turn-taking decisions visible. Compare recorded-source runs in the call console.">
+  <title>StutterTurn — Let people finish.</title>
+  <link rel="preload" href="demo-ui/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header shell">
+    <a class="wordmark" href="./" aria-label="StutterTurn home">StutterTurn.</a>
+    <nav aria-label="Main navigation"><a href="#evidence">The evidence</a><a href="judges/">Judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></nav>
+  </header>
+  <main id="main" tabindex="-1">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">Let people<br>finish.</h1>
+        <div class="hero-intro">
+          <p class="hero-deck">Compare when a voice agent decides to answer.</p>
+          <p>Speech has pauses, repetitions, and restarts. StutterTurn is an engineering prototype for examining the space between a pause and a finished turn.</p>
+          <a class="button button-primary" href="judges/">Open judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a>
+        </div>
+      </div>
+      <figure class="turn-figure">
+        <div class="figure-title"><h2>A pause can still be part of a turn.</h2><span>Illustrative sequence</span></div>
+        <div class="turn-diagram" role="img" aria-label="Illustrative sequence, not recorded data: the caller speaks, pauses, and continues. The agent holds during the pause and replies after the caller finishes.">
+          <div class="diagram-labels"><span></span><div class="phase-labels"><span>Speaking</span><span>Pause</span><span>Continuing</span><span>Reply</span></div></div>
+          <div class="diagram-row"><span class="diagram-label">Caller</span><div class="concept-track caller-track"><span class="speech-start"></span><span class="speech-pause"></span><span class="speech-continue"></span></div></div>
+          <div class="diagram-row"><span class="diagram-label">Agent</span><div class="concept-track agent-track"><span class="agent-hold">Holding</span><span class="agent-reply">Reply</span></div></div>
+          <div class="diagram-foot"><span></span><p>Room to continue.<span>Then a response.</span></p></div>
+        </div>
+        <figcaption>Concept illustration. No recorded timing or audio is represented here.</figcaption>
+      </figure>
+    </section>
+
+    <section class="comparison-section shell" aria-labelledby="comparison-title">
+      <div class="section-intro"><h2 id="comparison-title">Same recording.<br>A different wait.</h2><p>The console puts the caller and the agent on one timeline, so a turn decision and reported response audio can be inspected separately.</p></div>
+      <div class="comparison-steps">
+        <div><h3>Choose a recorded source</h3><p>Replay a SEP-28k clip. Keep that source fixed when you change configurations.</p></div>
+        <div><h3>Compare stock and patient</h3><p>Start a fresh run for each. Both use the same model; the patient setting waits longer through silence.</p></div>
+        <div><h3>Follow the event record</h3><p>Inspect speech, holding, turn decisions, and reported audio receipt together. A decision alone does not mean the caller heard a reply.</p></div>
+      </div>
+    </section>
+
+    <section id="evidence" class="evidence-section shell" aria-labelledby="evidence-title">
+      <div class="section-intro"><h2 id="evidence-title">Inspect what<br>we have.</h2><p>The first replay handoff checks the recording-to-event path. It is an engineering check, with human review and model evaluation still ahead.</p></div>
+      <div class="evidence-content">
+        <div class="evidence-heading"><h3>First recorded-source replay</h3><span class="revision">2026-10-10 · Handoff 3ed3786<br>Saved logs executed on a229787</span></div>
+        <dl class="evidence-facts">
+          <div><dt>Sources</dt><dd>5 SEP-28k recordings</dd></div>
+          <div><dt>Runs</dt><dd>10 replay logs across stock and patient</dd></div>
+          <div><dt>Setting changed</dt><dd>Silence gate: 0.2 s → 1.0 s</dd></div>
+          <div><dt>Candidate model</dt><dd>Unavailable in this handoff</dd></div>
+        </dl>
+        <p class="evidence-limit">Labels have not been human-reviewed. These runs do not establish improved interruption rates or response delay. Audio receipt is logged; speaker playback is unverified.</p>
+        <a class="text-link" href="https://github.com/vinhbin/stutterturn/tree/3ed3786/agent/evidence/2026-10-10-first-replay">Inspect the pinned replay evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a>
+      </div>
+    </section>
+
+    <section class="closing shell" aria-labelledby="closing-title"><h2 id="closing-title">Watch the turn.<br>Inspect the record.</h2><div><p>The judge view brings the comparison, console, and evidence into one place.</p><a class="button button-primary" href="judges/">Open judge view <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></div></section>
+  </main>
+  <footer class="site-footer shell"><span>StutterTurn. <span class="footer-tagline">Let people finish.</span></span><a href="demo-ui/">Open full console</a></footer>
+</body>
+</html>
