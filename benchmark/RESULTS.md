@@ -1,5 +1,12 @@
 # StutterTurn Kill Test — RESULTS
 
+> **Superseded for current claims (Niko, Oct 10, 19:00 EDT). This report is kept as recorded.** It is the afternoon **exploratory** kill test: stock INT8 only, energy-derived labels, all shows mixed with no held-out split, and a different machine. The current development evidence is:
+> - [`docs/model-results-2026-10-10.md`](../docs/model-results-2026-10-10.md): stock INT8 vs FP32, the threshold and wait trade-offs on show-separated dev items, and both training outcomes;
+> - [`docs/training-report-2026-10-10.md`](../docs/training-report-2026-10-10.md);
+> - the eval pipeline in [`specs/`](specs/).
+>
+> Numbers below (for example the threshold results in §5) are on the exploratory clip sets and must not be quoted as current results. INT8 probabilities differ across platforms (`specs/eval-runner-v1.md`). The reserved test set stays sealed (D-009).
+
 Run date: 2026-10-10. Machine: Windows 11 Home, Python 3.12.10, ffmpeg 9.0.1, RTX 3060 Ti 8GB (all inference was CPU), 49 GB free disk. ELEVENLABS_API_KEY present; NO Gemini key.
 Work dir: `C:\Users\Binep\empty codex 2\stutterturn-killtest` — scripts in `scripts/`, eval CSVs and raw results in `data/`, clips in `audio/`, model repo in `smart-turn/`.
 

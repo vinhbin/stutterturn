@@ -10,7 +10,7 @@ This file defines what a StutterTurn model artifact is and how the agent calls i
 |---|---|---|---|---|
 | `stock-int8` | `smart-turn-v3.2-cpu.onnx` (pipecat-ai/smart-turn-v3 @ `f766f81`) | `2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f` | **Verified** hash and inference ([handoff](../docs/model-recovery-handoff.md)) | Stock arm, and the exploratory benchmark's model |
 | `stock-fp32` | `smart-turn-v3.2-gpu.onnx` (same revision; runs on CPU) | `ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be` | **Verified** hash and reconstruction parity ([evidence](../docs/proofs/model-mechanics/evidence.json)) | Starting point for training; a stock arm when compared against an FP32 candidate |
-| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no candidate exists yet | Candidate arm |
+| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). Training v1 and v2 gave `dev_nothing_passes`, v3 is paused (D-010), and test is sealed (D-009) | Candidate arm |
 
 - `synthetic-one-batch.onnx` (`9a00002e…7d3c`) is a mechanical proof output. **It must never be loaded as a candidate or shown in the demo.**
 - Never overwrite a published `v{N}`. Any retraining, even with the same data, produces `v{N+1}`.
@@ -81,7 +81,11 @@ Being agent-ready doesn't mean improved. Improvement is decided only by the PLAN
 
 | model_id | sha256 | status | evidence |
 |---|---|---|---|
-| — | — | No candidate yet | — |
+| — | — | **No released or selected candidate** (status as of 2026-10-10 19:00 EDT) | [model results](../docs/model-results-2026-10-10.md), [training report](../docs/training-report-2026-10-10.md) |
+| `stutterturn-v2-rV3-c0.51` | `e2b22997…` (full hash in the `sel-v2` `decision.json`) | `dev-candidate`, **rejected** by `sel-v2` (`dev_nothing_passes`: M5 guard) | [issue #2 `decision.md`](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102500044) |
+| `stutterturn-v2-rV2-c2.00` | `3cbb4063…` (full hash in the `sel-v2` `decision.json`) | `dev-candidate`, **rejected** by `sel-v2` (`dev_nothing_passes`: M5 guard) | same |
+
+Rejected development candidates aren't releases. Their names are never reused, their weights aren't distributed, and the agent must not load them as a candidate arm. Training v1 exported no candidate: its pre-screen had 0 eligible checkpoints. Full hashes and records will be committed once the `sel-v2` evidence is preserved (issue #2 request).
 
 ## 7. Per-call log record (Proposed; consumed by E1 and the UI)
 
