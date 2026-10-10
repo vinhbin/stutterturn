@@ -57,7 +57,7 @@ var DEMO_ARMS = [
   {
     id: 'patient',
     label: 'PATIENT',
-    detail: 'stock agent, patient/wait configuration (fallback comparison arm if the model gate fails)',
+    detail: 'stock agent, patient/wait configuration (fallback comparison arm if the model gate fails) — a longer wait, not a trained model',
   },
 ];
 

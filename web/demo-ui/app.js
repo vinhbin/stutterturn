@@ -42,9 +42,17 @@
 
   /* ---------- status + chrome ---------- */
 
+  // For trusted static markup authored in this file only.
   function setStatus(kind, html) {
     el.statusBanner.className = 'status-banner ' + kind;
     el.statusBanner.innerHTML = html;
+  }
+
+  // For any runtime-supplied string (adapter/backend errors): rendered as text,
+  // never as HTML, so a future LiveAdapter can relay backend messages safely.
+  function setStatusText(kind, text) {
+    el.statusBanner.className = 'status-banner ' + kind;
+    el.statusBanner.textContent = text;
   }
 
   function refreshChrome() {
@@ -272,7 +280,7 @@
       }),
       onError: guard(function (message) {
         setRunPhase('error');
-        setStatus('error', 'Run error: ' + String(message).replace(/[<>]/g, ''));
+        setStatusText('error', 'Run error: ' + String(message));
         appendEventRow(run, { t: NaN, kind: 'error', detail: String(message) });
       }),
     };
@@ -283,7 +291,7 @@
     } catch (err) {
       state.run = null;
       setRunPhase('error');
-      setStatus('error', String(err && err.message ? err.message : err).replace(/[<>]/g, ''));
+      setStatusText('error', String(err && err.message ? err.message : err));
       return;
     }
 
