@@ -1,0 +1,14 @@
+{"v":"0.1","type":"run_started","run_id":"20261010T194813Z-patient-3064","seq":0,"config":"patient","params":{"vad_stop_s":1.0,"vad_start_s":0.2,"threshold":0.5,"fallback_s":3.0,"frame_s":0.032,"trailing_silence_s":5.0,"pre_roll_s":0.192,"time_origin":"source_audio_start"},"model":"stock-int8","model_sha256":"2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f","source":{"source_id":"HeStutters_4_32.wav","duration_s":3.0,"source_offset_s":0},"commit":"bcf50d1","t0_wall":"2026-10-10T19:48:15.099Z","services":"on"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":1,"t":0.256,"kind":"info","name":"speech_start","prob":0.971}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":2,"t":0.256,"kind":"state","state":"speaking"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":3,"t":2.016,"kind":"info","name":"speech_stop"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":4,"t":2.016,"kind":"state","state":"silence"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":5,"t":3.008,"kind":"decision","name":"turn_incomplete","model":"stock-int8","model_id":"stock-int8","prob":0.0057,"threshold":0.5,"complete":false,"silence_s":1.024,"infer_ms":36.0,"input_s":2.976}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":6,"t":3.008,"kind":"state","state":"holding","prob":0.0057,"model":"stock-int8"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":7,"t":4.992,"kind":"decision","name":"turn_complete","model":"stock-int8","model_id":"stock-int8","prob":null,"threshold":0.5,"complete":true,"silence_s":3.008,"infer_ms":null,"trigger":"fallback_timeout"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":8,"t":4.992,"kind":"info","name":"response_requested","detail":"gemini gemini-3.8-flash"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":9,"t":6.703,"kind":"audible","name":"agent_audio_start","detail":"I'm here. How can I help you?"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":10,"t":6.703,"kind":"state","state":"agent"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":11,"t":8.468,"kind":"audible","name":"agent_audio_end"}
+{"v":"0.1","type":"event","run_id":"20261010T194813Z-patient-3064","seq":12,"t":8.468,"kind":"state","state":"silence"}
+{"v":"0.1","type":"run_ended","run_id":"20261010T194813Z-patient-3064","seq":13,"t":8.468,"reason":"completed","summary":{"first_turn_complete_t":4.992,"trigger":"fallback_timeout","first_agent_audio_t":6.703,"llm_latency_s":1.453,"tts_first_audio_s":0.25,"speaker_resumed_after_decision":false,"cancelled":false,"audible_interruption":false,"overlap_s":null,"no_response":false,"timeouts":[],"reply_text":"I'm here. How can I help you?","services":"on","chars_used":29,"turns":1},"log":"agent/runs/20261010T194813Z-patient-3064.jsonl"}
