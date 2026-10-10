@@ -348,7 +348,13 @@
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey) { return; }
     var tag = (e.target && e.target.tagName) || '';
-    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') { return; }
+    if (tag === 'TEXTAREA' || tag === 'SELECT') { return; }
+    if (tag === 'INPUT') {
+      // Only text-entry inputs swallow shortcuts; a keyboard user who just
+      // arrowed through the config radios must still be able to press S/R.
+      var type = String(e.target.type || '').toLowerCase();
+      if (type !== 'radio' && type !== 'checkbox' && type !== 'button') { return; }
+    }
     var k = e.key.toLowerCase();
     if (k === 's') { e.preventDefault(); startRun(); }
     else if (k === 'x') { e.preventDefault(); stopRun(); }
