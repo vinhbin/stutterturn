@@ -62,7 +62,8 @@ Legend: ⬜ assigned · 🟡 in progress · ✅ proved with evidence · ⛔ bloc
 | NSA Atlanta outreach for one real user's voice — yes/no | team | afternoon |
 | Kareem's GitHub handle (repo access) | Vinh | now |
 | 8 kHz phone-path behavior | Guttuu | Phase 2 |
-| License choice before publication | team | Phase 5 |
+| License choice before publication — incl. MODEL WEIGHTS: trained on CC BY-NC data → research/non-commercial release with attribution; never claim "fully open" without the qualifier | team | Phase 5 |
+| Main-track judging rubric: the MLH ceremony deck has only side-quest prizes — the progsu deck/Discord still needs checking | Vinh | Phase 0 |
 
 ## Pre-submit checklist
 
@@ -72,3 +73,5 @@ Legend: ⬜ assigned · 🟡 in progress · ✅ proved with evidence · ⛔ bloc
 - [ ] Disclosures: pre-event planning, AI assistance (benchmark + code), dataset licenses (SEP-28k CC BY-NC, audio not redistributed), Smart Turn BSD-2.
 - [ ] Never-say list respected: no "all voice agents fail", no medical claims, no "solved stuttering".
 - [ ] Devpost: AI/ML track + MLH Best Use of ElevenLabs; received confirmation before 9:00 AM.
+- [ ] Vultr credits via promo code MAJORLEAGUEHACKING (from the MLH ceremony deck).
+- [ ] After the event: DEV Writing Challenge post ($100; dev.to/mlh-hackathon) — the benchmark story writes itself.
