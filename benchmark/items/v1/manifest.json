@@ -1,0 +1,124 @@
+{
+ "version": "v1",
+ "created_utc": "2026-10-10T19:38:04Z",
+ "script": "benchmark/scripts/build_items.py",
+ "script_sha256": "8555002df51cd322d9d6f659965b483315dd78051a4ddc3e6f0f985360ba400b",
+ "build_eval_sets_sha256": "5cfcb760cbe92c71ccec55c58c9bbb0b8474505b1ccc0f02984e07b83d00773c",
+ "split_sha256": {
+  "train": "60e2509fd4186227f41a5b77fbf7355d6c826abce0eb653e4de469cb0b584e1c",
+  "dev": "3030592364bcf7f7514eb85a59d72323558706aae40cc61fe1ec5ed7dc80b340",
+  "test": "fd558b91fb405f83f1b9e8e85ff7922a1aaad4193725bd21d29dd475c25832c2"
+ },
+ "split_check": "OK: /Users/niyakoabajebel/Documents/GitHub/stutterturn/benchmark/splits/v1 verified",
+ "vad_params": {
+  "sr": 16000,
+  "frame_s": 0.03,
+  "hop_s": 0.01,
+  "gap_min_s": 0.3,
+  "abs_floor_db": -45.0,
+  "rel_db": 25.0,
+  "min_pre_speech_s": 0.2,
+  "resume_run_frames": 5,
+  "vad_stop_s": 0.2,
+  "min_fluent_speech_s": 0.5,
+  "min_trailing_s": 0.5
+ },
+ "annotation_files": {},
+ "category_vocabulary": [
+  "completed_fluent_turn",
+  "completed_stuttered_turn",
+  "unfinished_fluent_pause",
+  "unfinished_stutter_block"
+ ],
+ "time_origin_handling": {
+  "clip_start": "clip-relative",
+  "source_audio_start": "clip-relative",
+  "episode_start": "subtract start/16000 from the split CSV row"
+ },
+ "tallies": {
+  "dev/block": {
+   "gap_but_no_pre_speech": 93,
+   "item_stuttered_unfinished": 352,
+   "no_gap": 38,
+   "no_resume": 66
+  },
+  "dev/fluent": {
+   "cmp_trailing_lt_0.5": 2352,
+   "item_fluent_completed_proxy": 680,
+   "item_fluent_unfinished": 1518,
+   "no_speech_detected": 22,
+   "too_short": 2,
+   "unf_no_mid_pause": 1514
+  },
+  "dev/other_disfluent": {
+   "too_short": 1
+  },
+  "test/block": {
+   "empty_on_mirror": 6,
+   "gap_but_no_pre_speech": 191,
+   "item_stuttered_unfinished": 415,
+   "no_gap": 98,
+   "no_resume": 134
+  },
+  "test/fluent": {
+   "cmp_trailing_lt_0.5": 2535,
+   "empty_on_mirror": 21,
+   "item_fluent_completed_proxy": 833,
+   "item_fluent_unfinished": 1311,
+   "no_speech_detected": 5,
+   "unf_no_mid_pause": 2057
+  }
+ },
+ "item_counts_main": {
+  "dev|fluent|unfinished|energy_vad": 1518,
+  "dev|stuttered|unfinished|energy_vad": 352,
+  "test|fluent|unfinished|energy_vad": 1311,
+  "test|stuttered|unfinished|energy_vad": 415
+ },
+ "item_counts_end_of_window": {
+  "dev|fluent|completed|energy_vad": 680,
+  "test|fluent|completed|energy_vad": 833
+ },
+ "review_queue": {
+  "rows": 90,
+  "per_bucket": {
+   "unf_stu": 20,
+   "unf_flu": 20,
+   "cmp_stu": 25,
+   "cmp_flu": 25
+  },
+  "candidates_available": {
+   "unf_stu": 352,
+   "unf_flu": 1518,
+   "cmp_stu": 538,
+   "cmp_flu": 680
+  },
+  "note": "n=20 per bucket cannot detect a fluent regression (95% CI about +/-20 points)"
+ },
+ "output_sha256": {
+  "dev.jsonl": "742b645ba7213fecc0753d6c10376e330673b70c0d21d59881f0ca442e962ee3",
+  "test.jsonl": "6bddc5b6b59ad2b929b0542828199d13c0130cd450b57394f7ac2488b6c26d32",
+  "dev_end_of_window.jsonl": "e30a456895cd61dd203fee319c864a9014097f720581a1fe87611cf6d7f52905",
+  "test_end_of_window.jsonl": "1cd7140f67bffbc30c315b6818b0464a54b8f024674bf2697de691798ab5c5fd",
+  "provenance.jsonl": "99d8f9d6b8a4e941e3cb1c0327b7bc6560d095a80e4141ceb07dcaf39f217466",
+  "review_queue_dev.csv": "dcd799ffe6ef899c97cdf7e25e95fef7593e322f5e9be70fde50117aa3ab4254",
+  "review_queue_dev_energy.csv": "27909eaf94e40b48e8ff1467c680e8e8f2ab6e151dc2adb39b522403b88a275c"
+ },
+ "annotated_dev_test_keys": [],
+ "test_sealed": true,
+ "limits": [
+  "3 s clips cut from longer episodes; the mirror has only the windows. 'Fluent' means fluent-labelled clips, not fluent speakers (many participants stutter).",
+  "Unfinished stuttered: Block>=2 clip with energy gap then energy resume in the clip. The resume may be another speaker, so items are energy_vad until a human confirms.",
+  "Unfinished fluent is weaker: a mid-clip pause in a fluent-labelled clip may follow a finished sentence and the resume may be another speaker. Energy only until reviewed.",
+  "Completed turns are NOT provable from clips: end-of-window silence is not a turn end. Energy 'completed' items are end_of_window proxies in separate files and must never be reported as turn-end delay. Real completed items come only from human labels made with episode context.",
+  "The 3.0 s fallback is censored: with <=3 s of audio it essentially never becomes observable.",
+  "The PLAN +50 ms delay criterion is degenerate under the single schedule: every completed item the model decides gets delay_s = vad_stop_s (0.2 s) exactly, so the median difference between any two models is 0. The measurable completed-turn signal under single is the rate decided at the first check vs censored/fallback, compared paired between models. Under interval, delay varies but is censored at the trailing silence. Gate reports must state this; delay medians must not be presented as evidence.",
+  "Making completed-turn delay measurable needs human labels: about 50 (preferably 100) confirmed completed turns per group in dev, each with >=0.5 s of post-end audio in the clip. Stuttered completed turns may come from any dev clip with stuttering labels. Turn ends are confirmed in episode context (episode URL + split start/stop).",
+  "Per-show VAD threshold differences (MSL quietest frames ~ -84 dB vs SV ~ -59 dB) shift item yield by show.",
+  "8 of 117 overlap block items also carry Interjection >= 2.",
+  "NaturalPause >= 2 on 10 of 117 block and 16 of 52 fluent overlap items.",
+  "Review queue n = 20 per bucket cannot detect a fluent regression (95% CI about +/-20 points).",
+  "Human-labelled dev/test clips must never feed training; see annotated_dev_test_keys. Annotations arriving after a build mean a new version (items/v2); v1 is never edited.",
+  "No model or threshold selection uses test."
+ ]
+}

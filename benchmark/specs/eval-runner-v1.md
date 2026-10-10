@@ -138,3 +138,11 @@ Implemented by a Sonnet subagent, then independently verified by Niko's session.
     1. A FP32 candidate must be compared against **stock FP32** (`model/CONTRACT.md` §5.4).
     2. Stock FP32 is itself a cheap baseline the 3 PM gate must include, alongside `patient`.
     3. The agent currently runs INT8.
+
+## Input policy (added 2026-10-10)
+
+Configs may set `input_policy` (`clip_start` default, or `turn_onset` with `pre_roll_s`), which changes where the model input starts relative to the clip. Defined in `benchmark/specs/input-policy-v1.md`; `turn_onset` runs need `--vad-model` and `--vad-sha256`.
+
+## Grid scope (added 2026-10-10)
+
+Configs may set `grid_scope` (`full` default, or `checks`), which computes only the schedule's check points instead of every `grid_step_s` point. Outcomes are identical; threshold re-scoring still works, schedule re-scoring does not. `--rescore` also takes `--threshold X`. Defined in `benchmark/specs/checks-only-grid-v1.md`.

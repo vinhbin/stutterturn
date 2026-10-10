@@ -1,0 +1,12 @@
+{
+ "model_id": "stutterturn-cand-a",
+ "sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+ "threshold": 0.5,
+ "status": "dev-candidate",
+ "provenance": {
+  "source": "checkpoint",
+  "run_id": "R1",
+  "checkpoint": "ckpt-e1.00.pt",
+  "epoch": 1.0
+ }
+}
