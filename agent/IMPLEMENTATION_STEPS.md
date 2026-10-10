@@ -147,7 +147,7 @@ Reply task (an `asyncio.Task`, started at `turn_complete`):
    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
    wav = io.BytesIO(); sf.write(wav, turn_audio, SR, format="WAV", subtype="PCM_16")
    resp = await asyncio.wait_for(client.aio.models.generate_content(
-       model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+       model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),   # 2.5-flash is closed to new users (Oct 10)
        contents=[types.Part.from_bytes(data=wav.getvalue(), mime_type="audio/wav"), PROMPT],
        config=types.GenerateContentConfig(max_output_tokens=60, temperature=0.4,
            thinking_config=types.ThinkingConfig(thinking_budget=0))), timeout=10)

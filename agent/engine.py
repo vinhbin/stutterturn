@@ -161,7 +161,7 @@ class Services:
             raise RuntimeError("Missing in agent/.env: " + ", ".join(missing))
         from google import genai
         self.genai_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-        self.gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+        self.gemini_model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
         self.el_key = os.environ["ELEVENLABS_API_KEY"]
         self.voice_id = os.getenv("ELEVENLABS_VOICE_ID", "")
         self.max_chars = int(os.getenv("ELEVENLABS_MAX_CHARS", "3000"))
