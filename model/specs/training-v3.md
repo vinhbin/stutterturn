@@ -1,6 +1,6 @@
 # Spec: StutterTurn candidate training v3 (replay-protected)
 
-**Owner:** Niko (spec, selection) · **Executor:** Guttuu · **Status:** pre-registered draft, written 18:20 EDT **before any v3 run**. **Runs only if Vinh records approval of a v3 timebox** (the "no v3 tonight" rule in training-v2 §9 otherwise stands). **Proposal:** [issue #2, Guttuu, 21:53Z](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102568699). **This is a delta on `model/specs/training-v2.md`: every section not changed here applies unchanged.**
+**Owner:** Niko (spec, selection) · **Executor:** Guttuu · **Status:** pre-registered 18:20 EDT, reviewed (Opus) and amended 18:3x, **both before any v3 run**. **Runs only if Vinh records approval of a v3 timebox** (the "no v3 tonight" rule in training-v2 §9 otherwise stands). **Proposal:** [issue #2, Guttuu, 21:53Z](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102568699). **This is a delta on `model/specs/training-v2.md`: every section not changed here applies unchanged.**
 
 ## 0. Why v3, and what it must disclose
 
@@ -12,7 +12,7 @@
 
 **Disclosure, required in every v3 description:** dev has now served **three** pre-registered attempts (v1 and v2 both `dev_nothing_passes`; v3 was designed after seeing v2's dev and guard results). The test set stays sealed under **D-009**. No efficacy claim is possible from dev, and a v3 candidate does **not** authorize a test run. Only a later, explicit unseal decision by Vinh could do that.
 
-## 2d. Mixture (replaces v2 §2d shares only)
+## 2d. Mixture and runs (replaces the v2 §2d shares and the v2 §4 run grid)
 
 The formula, length matching, `pos_weight` (three-source) and the per-sample draw are as in v2. Only the shares change:
 
@@ -40,6 +40,8 @@ These use 2 epochs, seed 0, and checkpoints every half epoch plus the end. The e
 - **Limits text:** `--training-spec v3`, which writes the three-attempt disclosure.
 - **Outcome:** reported exactly as the script gives it.
 
+**§7 (test run) is suspended under D-009. No v3 outcome triggers §7.2**, despite the "applies unchanged" inheritance through v2 and v1.
+
 ## 8. Harness acceptance checks (delta)
 
 1. The data-v2 manifest hashes are unchanged.
@@ -58,4 +60,5 @@ These use 2 epochs, seed 0, and checkpoints every half epoch plus the end. The e
 ## 10. Risks (in addition to v2 §10)
 
 - **Trade-off, not a fix:** more replay may restore M5 by weakening the SEP-28k signal, so M1 gains may shrink. That would be an honest result.
+- **More replay steps:** an epoch is weight_total / `p_neg`, about 6.3k samples at 0.15 and 9.4k at 0.10, against 4.7k in v2. 2a and SEP-28k draws stay about constant (about 1.9k each over 2 epochs); only the replay volume grows, about 1.6× for W1/W2 and 2.7× for W3. Epochs stay as defined, because fixing steps would cut the SEP-28k exposure and change the hypothesis.
 - **Selection on dev three times:** the more attempts on one dev set, the more an apparent pass may reflect chance. That's another reason a v3 pass is a development decision only.
