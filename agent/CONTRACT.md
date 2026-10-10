@@ -116,7 +116,7 @@ One socket can carry several runs one after another; one run at a time.
 
 **Playback mode (`--play`, implemented).** `run.py --play` or `server.py --play` also plays the run on the machine's speakers: the source recording and the agent's speech are mixed on one 16 kHz timeline, where sample *i* plays *i*/16000 s after the run starts. In this mode `agent_audio_start` / `agent_audio_end` are positions on that timeline, so they line up with source times as a listener hears them. Agent speech starts no earlier than the device's next writable block (256 samples); a late TTS chunk is placed at the next playable position rather than dropped, and `summary.playback_late_chunks` counts these. On barge-in the agent's audio is silenced from the stop time. Both tracks share the device output latency, reported in `run_started.playback.reported_output_latency_s` (Realtek laptop speakers, MME: 0.096 s) but not measured acoustically. `run_started.playback` is `null` without `--play`, and `GET /v0/health` reports `playback: "on" | "off"`. Decisions and VAD events are unaffected by playback.
 
-### Playback lifecycle increment (October 10; deterministic checks only)
+### Playback lifecycle increment (October 10; software/runtime checks)
 
 The HTTP/WebSocket version remains **0.1**. Additive `timing.v: "playback-v1"`
 identifies the following software provenance; it is not a claim of DAC or acoustic measurement:
@@ -151,10 +151,13 @@ callback produces `output_stalled`; device cleanup errors produce `device_cleanu
 and `summary.playback_device_errors`. Failed device operations cannot establish
 that hardware released successfully. Stops do not wait for normal drain.
 
-The fake-device tests verify software queue/cancellation behavior only. Real
-device stop/flush, callback underruns/status, late-chunk overlap refinement,
-listening on permitted recordings and acoustic uncertainty remain unverified by
-this increment. Inference still blocks source-frame processing while awaited in
+The fake-device tests verify software queue/cancellation behavior only. The
+[current-code runtime packet](../docs/proofs/playback-runtime/README.md)
+additionally records real-device open/drain/abort, source stop/restart, and one
+real provider reply at `42b86d0`. Human listening and acoustic stop/flush remain
+pending; the source-stop check did not stop an active generated reply. Callback
+underruns/status and late-chunk overlap refinement remain unverified. Inference
+still blocks source-frame processing while awaited in
 an active run; its schedule has not been redesigned.
 
 ## Run log and summary (implemented)
