@@ -114,3 +114,27 @@ Setup: a fresh venv, `pip install -r benchmark/requirements.txt`, the stock INT8
 8. **INT8 vs FP32 stock** on the legacy items: report both premature totals. This measures the quantization effect that `model/CONTRACT.md` §5.4 needs.
 
 Report any acceptance check you couldn't run (for example, audio download failed) as **not run** with the reason. Never report it as passed.
+
+## Acceptance results (2026-10-10, macOS arm64, Python 3.11.4)
+
+Implemented by a Sonnet subagent, then independently verified by Niko's session.
+
+- **Check 1, legacy regression: decisions pass; the per-item 1e-3 criterion is replaced.**
+  - Totals reproduce exactly: **116/200 first-check, 136/200 any-check**, with 0 per-item decision flips against `data/model_block_results.csv`.
+  - 127 of 805 probabilities differ from that CSV by more than 1e-3 (max 0.258). Running the *original* `run_model_arm.py` `predict()` on this Mac gives the same values as the new runner: across all 805, the max difference between new and old code on one machine is **4.95e-7**.
+  - The drift is therefore **cross-platform INT8 numerics** (the CSV was made on Windows x86), not a runner defect.
+  - **Revised criterion:** compare against the old code on the same machine, within 1e-5, plus identical decisions against the historical CSV.
+  - Consequence: never compare INT8 probabilities across machines; record `env.platform` with every run.
+- Checks 2–7 pass: hash guard, immutability (`--run-id` override added for testing), cache isolation (FP32 run had 0 cache hits), censoring, re-scoring with 0 model calls, and the compare refusal.
+- **Check 8, quantization effect on the legacy items** (exploratory, energy labels, all shows; not a gate result):
+
+  | Model | First-check premature | Any-check premature |
+  |---|---|---|
+  | stock INT8 | 116/200 (58.0%) | 136/200 (68.0%) |
+  | stock FP32 | 87/200 (43.5%) | 109/200 (54.5%) |
+
+  Paired any-check: 28 items INT8-only premature, 1 FP32-only.
+  - **Implications:**
+    1. A FP32 candidate must be compared against **stock FP32** (`model/CONTRACT.md` §5.4).
+    2. Stock FP32 is itself a cheap baseline the 3 PM gate must include, alongside `patient`.
+    3. The agent currently runs INT8.

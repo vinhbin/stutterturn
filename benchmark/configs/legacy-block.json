@@ -1,0 +1,4 @@
+{"config_id": "legacy-block", "threshold": 0.5,
+ "vad_stop_s": 0.2, "schedule": "legacy",
+ "checkpoints_s": [0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5],
+ "recheck_interval_s": null, "fallback_timeout_s": 3.0, "grid_step_s": 0.01}
