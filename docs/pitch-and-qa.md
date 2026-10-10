@@ -89,7 +89,7 @@ Spoken length: 341 words ≈ **2:16 at ~150 wpm**, leaving ~44 s for the compari
 
 ### The 10-second version — ready today
 
-> "We measured the open voice-agent stack on real recordings of people who stutter: it judged the caller 'done' during 58% of stutter blocks — and in our tests no timeout or threshold fixed it without slowing everyone down. We're building the open fix and publishing the benchmark."
+> "We measured the open voice-agent stack on real recordings of people who stutter: in our first measurement it judged the caller 'done' during 58% of stutter blocks — and in our tests no timeout or threshold fixed it without slowing everyone down. We're building the open fix and publishing the benchmark."
 
 ---
 

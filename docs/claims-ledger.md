@@ -34,7 +34,7 @@ Every result-bearing, novelty, implementation or compatibility sentence we might
 
 ### L-03 — Fluent latency axis of stock
 
-- **Ready wording:** "For fluent callers stock adds a median 0.10 s after end of speech (p90 0.40 s) — but 26% of fluent turns were never judged complete and fell to the 3-second fallback timeout. We report that nonresponse rate; we don't hide it in an average."
+- **Ready wording:** "For fluent callers stock adds a median 0.10 s on the 77 clips with measurable trailing silence (p90 0.40 s) — but 26% of fluent turns were never judged complete and fell to the 3-second fallback timeout. We report that nonresponse rate; we don't hide it in an average."
 - **Metric / population:** median added latency 0.10 s, p90 0.40 s, on the N=77 fluent latency subset (clips with ≥ 0.5 s trailing silence out of 200 fluent clips); 26% fallback-timeout rate; 100 ms measurement checkpoints.
 - **Source / run:** [benchmark/RESULTS.md](../benchmark/RESULTS.md) §3, §5; `benchmark/data/model_fluent_latency.csv`, `benchmark/data/model_fluent_full_curves.json`.
 - **Status:** ready (as worded, exploratory). The pitch line "one tenth of a second" may be used only with the fallback-rate caveat available in Q&A.
