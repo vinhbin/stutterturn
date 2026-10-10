@@ -86,7 +86,9 @@ function nonempty(value) { return typeof value === 'string' && value.length > 0 
 function validTime(value) { return typeof value === 'number' && Number.isFinite(value) && value >= 0; }
 function validSourceFile(value) {
   if (!nonempty(value) || /[\\:\u0000-\u001f\u007f?#%]/.test(value)) { return false; }
-  // The backend lists basenames or relative paths, never URLs or filesystem roots.
+  // Contract v0.1 (af2813d) lists bare file names with no "/" or "\". Relative
+  // paths are tolerated only for backward compatibility with the pre-af2813d
+  // (3ed3786-era) server; URLs and filesystem roots are always rejected.
   return value.split('/').every(function (part) {
     return part.length > 0 && part !== '.' && part !== '..' && part.trim() === part && !part.endsWith('.');
   });
