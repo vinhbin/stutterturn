@@ -1,16 +1,16 @@
-# Proposed v3: one 80/20 experiment, with separate validation
+# Approved v3 scope: one 80/20 experiment, with separate validation
 
-**October 10, 2026. Recommendation for Vinh, Guttuu, and Niko; not execution approval.** Vinh clarified that 80/20 means original training replay versus stutter-focused adaptation, then paused training. He requested this recommendation/report and its Git push. Those requests do not resume training or open the reserved test.
+**October 10, 2026. Execution approved at approximately 19:00 EDT under D-011.** Vinh explicitly resumed W3 only with “ok do it” after the bounded recommendation. [The approval is recorded on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431). It supersedes his earlier training pause, but keeps the reserved test sealed, all validation/promotion checks, and the 20:00 EDT hard stop. Approval does not establish that Guttuu has started or completed the run.
 
 ## Recommendation and why
 
-Run **only W3**, if Vinh explicitly resumes the experiment in time: 80% original Smart Turn training replay, 10% SEP unfinished-gap examples, and 10% SEP completed-window examples. Start from stock FP32 Smart Turn v3.2, not the rejected v2 checkpoint.
+Run **only W3**, following preflight and within the approved timebox: 80% original Smart Turn training replay, 10% SEP unfinished-gap examples, and 10% SEP completed-window examples. Start from stock FP32 Smart Turn v3.2, not the rejected v2 checkpoint.
 
 v2's nearest miss reduced stutter-gap premature decisions from 47.4% to 18.5%, but worsened general-speech incomplete specificity by about 0.6 percentage point. More original replay directly tests whether we can protect that general behavior while retaining some adaptation. It may also weaken the stutter-gap improvement. Keep the outcome either way; do not promise that 80/20 will work.
 
-This is narrower than [Niko's reviewed v3 spec](https://github.com/vinhbin/stutterturn/blob/f7201981e2af591d14321ee2047b39a8e3371449/model/specs/training-v3.md), which requires W1/W2 at 70% replay and W3 at 80%, with optional W4. **Before execution, record the W3-only amendment and its checks in the team protocol.** Do not silently claim that the current required run grid was completed.
+This narrows [Niko's original reviewed v3 spec](https://github.com/vinhbin/stutterturn/blob/f7201981e2af591d14321ee2047b39a8e3371449/model/specs/training-v3.md), which required W1/W2 at 70% replay and W3 at 80%, with optional W4. Niko recorded the [W3-only amendment](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103046179), now merged in PR #28. Use the [reconciled team protocol](../model/specs/training-v3.md). Record W1/W2/W4 as not run; do not claim the original grid was completed.
 
-## Proposed frozen recipe
+## Approved frozen recipe
 
 | Item | Recommendation |
 |---|---|
@@ -49,11 +49,11 @@ For later confirmation, obtain different authentic recordings with reviewed endp
 
 ## Timing, ownership and fallback
 
-[Niko's 18:45 EDT update](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6102988921) requests go/no-go by about **19:00 EDT**, estimates roughly 45 minutes end to end, and retains the **20:00 hard stop** on October 10. The reviewed proposal also targets prescreen by 19:15 and selection by 19:40. If approval or checks cannot fit, do not compress verification or extend the deadline implicitly. No v4 or extra sweep follows a failed result.
+[Niko's reconciled protocol](../model/specs/training-v3.md) targets prescreen at **resume +20 minutes** and selection at **resume +40 minutes**, with the unchanged **20:00 EDT hard stop** on October 10. Vinh approved at approximately 19:00. If execution or checks cannot fit in the remaining time, do not compress verification or extend the deadline. No v4 or extra sweep follows a failed result.
 
-- **Vinh:** decide whether to resume; the pause currently stands.
-- **Niko:** reconcile the W3-only amendment and additional promotion checks with the team spec; own selection and disclosure.
-- **Guttuu:** execute only after approval, record the environment/artifacts and exact outcome, and verify audible behavior before any candidate integration.
+- **Vinh:** approved W3 only under D-011; later integration still requires evidence and a recorded decision.
+- **Niko:** the amendment is recorded; own selection, matched input checks, and disclosure.
+- **Guttuu:** execute the approved run after preflight, record start/environment/artifacts/outcome, and verify audible behavior before any candidate integration.
 
 If no candidate qualifies, retain the stock/patient demonstration and report the failed adaptation honestly. Its human-label, audio and hosting acceptance work still has to be completed. The [judge-facing training report](training-report-2026-10-10.md) explains the current evidence and limitations.
 
@@ -68,4 +68,4 @@ Vinh also asked about data beyond the current sources. These are researched opti
 
 Prioritize reviewed conversational endpoints over simply increasing clip count. Stutter annotations and timestamped transcripts still do not directly supply the complete/incomplete turn labels our task needs. Group all sessions/crops from the same speaker into one partition before creating examples, check duplicate and near-duplicate audio against existing sources, and document unresolved speaker identities. A source that looks new is not automatically an independent test.
 
-For a later version, build a small reviewed real-speech pilot first, then freeze a new training manifest and separate development/confirmation speakers. Keep original replay in the mixture and retain both incomplete and completed adaptation examples. Do not insert these sources into W3 at the last minute: changing data and mixture together would change the proposed experiment. No new training, download, or final-test run is authorized by this source list.
+For a later version, build a small reviewed real-speech pilot first, then freeze a new training manifest and separate development/confirmation speakers. Keep original replay in the mixture and retain both incomplete and completed adaptation examples. Do not insert these sources into W3 at the last minute: changing data and mixture together would change the approved experiment. The W3 approval does not cover these additional datasets, another training variant, or any final-test run.
