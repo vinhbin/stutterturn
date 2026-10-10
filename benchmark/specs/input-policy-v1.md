@@ -60,7 +60,7 @@ Keep the table schema. The cache key's `preproc_version` component becomes `PREP
 
 ## Fixture
 
-`benchmark/fixtures/agent-onset-v1/onsets.csv` (sha256 `d3307a54e0c8610515ec26bb3d633647f8ef0134ef842e5dcb731563310c1c03`) was produced by `generate.py` in the same folder. That script replays all 200 `data/block_eval.csv` clips through Guttuu's engine (turn logic as on `main` `49716d0`). It records:
+`benchmark/fixtures/agent-onset-v1/onsets.csv` (sha256 `2e2ba14d3e3fd358926642ab1558577ffe4696db989ae41460627205f5804e28`) was produced by `generate.py` in the same folder. That script replays all 200 `data/block_eval.csv` clips through Guttuu's engine (turn logic as on `main` `49716d0`). It records:
 
 - the first `speech_start`;
 - the intended pre-roll start;

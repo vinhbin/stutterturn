@@ -1,0 +1,5 @@
+# Benchmark manifests hash exact bytes. Keep checkout bytes identical on all OSes.
+*.csv text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.py text eol=lf
