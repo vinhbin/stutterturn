@@ -9,7 +9,7 @@ In our exploratory measurement on real recordings, the standard open model's INT
 | Main track | AI/ML |
 | Team | Vinh · Guttuu · Niko — Kareem departed during the event |
 | Demo / Devpost | Pending; no working public demo is claimed here |
-| Intended core integrations | Gemini agent responses and ElevenLabs voice — both ran in the [first saved replay](agent/evidence/2026-10-10-first-replay/) |
+| Intended core integrations | Gemini agent responses and ElevenLabs voice — both ran in the [saved replay v2](agent/evidence/2026-10-10-replay-v2/) |
 | Optional after core proof | Phone transport, Vultr hosting/training and Tiger Data (unstaffed since Kareem's departure — see [PLAN](PLAN.md#current-status)); actual use determines sponsor entries |
 
 ## Build status
@@ -21,7 +21,7 @@ Legend: ✅ on main with saved evidence · ⬜ no repo evidence yet
 | Capability | Status | Evidence |
 |---|---|---|
 | Exploratory stock baseline on real recordings (INT8 CPU build; energy-derived labels, listen-through pending) | ✅ | [benchmark/RESULTS.md](benchmark/RESULTS.md) |
-| Agent contract and runnable stock/patient **web replay** agent (Gemini reply, ElevenLabs voice) | ✅ | [agent/CONTRACT.md](agent/CONTRACT.md) v0.1 · [first replay](agent/evidence/2026-10-10-first-replay/) · [PR #11](https://github.com/vinhbin/stutterturn/pull/11) |
+| Agent contract and runnable stock/patient **web replay** agent (Gemini reply, ElevenLabs voice) | ✅ | [agent/CONTRACT.md](agent/CONTRACT.md) v0.1 · [replay v2](agent/evidence/2026-10-10-replay-v2/) (supersedes the [first replay](agent/evidence/2026-10-10-first-replay/)) · [PR #11](https://github.com/vinhbin/stutterturn/pull/11), [PR #14](https://github.com/vinhbin/stutterturn/pull/14) |
 | Landing page, judge view and run console wired to the real backend | ✅ | [web/](web/README.md) · [saved model-only runs](web/evidence/2026-10-10-ui-integration/) · [PR #12](https://github.com/vinhbin/stutterturn/pull/12) |
 | Stock-weight recovery, synthetic update and ONNX export/reload parity (mechanics only, not adaptation) | ✅ | [docs/proofs/model-mechanics/](docs/proofs/model-mechanics/README.md) |
 | Frozen show-separated split manifests v1 and matched eval-runner spec | ✅ | [benchmark/splits/v1/](benchmark/splits/v1/) · [benchmark/specs/](benchmark/specs/) · [PR #9](https://github.com/vinhbin/stutterturn/pull/9) |
@@ -31,11 +31,11 @@ Legend: ✅ on main with saved evidence · ⬜ no repo evidence yet
 | Gemini end-of-speech rival arm | ⬜ | needs an API key |
 | Phone transport (8 kHz) — the current agent replays web audio; no phone path | ⬜ | |
 
-In the saved replay, stock decided "complete" inside the labelled block in 2 of 5 clips; both replies were cancelled before any audio, so no audible interruption occurred in that pipeline. Five clips support no rates. The reviewed passive demo UI and corrected claims/pitch documents merged earlier via [PR #7](https://github.com/vinhbin/stutterturn/pull/7) and [PR #8](https://github.com/vinhbin/stutterturn/pull/8). Follow PLAN for live-agent, model and annotation acceptance; a merged PR does not pass a gate.
+In the saved replay v2 — which supersedes the first replay after a model-input fix restored the missing pre-roll — stock decided "complete" inside the labelled gap in 4 of 5 clips; 3 of those replies were cancelled before any audio, the fourth clip ended too soon to observe overlap, and no audible interruption occurred in any of the 10 runs. That reflects the pipeline's reply delay, not demonstrated safety, and these are model completion decisions on exploratory energy-derived labels. Five clips support no rates. The reviewed passive demo UI and corrected claims/pitch documents merged earlier via [PR #7](https://github.com/vinhbin/stutterturn/pull/7) and [PR #8](https://github.com/vinhbin/stutterturn/pull/8). Follow PLAN for live-agent, model and annotation acceptance; a merged PR does not pass a gate.
 
 ## What the first complete demonstration must show
 
-Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech. The [first saved replay](agent/evidence/2026-10-10-first-replay/) does exactly this for five clips under exploratory labels — separating completion decisions from audible outcomes and recording cancellations; human-validated labels and more sources are still required before any rate is quoted.
+Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech. The [saved replay v2](agent/evidence/2026-10-10-replay-v2/) does exactly this for five clips under exploratory labels — separating completion decisions from audible outcomes and recording cancellations; human-validated labels and more sources are still required before any rate is quoted.
 
 The candidate arm becomes available only after a real exported model is integrated. If the adaptation gate fails, the deliverable becomes a corrected benchmark and interactive baseline comparison. That fallback still needs validated labels and reproducible runs. A UI fixture or a model prediction alone does not prove either outcome.
 
@@ -78,7 +78,7 @@ python -m http.server 8041 --bind 127.0.0.1 --directory web
 | Owner | Current handoff |
 |---|---|
 | Niko | Trainable checkpoint/export, corrected evaluation and immutable evidence — splits v1 and the eval-runner spec are on main |
-| Guttuu | Runnable stock/patient web agent, control/event contract and real audio timings — contract v0.1 and the first replay are on main |
+| Guttuu | Runnable stock/patient web agent, control/event contract and real audio timings — contract v0.1 and replay v2 (superseding the first replay) are on main |
 | Vinh | A/B human labels, integration decisions, demo UI, site/README upkeep, pitch/video/submission |
 | Kareem | Departed during the event (Saturday afternoon). His lane — judges page, README and evidence links — is now maintained by Vinh's side; the pages and evidence index were delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12). Open reassignments are in [PLAN](PLAN.md#current-status). |
 
