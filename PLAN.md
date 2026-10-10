@@ -1,6 +1,6 @@
 # StutterTurn plan and coordination
 
-**Team:** Vinh · Guttuu · Niko · Kareem · **Repo:** https://github.com/vinhbin/stutterturn
+**Team:** Vinh · Guttuu · Niko · Kareem (departed Sat afternoon — [D-008](docs/decision-log.md)) · **Repo:** https://github.com/vinhbin/stutterturn
 
 **Times:** America/New_York (EDT), Saturday October 10 unless marked Sunday. **Deadlines:** feature freeze Sun 1:00 AM; video + Devpost 1:00–8:00 AM; submit by 8:30 AM (official 9:00 AM). Judging: 3 minutes, about two judges at the table.
 
@@ -10,14 +10,13 @@
 
 ## Current status
 
-October 10, 2 PM EDT repository check.
+October 10, late-afternoon EDT repository check, after merged PRs [#9](https://github.com/vinhbin/stutterturn/pull/9)–[#13](https://github.com/vinhbin/stutterturn/pull/13).
 
-- **On main:** exploratory benchmark scripts and historical results at `8161223`; their labels, comparator and latency interpretation still need the corrections below. No validated efficacy result is available.
-- **Merged implementation:** [PR #7](https://github.com/vinhbin/stutterturn/pull/7) merged at `9c2cbca`; its UI fixes at `ee06776` passed 30/30 original checks and 14/14 focused regressions, with an independent rerun of the latter. [PR #8](https://github.com/vinhbin/stutterturn/pull/8) merged at `8828693`, bringing reviewed evidence corrections and the preserved intended pitch onto main. Live acceptance remains blocked; neither merge proves a working voice interaction.
-- **Model mechanics verified independently:** [recovery handoff](docs/model-recovery-handoff.md) and [reproduction artifacts](docs/proofs/model-mechanics/README.md) record recovered stock FP32 weights, a synthetic training update and ONNX export/reload parity. This does not establish stutter adaptation, real-audio preprocessing or agent compatibility; Niko's complete F1 integration handoff is still pending.
-- **Not yet reported in the repository:** human-reviewed A/B annotations, the stock/patient web-agent run, model/agent contracts, an adapted speech model and a corrected matched evaluation. This does not rule out teammates' unpushed work; owners attach their artifact at the next checkpoint.
-- **Gate status:** the 2 PM feasibility decision has no published result yet; the 3 PM development gate remains next. Vinh records the actual result and evidence. Time elapsed or a merged PR does not pass a gate.
-- **Immediate dependency:** Guttuu's agent contract and first complete stock replay unblock live UI integration. Niko's checkpoint proof and the two human listening batches continue independently. Additional UI/pitch expansion waits for these handoffs.
+- **Team change — Kareem departed** this afternoon (confirmed by Vinh); recorded as [D-008](docs/decision-log.md). His web-lane deliverables — landing page, judge view and evidence index — landed via [PR #12](https://github.com/vinhbin/stutterturn/pull/12) and are now maintained by Vinh's side, which also absorbs root `README.md` upkeep and disclosures. Gate criteria and evidence standards are unchanged.
+- **OPEN — needs a new human:** the B-batch label cross-check (F4's independence check, previously Kareem's) is unassigned. Flagged for reassignment to **Guttuu or Niko**; the team has not decided. Until someone cross-checks Vinh's `uncertainty`-flagged rows plus 5 random rows, F4's independence caveat is unmet.
+- **At risk / likely cut:** the optional Tiger Data integration (Kareem's) is now unstaffed; team decision pending. It was already deferred behind the core proof.
+- **On main:** Guttuu's `agent/CONTRACT.md` v0.1 and runnable stock/patient web replay agent with the [first replay evidence](agent/evidence/2026-10-10-first-replay/) ([PR #11](https://github.com/vinhbin/stutterturn/pull/11), fixes in [PR #13](https://github.com/vinhbin/stutterturn/pull/13)): five block clips × stock/patient; stock decided "complete" inside the labelled block in 2 of 5, both replies cancelled before audio — no audible interruption in those ten runs, and no rates from five clips. The run console, landing and judge pages with real backend integration and [saved model-only runs](web/evidence/2026-10-10-ui-integration/) ([PR #10](https://github.com/vinhbin/stutterturn/pull/10), [PR #12](https://github.com/vinhbin/stutterturn/pull/12)). Niko's frozen show-separated splits v1 and the matched eval-runner spec ([PR #9](https://github.com/vinhbin/stutterturn/pull/9)); eval items v1 and the INT8/FP32 precision-baseline run records remain on `niko/model-benchmark`, not yet merged. The [model-mechanics proof](docs/proofs/model-mechanics/README.md) stands; it is not adaptation.
+- **Not yet in the repository:** human-reviewed A/B annotations (F3/F4), a trained candidate model and matched evaluation result, long-block tests, phone transport, and any published 2 PM/3 PM gate outcome. Vinh records actual gate results and evidence; elapsed time or a merged PR does not pass a gate.
 
 Replace this current summary as evidence arrives. Preserve meaningful previous decisions in [the decision log](docs/decision-log.md), rather than appending competing current snapshots.
 
