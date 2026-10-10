@@ -41,8 +41,14 @@ def main():
         print(f"REFUSED: items_sha256 differ ({ra['items_sha256'][:12]} vs {rb['items_sha256'][:12]})", file=sys.stderr)
         sys.exit(2)
     ca, cb = ra["config"], rb["config"]
+    # grid_scope: absent == "full"; checks-only outcomes are proven identical (specs/checks-only-grid-v1.md)
+    ca = dict(ca, grid_scope=ca.get("grid_scope", "full"))
+    cb = dict(cb, grid_scope=cb.get("grid_scope", "full"))
     diff = sorted(k for k in set(ca) | set(cb) if ca.get(k) != cb.get(k))
-    other = [k for k in diff if k != "threshold"]
+    allowed = {"threshold"}
+    if "grid_scope" in diff and set(diff) <= {"threshold", "grid_scope", "config_id"}:
+        allowed |= {"grid_scope", "config_id"}
+    other = [k for k in diff if k not in allowed]
     if other and not a.allow_config_diff:
         print(f"REFUSED: configs differ in {other} (besides threshold); use --allow-config-diff", file=sys.stderr)
         sys.exit(2)

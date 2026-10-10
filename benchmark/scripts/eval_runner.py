@@ -5,7 +5,8 @@ Usage:
       --expected-sha256 HEX --items items.jsonl --config cfg.json [--scratch] [--no-cache]
   python benchmark/scripts/eval_runner.py --rescore RUN_DIR --config other.json [--scratch]
 
-Probabilities are computed on the full grid and stored; decisions are derived from the
+Probabilities are computed on the full grid (or only the schedule's check points under
+grid_scope "checks") and stored; decisions are derived from the
 grid by the configured schedule, so thresholds/schedules can be re-scored offline.
 """
 import argparse, hashlib, json, math, os, platform, sqlite3, subprocess, sys, time
@@ -25,6 +26,7 @@ GROUPS = {"stuttered", "fluent"}
 KINDS = {"unfinished", "completed"}
 LABEL_SOURCES = {"human", "sep28k_annotator", "energy_vad"}
 SCHEDULES = {"single", "interval", "legacy"}
+GRID_SCOPES = {"full", "checks"}
 ITEM_FIELDS = ["item_id", "clip_key", "audio", "split", "group", "kind", "silence_start_s",
                "resume_s", "turn_end_s", "observe_until_s", "label_source"]
 OUTCOME_KEYS = ["grid", "infer_ms", "outcome", "premature", "decision_t", "trigger", "margin_s",
@@ -126,6 +128,12 @@ def load_config(path):
             sys.exit("schedule legacy is not allowed with input_policy turn_onset")
     elif "pre_roll_s" in cfg:
         sys.exit("pre_roll_s is only allowed with input_policy turn_onset")
+    # grid_scope: not setdefault'ed either (specs/checks-only-grid-v1.md); read with cfg.get(..., "full").
+    gs = cfg.get("grid_scope", "full")
+    if gs not in GRID_SCOPES:
+        sys.exit(f"bad grid_scope {gs!r} (expected 'full' or 'checks')")
+    if gs == "checks" and cfg["schedule"] == "legacy":
+        sys.exit("grid_scope checks is not allowed with schedule legacy (legacy already evaluates only its checkpoints)")
     return cfg
 
 
@@ -489,7 +497,10 @@ def do_infer(args):
             else:
                 start, onset_s, fb, pre_v = 0, None, False, PREPROC_VERSION
             grid, ims = {}, {}
-            for t in grid_times(it, cfg):
+            ts_all = grid_times(it, cfg)
+            if cfg.get("grid_scope", "full") == "checks":
+                ts_all = check_times(ts_all, cfg)
+            for t in ts_all:
                 if cfg["schedule"] == "legacy":
                     cut = int((it["silence_start_s"] + t) * SR)  # run_model_arm.py: int(), not round()
                 else:
@@ -523,7 +534,8 @@ def do_infer(args):
         run = base_run(run_id, cfg, {"model_id": args.model_id, "model_sha256": model_sha,
                                      "items_path": os.path.relpath(os.path.abspath(args.items), BASE),
                                      "items_sha256": items_sha, "vad_model_sha256": vad_sha, "cache_hits": cache.hits,
-                                     "cache_misses": cache.misses, "wall_s": round(time.time() - t_start, 2)})
+                                     "cache_misses": cache.misses, "model_calls": cache.misses,
+                                     "grid_points": cache.hits + cache.misses, "wall_s": round(time.time() - t_start, 2)})
         write_run(d, run, rows, summary)
     except BaseException:
         import shutil
@@ -538,6 +550,8 @@ def do_rescore(args):
     srun = json.load(open(os.path.join(src, "run.json")))
     scfg = srun["config"]
     cfg = load_config(args.config)
+    if args.threshold is not None:
+        cfg["threshold"] = args.threshold
     for k in ["grid_step_s", "vad_stop_s"]:
         if cfg[k] != scfg[k]:
             sys.exit(f"refusing rescore: {k} differs ({scfg[k]} -> {cfg[k]})")
@@ -553,7 +567,10 @@ def do_rescore(args):
     rows = []
     for r in src_rows:
         it = {k: v for k, v in r.items() if k not in OUTCOME_KEYS}
-        need = [key3(t) for t in grid_times(it, cfg)]
+        need_ts = grid_times(it, cfg)
+        if cfg.get("grid_scope", "full") == "checks":
+            need_ts = check_times(need_ts, cfg)
+        need = [key3(t) for t in need_ts]
         if cfg["schedule"] == "legacy":
             need = sorted(r["grid"])  # identical checkpoints and items => identical grid
         missing = [k for k in need if k not in r["grid"]]
@@ -573,6 +590,8 @@ def do_rescore(args):
             row["input_start_fallback"] = r.get("input_start_fallback")
         rows.append(row)
     run_id = make_run_id(args, srun["model_id"], cfg["config_id"], srun["items_sha256"])
+    if args.threshold is not None and not args.run_id:
+        run_id += f"-th{args.threshold:.2f}"
     d = claim_dir(run_id)
     try:
         summary = summarize(rows, cfg)
@@ -604,8 +623,12 @@ def main():
     ap.add_argument("--vad-sha256", help="expected sha256 of --vad-model")
     ap.add_argument("--rescore", help="existing run dir to re-score from stored grids")
     ap.add_argument("--scratch", action="store_true"); ap.add_argument("--no-cache", action="store_true")
+    ap.add_argument("--threshold", type=float,
+                    help="with --rescore: override the config's threshold; appends -thX.XX to the run id")
     ap.add_argument("--run-id", help="override the derived run id (used to test immutability)")
     args = ap.parse_args()
+    if args.threshold is not None and not args.rescore:
+        ap.error("--threshold is only valid with --rescore")
     if args.rescore:
         do_rescore(args)
     else:

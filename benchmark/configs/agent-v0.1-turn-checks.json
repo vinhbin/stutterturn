@@ -1,0 +1,1 @@
+{"config_id": "agent-v0.1-turn-checks", "threshold": 0.5, "vad_stop_s": 0.2, "schedule": "single", "recheck_interval_s": null, "fallback_timeout_s": 3.0, "grid_step_s": 0.01, "input_policy": "turn_onset", "pre_roll_s": 0.2, "grid_scope": "checks"}

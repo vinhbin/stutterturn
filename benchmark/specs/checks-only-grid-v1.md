@@ -104,3 +104,24 @@ Never use `test.jsonl`; it is sealed.
 7. **Regression:** the legacy run (`legacy-block.json`, stock INT8) still reports 116/200 first-check and 136/200 any-check.
 
 If any equivalence check finds a difference, stop and report the first differing items. Don't adapt `decide()` to hide it. Report any check you couldn't run as **NOT RUN** with the reason, never as passed.
+
+## Acceptance results (2026-10-10, macOS arm64)
+
+All 7 checks passed (Sonnet implementer, re-verified by Opus on 59 dev stuttered items with FP32: 0 outcome or probability differences, 59 vs about 2.5k grid points).
+
+| Equivalence check | Items | Full calls | Checks calls | Differences |
+|---|---|---|---|---|
+| single, dev fluent subset | 300 | 13,980 | 300 | 0 |
+| single, dev end-of-window subset | 100 | 8,402 | 100 | 0 |
+| single, legacy block | 200 | 8,406 | 200 | 0 |
+| interval-50ms, dev subset | 300 | 13,980 | 2,916 | 0 |
+| turn_onset, dev subset | 300 | 13,980 | 300 | 0 |
+
+Full dev under `agent-v0.1-single-checks` on this Mac (a **preview, not evidence**; official arms run on one machine per selection-v1):
+
+| Model | Main: premature (all groups) | End-of-window: decided by model | Wall time |
+|---|---|---|---|
+| stock INT8 | 1,120/1,870 | 375/680 | 40 s + 16 s |
+| stock FP32 | 934/1,870 | 317/680 | 70 s + 27 s |
+
+Config hashes for all four existing configs are unchanged, legacy still reports 116/136, and all guards and compare rules behave as specified.
