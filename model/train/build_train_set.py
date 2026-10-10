@@ -260,7 +260,10 @@ def sep_positives(stu, plant_key=None, allow_length_mismatch=False):
     q2e = [x / C.SR for x in wquantiles([r["keep_samples"] if r["keep_samples"] < r["cut_samples"]
                                          else r["cut_samples"] for r in rows],
                                         [r["weight"] for r in rows], q)]
-    length_ok = all(abs(a - b) <= 0.1 for a, b in zip(q2a, q2e))
+    # check 1 as amended in training-v2.md (5e0af13, before any v2 run): within 0.1 s at
+    # p10 and p50, and 2e must not exceed 2a at any quantile (structural p90 gap is recorded)
+    length_ok = (all(abs(a - b) <= 0.1 + 1e-9 for a, b in zip(q2a[:2], q2e[:2]))
+                 and all(b <= a + 1e-9 for a, b in zip(q2a, q2e)))
     if not length_ok and not allow_length_mismatch:
         sys.exit(f"REFUSING: length matching off: 2a {q2a} vs 2e {q2e} "
                  "(use --allow-length-mismatch only for scratch diagnostics)")
@@ -268,6 +271,8 @@ def sep_positives(stu, plant_key=None, allow_length_mismatch=False):
             "samples": len(rows), "clip_outcomes": counts, "clips_in_both_2a_2e": both,
             "length_s_p10_p50_p90": {"2a": [round(x, 3) for x in q2a], "2e_after_matching": [round(x, 3) for x in q2e]},
             "length_match_ok": length_ok,
+            "length_rule": "training-v2 check 1 (amended 5e0af13): |2e-2a| <= 0.1 s at p10 and p50; 2e <= 2a at p10/p50/p90",
+            "length_residual_gap_s": [round(b - a, 3) for a, b in zip(q2a, q2e)],
             "weight_by_group": {g: round(sum(r["weight"] for r in rows if r["group"] == g), 6) for g in by_group}}
     return rows, info
 
