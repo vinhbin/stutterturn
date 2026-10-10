@@ -30,25 +30,41 @@ ROOT = os.path.dirname(AGENT)
 MODELS = os.path.join(AGENT, "models")
 AUDIO = os.path.join(ROOT, "benchmark", "audio")
 RUNS = os.path.join(AGENT, "runs")
-STOCK_MODEL = os.path.join(MODELS, "smart-turn-v3.2-cpu.onnx")
 SILERO_MODEL = os.path.join(MODELS, "silero_vad.onnx")
+
+# Pinned stock artifacts (model/CONTRACT.md section 1). The agent refuses a file whose hash differs.
+STOCK_MODELS = {
+    "stock-int8": {"file": "smart-turn-v3.2-cpu.onnx",
+                   "sha256": "2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f"},
+    "stock-fp32": {"file": "smart-turn-v3.2-gpu.onnx",
+                   "sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"},
+}
 
 PROMPT = ("You are a helpful voice assistant on a phone line. The caller's audio is attached. "
           "Reply in one short sentence, at most 20 words. Never comment on how the caller speaks.")
 
+TURN_LOGIC = {"vad_stop_s": 0.2, "vad_start_s": 0.2, "fallback_s": 3.0}
 CONFIGS = {
-    "stock": {"label": "Stock Smart Turn v3.2", "model": "smart-turn-v3.2-cpu",
-              "vad_stop_s": 0.2, "vad_start_s": 0.2, "threshold": 0.5, "fallback_s": 3.0,
-              "detail": "Smart Turn v3.2 CPU ONNX; model runs after 0.2 s of silence; "
+    "stock": {"label": "Stock Smart Turn v3.2 (INT8)", "model_id": "stock-int8", **TURN_LOGIC,
+              "detail": "Smart Turn v3.2 CPU INT8 ONNX; model runs after 0.2 s of silence; "
                         "3.0 s silence fallback"},
-    "patient": {"label": "Patient (longer wait, same model)", "model": "smart-turn-v3.2-cpu",
-                "vad_stop_s": 1.0, "vad_start_s": 0.2, "threshold": 0.5, "fallback_s": 3.0,
+    "stock_fp32": {"label": "Stock Smart Turn v3.2 (FP32)", "model_id": "stock-fp32", **TURN_LOGIC,
+                   "detail": "Same as stock with the unquantized FP32 export; the comparator "
+                             "for candidates (model/CONTRACT.md 5.4)"},
+    "patient": {"label": "Patient (longer wait, same model)", "model_id": "stock-int8",
+                **TURN_LOGIC, "vad_stop_s": 1.0,
                 "detail": "Same model and threshold; acts only after 1.0 s of silence "
                           "(stock: 0.2 s). A waiting configuration, not a trained model"},
-    "candidate": {"label": "StutterTurn candidate", "model": "candidate",
-                  "vad_stop_s": 0.2, "vad_start_s": 0.2, "threshold": 0.5, "fallback_s": 3.0,
-                  "detail": "Niko's export from CANDIDATE_MODEL; same turn logic as stock"},
+    "candidate": {"label": "StutterTurn candidate", "model_id": "candidate", **TURN_LOGIC,
+                  "detail": "Niko's export from CANDIDATE_MODEL with its metadata JSON; "
+                            "same turn logic as stock"},
 }
+
+try:  # non-secret settings such as CANDIDATE_MODEL; keys are read only by Services
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(AGENT, ".env"))
+except ImportError:
+    pass
 
 
 def _sha256(path):
@@ -72,20 +88,56 @@ def _commit():
         return "unknown"
 
 
-def candidate_path():
-    p = os.getenv("CANDIDATE_MODEL", "")
-    return p if p and os.path.exists(p) else None
+class ModelUnavailable(Exception):
+    pass
+
+
+def resolve_model(model_id):
+    """Return {model_id, path, sha256, threshold} or raise ModelUnavailable.
+
+    Stock: pinned file in agent/models. Candidate: CANDIDATE_MODEL plus the metadata
+    JSON beside it (same name, .json), whose sha256 must match the file
+    (model/CONTRACT.md section 5). CANDIDATE_SHA256 may supply the hash if the
+    metadata file is absent.
+    """
+    if model_id in STOCK_MODELS:
+        m = STOCK_MODELS[model_id]
+        path = os.path.join(MODELS, m["file"])
+        if not os.path.exists(path):
+            raise ModelUnavailable(f"{m['file']} missing; run agent/fetch_assets.py")
+        return {"model_id": model_id, "path": path, "sha256": m["sha256"], "threshold": 0.5}
+    path = os.getenv("CANDIDATE_MODEL", "")
+    if not path:
+        raise ModelUnavailable("No candidate export yet (CANDIDATE_MODEL unset)")
+    if not os.path.exists(path):
+        raise ModelUnavailable(f"CANDIDATE_MODEL not found: {path}")
+    meta_path = os.path.splitext(path)[0] + ".json"
+    meta = {}
+    if os.path.exists(meta_path):
+        with open(meta_path, encoding="utf-8") as f:
+            meta = json.load(f)
+    expected = meta.get("sha256") or os.getenv("CANDIDATE_SHA256", "")
+    if not expected:
+        raise ModelUnavailable("Candidate has no expected SHA-256 (metadata JSON or CANDIDATE_SHA256)")
+    return {"model_id": meta.get("model_id") or os.path.splitext(os.path.basename(path))[0],
+            "path": path, "sha256": expected.lower(),
+            "threshold": float(meta.get("threshold", 0.5))}
 
 
 def configurations():
     out = []
     for cid, c in CONFIGS.items():
-        available = cid != "candidate" or candidate_path() is not None
+        try:
+            m = resolve_model(c["model_id"])
+            if cid == "candidate" and _sha256(m["path"]) != m["sha256"]:
+                raise ModelUnavailable("Candidate file does not match its expected SHA-256")
+            available, note, threshold, model_id = True, "", m["threshold"], m["model_id"]
+        except ModelUnavailable as e:
+            available, note, threshold, model_id = False, str(e), 0.5, c["model_id"]
         out.append({"id": cid, "label": c["label"], "detail": c["detail"],
-                    "available": available,
-                    "note": "" if available else "No candidate export yet (CANDIDATE_MODEL unset)",
-                    "model": c["model"],
-                    "params": {k: c[k] for k in ("vad_stop_s", "vad_start_s", "threshold", "fallback_s")}})
+                    "available": available, "note": note, "model": model_id,
+                    "params": {"vad_stop_s": c["vad_stop_s"], "vad_start_s": c["vad_start_s"],
+                               "threshold": threshold, "fallback_s": c["fallback_s"]}})
     return out
 
 
@@ -112,7 +164,11 @@ class SileroVAD:
 class SmartTurn:
     _cache = {}
 
-    def __init__(self, path):
+    def __init__(self, path, expected_sha256):
+        got = _sha256(path)
+        if got != expected_sha256:
+            raise ModelUnavailable(f"{os.path.basename(path)}: SHA-256 {got} does not match "
+                                   f"expected {expected_sha256}; refusing to load")
         from transformers import WhisperFeatureExtractor
         so = ort.SessionOptions()
         so.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
@@ -120,22 +176,28 @@ class SmartTurn:
         so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         self.sess = ort.InferenceSession(path, sess_options=so, providers=["CPUExecutionProvider"])
         self.fe = WhisperFeatureExtractor(chunk_length=8)
-        self.sha256 = _sha256(path)
+        self.sha256 = got
 
     @classmethod
-    def load(cls, path):
-        if path not in cls._cache:
-            cls._cache[path] = cls(path)
-        return cls._cache[path]
+    def load(cls, path, expected_sha256):
+        key = (path, expected_sha256)
+        if key not in cls._cache:
+            cls._cache[key] = cls(path, expected_sha256)
+        return cls._cache[key]
 
-    def predict(self, audio):
+    def features(self, audio):
+        """Same preprocessing as benchmark/scripts/run_model_arm.py predict()."""
         n = 8 * SR
         audio = audio[-n:] if len(audio) > n else np.pad(audio, (n - len(audio), 0))
         inputs = self.fe(audio, sampling_rate=SR, return_tensors="np", padding="max_length",
                          max_length=n, truncation=True, do_normalize=True)
-        feats = np.expand_dims(inputs.input_features.squeeze(0).astype(np.float32), 0)
-        return float(self.sess.run(None, {"input_features": feats})[0][0].item())
+        return np.expand_dims(inputs.input_features.squeeze(0).astype(np.float32), 0)
 
+    def predict(self, audio):
+        """Returns (probability, inference milliseconds including feature extraction)."""
+        t = time.perf_counter()
+        prob = float(self.sess.run(None, {"input_features": self.features(audio)})[0][0].item())
+        return prob, round((time.perf_counter() - t) * 1000, 1)
 
 def list_sources():
     if not os.path.isdir(AUDIO):
@@ -226,14 +288,14 @@ class Run:
             raise ValueError(f"unknown config {config!r}")
         self.config = config
         self.cfg = CONFIGS[config]
-        if config == "candidate":
-            path = candidate_path()
-            if not path:
-                raise ValueError("candidate unavailable: CANDIDATE_MODEL unset or missing")
-        else:
-            path = STOCK_MODEL
-        self.model_path = path
-        self.model_name = os.path.basename(path).rsplit(".", 1)[0]
+        try:
+            m = resolve_model(self.cfg["model_id"])
+        except ModelUnavailable as e:
+            raise ValueError(f"{config} unavailable: {e}") from None
+        self.model_path = m["path"]
+        self.model_sha256 = m["sha256"]
+        self.model_name = m["model_id"]
+        self.threshold = m["threshold"]
         self.source_name = os.path.basename(source)
         self.audio = load_source(source)
         self.services = services
@@ -370,7 +432,7 @@ class Run:
     # -- main loop
     async def run(self):
         cfg = self.cfg
-        model = await asyncio.to_thread(SmartTurn.load, self.model_path)
+        model = await asyncio.to_thread(SmartTurn.load, self.model_path, self.model_sha256)
         vad = SileroVAD()
         self._log = open(self.log_path, "w", encoding="utf-8", newline="\n")
         trailing = np.zeros(int(TRAILING_SILENCE_S * SR), dtype=np.float32)
@@ -384,9 +446,10 @@ class Run:
         self.t0 = time.monotonic()
         self._send({"v": CONTRACT_VERSION, "type": "run_started", "run_id": self.run_id,
                     "seq": self.seq, "config": self.config,
-                    "params": {k: cfg[k] for k in ("vad_stop_s", "vad_start_s", "threshold",
-                                                   "fallback_s")}
-                              | {"frame_s": FRAME_S, "trailing_silence_s": TRAILING_SILENCE_S},
+                    "params": {"vad_stop_s": cfg["vad_stop_s"], "vad_start_s": cfg["vad_start_s"],
+                               "threshold": self.threshold, "fallback_s": cfg["fallback_s"],
+                               "frame_s": FRAME_S, "trailing_silence_s": TRAILING_SILENCE_S,
+                               "pre_roll_s": round(pre_roll_n * FRAME_S, 3), "time_origin": "source_audio_start"},
                     "model": self.model_name, "model_sha256": model.sha256,
                     "source": {"source_id": self.source_name,
                                "duration_s": round(len(self.audio) / SR, 3),
@@ -399,7 +462,7 @@ class Run:
         in_speech = False
         speech_run = silence_run = 0
         first_speech_i = first_silence_i = None
-        pre_roll = []
+        recent = []
         turn_audio = None          # list of frames, None = no open turn
         decided = False
         checked = False
@@ -417,9 +480,11 @@ class Run:
             self._maybe_end_agent_audio(ft)
             frame = stream[i * FRAME:(i + 1) * FRAME]
             p = vad(frame)
-            pre_roll.append(frame)
-            if len(pre_roll) > pre_roll_n:
-                pre_roll.pop(0)
+            # recent frames, enough to reach pre_roll_n frames before a speech run
+            # that is only confirmed start_n frames after it began
+            recent.append((i, frame))
+            if len(recent) > pre_roll_n + start_n + 1:
+                recent.pop(0)
             if turn_audio is not None:
                 turn_audio.append(frame)
 
@@ -440,7 +505,8 @@ class Run:
                         self._barge_in(st, cfg["vad_start_s"])
                         turn_audio = None
                     if turn_audio is None:
-                        turn_audio = list(pre_roll)
+                        # pre-roll + every frame since the first speech frame, up to now
+                        turn_audio = [f for j, f in recent if j >= first_speech_i - pre_roll_n]
                         decided = False
                         self.turns += 1
             else:
@@ -455,23 +521,30 @@ class Run:
                     self.state(stt, "silence")
                     if turn_audio is not None and not decided and not checked:
                         checked = True
-                        prob = await asyncio.to_thread(model.predict, np.concatenate(turn_audio))
-                        if prob > cfg["threshold"]:
+                        prob, infer_ms = await asyncio.to_thread(model.predict,
+                                                                 np.concatenate(turn_audio))
+                        common = {"model": self.model_name, "model_id": self.model_name,
+                                  "prob": round(prob, 4), "threshold": self.threshold,
+                                  "complete": prob > self.threshold,
+                                  "silence_s": round(silence_run * FRAME_S, 3),
+                                  "infer_ms": infer_ms,
+                                  "input_s": round(len(turn_audio) * FRAME_S, 3)}
+                        if prob > self.threshold:
                             decided = True
-                            self.event(ft, "decision", "turn_complete", model=self.model_name,
-                                       prob=round(prob, 4), threshold=cfg["threshold"],
-                                       trigger="smart_turn")
+                            self.event(ft, "decision", "turn_complete", trigger="smart_turn",
+                                       **common)
                             self._first_decision(ft, "smart_turn")
                             self._start_reply(ft, turn_audio)
                         else:
-                            self.event(ft, "decision", "turn_incomplete", model=self.model_name,
-                                       prob=round(prob, 4), threshold=cfg["threshold"])
+                            self.event(ft, "decision", "turn_incomplete", **common)
                             self.state(ft, "holding", prob=round(prob, 4), model=self.model_name)
                 if (turn_audio is not None and not decided and not in_speech
                         and silence_run >= fallback_n):
                     decided = True
-                    self.event(ft, "decision", "turn_complete", model=self.model_name, prob=None,
-                               threshold=cfg["threshold"], trigger="fallback_timeout")
+                    self.event(ft, "decision", "turn_complete", model=self.model_name,
+                               model_id=self.model_name, prob=None, threshold=self.threshold,
+                               complete=True, silence_s=round(silence_run * FRAME_S, 3),
+                               infer_ms=None, trigger="fallback_timeout")
                     self._first_decision(ft, "fallback_timeout")
                     self._start_reply(ft, turn_audio)
 
