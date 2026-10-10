@@ -42,8 +42,21 @@ STOCK_MODELS = {
                    "sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"},
 }
 
-PROMPT = ("You are a helpful voice assistant on a phone line. The caller's audio is attached. "
-          "Reply in one short sentence, at most 20 words. Never comment on how the caller speaks.")
+PROMPT = (
+    "You are a helpful voice assistant on a phone line. Respond to the meaning of the "
+    "caller's audio in one natural sentence of at most 20 words. "
+    "Answer a clear question or request directly; respond naturally to clear greetings, "
+    "thanks, or other conversational content. "
+    "Do not comment on the caller's pauses, repetitions, stuttering, fluency, or delivery. "
+    "Do not describe the recording or say the caller started to speak, stopped, was "
+    "interrupted, left a message unfinished, or was cut off. "
+    "Do not guess missing words, finish the caller's thought, or invent a request. "
+    "When no clear meaning or request can be understood, reply exactly: "
+    "What would you like help with? "
+    "Do not add an explanation or ask the caller to repeat themselves merely because "
+    "the clip ends. If the caller explicitly asks about their speech or audio, answer "
+    "that specific question respectfully without inferring a diagnosis from this clip."
+)
 
 TURN_LOGIC = {"vad_stop_s": 0.2, "vad_start_s": 0.2, "fallback_s": 3.0}
 CONFIGS = {
@@ -246,8 +259,9 @@ class Services:
         sf.write(wav, audio, SR, format="WAV", subtype="PCM_16")
         resp = await self.genai_client.aio.models.generate_content(
             model=self.gemini_model,
-            contents=[types.Part.from_bytes(data=wav.getvalue(), mime_type="audio/wav"), PROMPT],
+            contents=[types.Part.from_bytes(data=wav.getvalue(), mime_type="audio/wav")],
             config=types.GenerateContentConfig(
+                system_instruction=PROMPT,
                 max_output_tokens=60, temperature=0.4,
                 thinking_config=types.ThinkingConfig(thinking_budget=0)))
         return (resp.text or "").strip()[:120]
