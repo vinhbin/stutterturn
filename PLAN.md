@@ -39,6 +39,8 @@ The status below describes published evidence, not guesses about local work. Use
 
 F3/F4 together supply **30 feasibility examples**: 10 unfinished stutter blocks, 10 completed stuttered turns and 10 completed fluent turns. Annotation CSVs use the same header: `sample_id,source_id,context_ref,speaker_id,category,time_origin,block_onset_s,resumption_s,turn_end_s,reviewer,reviewed_at,uncertainty,accepted`. Times refer to the explicitly named source/context; leave inapplicable fields empty. Unknown speaker identity stays unknown. Niko validates schema, disjoint source samples and usable counts before consuming the files. No audio is committed.
 
+**F1 execution shortcut:** [model recovery handoff](docs/model-recovery-handoff.md) records the verified official artifact/source, a passing local stock-inference smoke check and an existing community FP32-to-PyTorch converter with a strict parity test. Conversion/training/export remain unverified; Niko should inspect this route before writing a converter from scratch. A skipped parity test or fresh Whisper initialization does not pass F1.
+
 These 30 examples are a **feasibility set**, not the final benchmark. If context or examples are unavailable, record the missing category as a blocker rather than substituting energy-derived labels. A loading/one-batch smoke test can run in parallel with listening; adaptation on newly selected stutter labels waits for their validation.
 
 ### Four parallel lanes — start together
