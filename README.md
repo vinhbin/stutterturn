@@ -7,10 +7,10 @@ In our exploratory measurement on real recordings, the standard open model's INT
 | Hacklanta '26 | |
 |---|---|
 | Main track | AI/ML |
-| Team | Vinh · Guttuu · Niko — Kareem departed during the event |
+| Team | Vinh · Guttuu · Niko · Kareem |
 | Demo / Devpost | Pending; no working public demo is claimed here |
 | Intended core integrations | Gemini agent responses and ElevenLabs voice — both ran in the [saved replay v2](agent/evidence/2026-10-10-replay-v2/) |
-| Optional after core proof | Phone transport, Vultr hosting/training and Tiger Data (unstaffed since Kareem's departure — see [PLAN](PLAN.md#current-status)); actual use determines sponsor entries |
+| Other integrations | Vultr hosts an earlier site build; Tiger Data's offline chart is built, with database connection still pending under Vinh's lane. Phone transport and Vultr training remain optional after core proof. See [PLAN](PLAN.md#current-status); actual use determines sponsor entries. |
 
 ## Build status
 
@@ -57,7 +57,7 @@ For the presentation site and run console, from current main:
 python -m http.server 8041 --bind 127.0.0.1 --directory web
 ```
 
-`/` is the landing page, `/judges/` the judge view and `/demo-ui/` the run console. Without a backend, the preview is synthetic UI data and labeled as such. With Guttuu's local backend running (`python agent/server.py`, setup in [agent/README.md](agent/README.md)), the console runs real local model decisions against the same recordings — see [web/README.md](web/README.md) and the [saved model-only runs](web/evidence/2026-10-10-ui-integration/). The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
+`/` is the landing page, `/judge/` the guided judge view and `/live/` the run console; `/judges/` and `/demo-ui/` remain legacy routes. Vultr still serves the earlier build, so the new routes await deployment. Without a backend, the preview is synthetic UI data and labeled as such. With Guttuu's local backend running (`python agent/server.py`, setup in [agent/README.md](agent/README.md)), the console runs real local model decisions against the same recordings — see [web/README.md](web/README.md) and the [saved model-only runs](web/evidence/2026-10-10-ui-integration/). The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
 
 ## Scope and limits
 
@@ -80,7 +80,7 @@ python -m http.server 8041 --bind 127.0.0.1 --directory web
 | Niko | Trainable checkpoint/export, corrected evaluation and immutable evidence — splits v1 and the eval-runner spec are on main |
 | Guttuu | Runnable stock/patient web agent, control/event contract and real audio timings — contract v0.1 and replay v2 (superseding the first replay) are on main |
 | Vinh | A/B human labels, integration decisions, demo UI, site/README upkeep, pitch/video/submission |
-| Kareem | Departed during the event (Saturday afternoon). His lane — judges page, README and evidence links — is now maintained by Vinh's side; the pages and evidence index were delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12). Open reassignments are in [PLAN](PLAN.md#current-status). |
+| Kareem | Judges page, README and evidence links; pages and evidence index delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12). Current maintenance and task ownership are tracked in [PLAN](PLAN.md#current-status). |
 
 [PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work plus frozen split manifests and run specs. `agent/` (contract v0.1 and the replay agent) and the `web/` site are on main; `model/` holds its contract, with the trained candidate still pending.
 

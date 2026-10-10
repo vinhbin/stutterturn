@@ -56,18 +56,33 @@ node web/demo-ui/dev/checks/site-checks.mjs
    the input-length rule amendment at `c20fa8a`, resolving that check's blocker.
    V1 failed selection. Keep the corrected comparison ready and record
    the actual scope decision by the existing 20:00 EDT stop.
-3. After playback code acceptance, use a backend running that exact revision,
-   verify the laptop's audible output and cancellation, then save fresh matched
-   evidence. The existing service on port 8765 still reports `3ed3786`; its older
-   receipt-only run is not validation of the new playback path.
+3. Guttuu's requested handoff is to listen locally and test audible output,
+   stopping an active reply, cancellation and restart. Vinh is on remote desktop
+   and cannot accept listening. The new [runtime packet](proofs/playback-runtime/README.md)
+   records three runs at `42b86d0`: real-device source stop/restart and one real
+   Gemini/ElevenLabs reply, with 29 characters under a 120-character cap. No
+   timeout, late chunk or cleanup error was reported. The 6.01 ms source-stop
+   observation is client request to terminal message, not acoustic latency.
+   The temporary server closed; the older service on port 8765 was preserved.
 4. Configure the Tiger Data connection locally, then separately verify real
    schema/ingestion/query behavior. No connection file was present during this
    continuation; offline verification does not establish database integration.
 5. Review/merge the branch, deploy the accepted site revision, rehearse three
    times with reset under 60 seconds, and finish video/submission within the
    existing freeze and submission buffer. The hosted UI still predates PR #21
-   at inspection. No merge, deployment, provider generation, database write or
-   human/acoustic acceptance was performed in this increment.
+   at inspection (`/judges/` and `/demo-ui/` work; `/judge/` and `/live/` are 404).
+   Windows HTTPS validation succeeds; the separate Python error was local trust
+   chain selection. No merge, deployment, database write or human/acoustic
+   acceptance was performed. The bounded real provider generation above happened
+   after the initial offline-only increment.
+
+The isolated execution worktree now also has its own ignored Python environment,
+all three pinned model/VAD assets and ten source clips. All 26 deterministic
+tests passed there, and whole-clip feature/probability parity passed on ten
+sources × stock INT8/FP32 with zero difference. This is preprocessing parity,
+not a completed model comparison. Niko subsequently pushed selection tooling at
+`f007c06`; Guttuu's latest published model handoff remains the v2 harness at
+`0d44829`, with no selected candidate/result yet.
 
 Current status and links should be refreshed in PLAN as those outputs arrive;
 this dated handoff records what was actually checked.
