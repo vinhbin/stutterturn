@@ -105,7 +105,7 @@ Log these to `metrics.jsonl`. In-loop PyTorch probabilities match ORT within abo
 |---|---|
 | A | stock INT8 |
 | B | stock FP32 |
-| C | stock FP32 rescored at every threshold 0.50, 0.51, …, 0.99, using `--rescore` (no extra inference), so stock gets as many operating points as the candidate |
+| C | stock FP32 rescored at every threshold 0.50, 0.51, …, 0.99, using `--rescore --threshold X` (no extra inference; every threshold keeps `config_id: "agent-v0.1-single-checks"` so `compare_runs` accepts D vs C; see `benchmark/specs/checks-only-grid-v1.md`), so stock gets as many operating points as the candidate |
 | D | the 2 pre-screened candidate checkpoints, at threshold 0.5 |
 | E | each D checkpoint rescored at thresholds {0.4, 0.5, 0.6} |
 | F (report only) | stock FP32 "patient" waits: `vad_stop_s` 0.4, 0.6 and 0.8, compared with `--allow-config-diff` |
