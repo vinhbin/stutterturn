@@ -1,0 +1,64 @@
+{
+  "scope": "Reply policy smoke check; not efficacy or acoustic evidence",
+  "prompt_sha256": "33059863f6ee856116d04c2c64c53608a5af709aeda82c7095376077c1070f39",
+  "code_commit": "7865b1d-dirty",
+  "results": [
+    {
+      "input": "captured stock turn audio",
+      "turn": 1,
+      "decision_t": 1.12,
+      "input_samples": 17408,
+      "repeat": 1,
+      "reply": "What would you like help with?",
+      "seconds": 1.868
+    },
+    {
+      "input": "captured stock turn audio",
+      "turn": 1,
+      "decision_t": 1.12,
+      "input_samples": 17408,
+      "repeat": 2,
+      "reply": "What would you like help with?",
+      "seconds": 1.751
+    },
+    {
+      "input": "captured stock turn audio",
+      "turn": 2,
+      "decision_t": 4.992,
+      "input_samples": 58880,
+      "repeat": 1,
+      "reply": "What would you like help with?",
+      "seconds": 1.406
+    },
+    {
+      "input": "captured stock turn audio",
+      "turn": 2,
+      "decision_t": 4.992,
+      "input_samples": 58880,
+      "repeat": 2,
+      "reply": "What would you like help with?",
+      "seconds": 1.629
+    },
+    {
+      "input": "text-only policy probe",
+      "case": "clear_request",
+      "content": "What is two plus two?",
+      "reply": "Two plus two equals four."
+    },
+    {
+      "input": "text-only policy probe",
+      "case": "explicit_audio_question",
+      "content": "How can I make my microphone sound clearer?",
+      "reply": "Position the microphone closer to your mouth, reduce background noise, and adjust your input volume levels."
+    }
+  ],
+  "provider_call_limit": 6,
+  "elevenlabs_calls": 0,
+  "speaker_playback": false,
+  "source": {
+    "file": "HeStutters_4_32.wav",
+    "sha256": "3f473af5d23cef679f19023bbac37d29e11e2cb651a40a10e2e4b55400f4eed5"
+  },
+  "capture_run_id": "20261010T220410Z-stock-9379",
+  "model": "gemini-3.8-flash"
+}
