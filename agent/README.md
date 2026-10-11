@@ -1,6 +1,6 @@
 # StutterTurn agent
 
-**Owner: Guttuu.** Replays a real SEP-28k recording through VAD + an end-of-turn model (stock, patient or Niko's candidate), optionally answers with Gemini + ElevenLabs, and logs when it decided and when it was audible. Interface: [CONTRACT.md](CONTRACT.md). Current evidence: [evidence/2026-10-10-replay-v2](evidence/2026-10-10-replay-v2/README.md) (supersedes the first replay, whose model input was faulty).
+**Owner: Guttuu.** Replays a real SEP-28k recording through VAD + an end-of-turn model (stock, patient or Niko's candidate), optionally answers with Gemini + ElevenLabs, and logs when it decided and when it was audible. Interface: [CONTRACT.md](CONTRACT.md). Current Stock FP32/X1 evidence: [longer replay](evidence/2026-10-11-long-replay-working/README.md) and [five additional pairs](evidence/2026-10-11-model-five-replay/README.md). The [historical Stock/Patient packet](evidence/2026-10-10-replay-v2/README.md) remains separately scoped.
 
 ## Setup (Windows, Python 3.11)
 
@@ -97,4 +97,4 @@ listening results; his raw run logs are still local.
 
 ## Not covered
 
-Live microphone input, phone transport and a selected candidate model have not been tested. Earlier Windows device/CLI checks reported the driver's output latency; they did not measure acoustic delay. Natural source resumption while a reply is already audible, callback underrun telemetry and the provider-cap path remain unverified. The browser controls audio on the backend laptop; browser audio delivery for a hosted backend is not implemented.
+Live microphone input and phone transport are not implemented. The exploratory X1 candidate is available for replay but is not a promoted release. Earlier Windows device/CLI checks reported the driver's output latency; they did not measure acoustic delay. Natural source resumption while a reply is already audible, callback underrun telemetry and the provider-cap path remain unverified. The Vultr-hosted console streams source and generated reply audio over an authenticated WebSocket to Web Audio. Digital rendering was verified in Chromium; see the [hosted setup](../docs/vultr-backend.md) and [current comparison proof](../docs/proofs/long-replay-judge/verification.json). The local `--play` option still uses backend laptop speakers.
