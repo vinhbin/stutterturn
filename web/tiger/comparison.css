@@ -26,6 +26,6 @@
   .cmp-figure { padding: 16px 8px; overflow-x: auto; }
   .cmp-figure svg { min-width: 660px; }
   #long-replay .snapshot-comparison table { table-layout: fixed; }
-  #long-replay .snapshot-comparison th, #long-replay .snapshot-comparison td { padding: 12px 8px; font-size: 12px; overflow-wrap: anywhere; }
+  #long-replay .snapshot-comparison th, #long-replay .snapshot-comparison td { padding: 12px 8px; font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
   .cmp-scroll-hint { display: block; color: var(--muted); font-size: 12px; margin-top: 8px; }
 }

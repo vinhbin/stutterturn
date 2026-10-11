@@ -73,6 +73,7 @@ with sync_playwright() as p:
                 if scenario == 'mobile':
                     cell = comparison.locator('thead th').last.bounding_box()
                     assert cell['x'] + cell['width'] <= 390
+                    assert comparison.locator('td').evaluate_all('cells => cells.every(c => c.scrollWidth <= c.clientWidth)')
                 comparison.locator('summary').click()
                 expect(comparison).to_contain_text('p=0.5432, threshold=0.6')
                 expect(comparison).to_contain_text('20261011T053423Z-stock_fp32-bbcf')
