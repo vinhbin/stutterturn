@@ -1,0 +1,204 @@
+{
+ "version": "dev2-v1",
+ "created_utc": "2026-10-11T03:06:30Z",
+ "script": "benchmark/scripts/build_dev2_items.py",
+ "script_sha256": "6b31009de8cb1a3fd25d9ec5f9466475d22bf2bc6983487d39a6d6b6cbb1d040",
+ "build_items_sha256": "8555002df51cd322d9d6f659965b483315dd78051a4ddc3e6f0f985360ba400b",
+ "build_eval_sets_sha256": "5cfcb760cbe92c71ccec55c58c9bbb0b8474505b1ccc0f02984e07b83d00773c",
+ "train_csv_sha256": "60e2509fd4186227f41a5b77fbf7355d6c826abce0eb653e4de469cb0b584e1c",
+ "holdout_rule": "smallest training show with >= 100 block clips (counts only)",
+ "show_counts": {
+  "HVSA": {
+   "clips": 628,
+   "block": 73
+  },
+  "HeStutters": {
+   "clips": 3361,
+   "block": 380
+  },
+  "IStutterSoWhat": {
+   "clips": 779,
+   "block": 122
+  },
+  "WomenWhoStutter": {
+   "clips": 8514,
+   "block": 1148
+  }
+ },
+ "heldout_show": "IStutterSoWhat",
+ "heldout_clips": 779,
+ "exposure_exclusion": {
+  "rule": "drop held-out-show clips named in benchmark/data/block_eval.csv, benchmark/data/fluent_eval.csv, benchmark/data/block_candidates.csv, benchmark/data/fluent_candidates.csv, benchmark/data/model_block_results.csv, benchmark/fixtures/agent-onset-v1/onsets.csv, benchmark/runs/legacy-items/block.jsonl, agent/evidence, web/evidence (Niko, #2 2026-10-11T02:41Z); items only, training excludes every show clip",
+  "excluded": 13,
+  "keys": {
+   "IStutterSoWhat_0_151": [
+    "benchmark/data/block_candidates.csv"
+   ],
+   "IStutterSoWhat_0_57": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_1_6": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_1_98": [
+    "benchmark/data/block_candidates.csv"
+   ],
+   "IStutterSoWhat_2_178": [
+    "benchmark/data/block_candidates.csv"
+   ],
+   "IStutterSoWhat_2_20": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_2_43": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_2_6": [
+    "benchmark/data/block_candidates.csv"
+   ],
+   "IStutterSoWhat_3_138": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_3_78": [
+    "benchmark/data/block_candidates.csv"
+   ],
+   "IStutterSoWhat_3_9": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_4_167": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ],
+   "IStutterSoWhat_4_4": [
+    "benchmark/data/block_candidates.csv",
+    "benchmark/data/block_eval.csv",
+    "benchmark/data/model_block_results.csv",
+    "benchmark/fixtures/agent-onset-v1/onsets.csv",
+    "benchmark/runs/legacy-items/block.jsonl"
+   ]
+  },
+  "overlapping_neighbours": {
+   "rule": "same ep_id, half-open [start, stop) overlap",
+   "excluded": 14,
+   "keys": {
+    "IStutterSoWhat_0_150": [
+     "IStutterSoWhat_0_151"
+    ],
+    "IStutterSoWhat_0_58": [
+     "IStutterSoWhat_0_57"
+    ],
+    "IStutterSoWhat_1_4": [
+     "IStutterSoWhat_1_6"
+    ],
+    "IStutterSoWhat_1_5": [
+     "IStutterSoWhat_1_6"
+    ],
+    "IStutterSoWhat_1_97": [
+     "IStutterSoWhat_1_98"
+    ],
+    "IStutterSoWhat_2_179": [
+     "IStutterSoWhat_2_178"
+    ],
+    "IStutterSoWhat_2_19": [
+     "IStutterSoWhat_2_20"
+    ],
+    "IStutterSoWhat_2_21": [
+     "IStutterSoWhat_2_20"
+    ],
+    "IStutterSoWhat_2_44": [
+     "IStutterSoWhat_2_43"
+    ],
+    "IStutterSoWhat_3_139": [
+     "IStutterSoWhat_3_138"
+    ],
+    "IStutterSoWhat_3_77": [
+     "IStutterSoWhat_3_78"
+    ],
+    "IStutterSoWhat_3_8": [
+     "IStutterSoWhat_3_9"
+    ],
+    "IStutterSoWhat_4_168": [
+     "IStutterSoWhat_4_167"
+    ],
+    "IStutterSoWhat_4_3": [
+     "IStutterSoWhat_4_4"
+    ]
+   }
+  }
+ },
+ "itemized_clips": 752,
+ "vad_params": {
+  "sr": 16000,
+  "frame_s": 0.03,
+  "hop_s": 0.01,
+  "gap_min_s": 0.3,
+  "abs_floor_db": -45.0,
+  "rel_db": 25.0,
+  "min_pre_speech_s": 0.2,
+  "resume_run_frames": 5,
+  "vad_stop_s": 0.2,
+  "min_fluent_speech_s": 0.5,
+  "min_trailing_s": 0.5
+ },
+ "tallies": {
+  "dev/block": {
+   "gap_but_no_pre_speech": 21,
+   "item_stuttered_unfinished": 69,
+   "no_gap": 4,
+   "no_resume": 14
+  },
+  "dev/fluent": {
+   "cmp_trailing_lt_0.5": 182,
+   "item_fluent_completed_proxy": 45,
+   "item_fluent_unfinished": 125,
+   "unf_no_mid_pause": 102
+  }
+ },
+ "item_counts": {
+  "main": {
+   "fluent/unfinished": 125,
+   "stuttered/unfinished": 69
+  },
+  "end_of_window": {
+   "fluent/completed": 45
+  },
+  "stuttered_completed": {
+   "stuttered/completed": 73
+  }
+ },
+ "output_sha256": {
+  "dev2.jsonl": "502f8239aa3d2d3a1271543bc60727f360fbea03ca7beefb7dbaa080dab50c0c",
+  "dev2_end_of_window.jsonl": "6a635d0fa2bd853c79d38cbf2e7578198f765aeb2f5538762b90a536b7641876",
+  "dev2_stuttered_completed.jsonl": "1819e5228e8ceaa140fc3a6442595ccfbb13229e9167f44aa728c40aaa17db1f",
+  "provenance.jsonl": "a8665ca92e233531ae55d584f63adfe0e62d460cb647df2fd34f5ee85108478e",
+  "heldout_keys.txt": "d976e64dfad44916297912543f863ad6792fe7120674a3508fc898d6d5130bd6"
+ },
+ "labels": "energy_vad proxies (same as items/v1); not human-confirmed",
+ "use": "v5 selector set only; v5 training must exclude every key in heldout_keys.txt; no model has been scored on these items"
+}

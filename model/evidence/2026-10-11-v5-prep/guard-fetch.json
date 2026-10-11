@@ -1,0 +1,36 @@
+{
+ "source": {
+  "repo": "pipecat-ai/smart-turn-data-v3.2-test",
+  "revision": "dfc179241fee65b0efe81ca37786f41ce26f38ec"
+ },
+ "first_shard": 4,
+ "cap": 3000,
+ "shards": [
+  {
+   "shard": 4,
+   "english_rows": 812,
+   "rows_jsonl_sha256": "92dc916c3f87efe7c610c86f502c37adacc8215e9d8af2a5ea7b33cffd0be13c"
+  },
+  {
+   "shard": 5,
+   "english_rows": 767,
+   "rows_jsonl_sha256": "e6f850ecc7d9c5b3eb05622120b2a6bffea8cd3f032f6b05c3214e742e996156"
+  },
+  {
+   "shard": 6,
+   "english_rows": 788,
+   "rows_jsonl_sha256": "3f24600159bd555f20a96cedef7fec9e8f473acb4c4eff6e9a3d0ef9298f15a6"
+  },
+  {
+   "shard": 7,
+   "english_rows": 778,
+   "rows_jsonl_sha256": "5ffe11b40912ca74da2469fced183e683e01e849bb238101282a2dba06dd83ce"
+  },
+  {
+   "shard": 8,
+   "english_rows": 789,
+   "rows_jsonl_sha256": "4e7954854056e1bad2d29e8403f0105b7f704badec9e925fa9a1c4d2f801669f"
+  }
+ ],
+ "code_commit": "e6a6c5c84359a30d13e4bd395c21c7763b7ca240"
+}
