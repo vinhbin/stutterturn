@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="../judge.css">
   <link rel="stylesheet" href="../tiger/chart.css">
   <link rel="stylesheet" href="../tiger/comparison.css">
+  <script src="../judge-data.js" defer></script>
   <script src="../tiger/chart.js" defer></script>
   <script src="../tiger/comparison.js" defer></script>
 </head>
@@ -33,7 +34,7 @@
         <p class="model-eyebrow">One recorded moment · 1.664 s</p>
         <h2 id="specimen-title">Same pause.<br>Different decision.</h2>
         <dl class="specimen-decisions"><div><dt>Stock FP32</dt><dd>Reply <span>0.9016 ≥ 0.50</span></dd></div><div><dt>StutterTurn X1</dt><dd>Hold <span>0.5432 &lt; 0.60</span></dd></div></dl>
-        <p class="specimen-note">Turn-completion scores and decision thresholds. Both use the same 0.2 s silence gate. The model and threshold change.</p>
+        <div class="score-rulers" aria-hidden="true"><div><span style="width:90.16%"></span><i style="left:50%"></i></div><div><span style="width:54.32%"></span><i style="left:60%"></i></div><p>0 <span>score / threshold marker</span> 1</p></div><p class="specimen-note">Turn-completion scores and decision thresholds. Both use the same 0.2 s silence gate. The model and threshold change.</p>
         <a class="text-link" href="#long-replay">Follow the complete replay →</a>
         <p class="specimen-note">Selected saved example · exploratory candidate</p>
       </aside>
@@ -52,24 +53,35 @@
     <section id="model" class="guide-section model-section" aria-labelledby="model-title">
       <div class="guide-section-heading"><h2 id="model-title">The model makes the turn decision.</h2><p>02 / Inside StutterTurn</p></div>
       <p class="snapshot-intro">We build on Pipecat Smart Turn v3.2. Our work is the adaptation, evaluation, and replay system around a concrete question: is this person finished, or still speaking through a pause?</p>
-      <div class="model-layout">
-        <ol class="model-pipeline" aria-label="Audio to turn decision">
-          <li><span class="model-step">01</span><div><h3>Listen to the current turn</h3><p>16 kHz mono audio. Silero VAD detects speech and silence; both replay configurations use a 0.2 s silence gate.</p></div></li>
-          <li><span class="model-step">02</span><div><h3>Represent the sound</h3><p>Up to eight seconds of audio becomes an 80 × 800 feature input using Whisper’s feature extractor.</p></div></li>
-          <li><span class="model-step">03</span><div><h3>Score whether the turn is complete</h3><p>Stock FP32 or our adapted X1 artifact runs through ONNX Runtime on the Vultr backend.</p></div></li>
-          <li><span class="model-step">04</span><div><h3>Hold, or prepare a reply</h3><p>The score is compared with the configuration’s threshold. A complete decision requests a response; resumed speech can cancel it.</p></div></li>
-        </ol>
-        <aside class="model-boundary"><p class="model-eyebrow">Two different jobs</p><h3>When to answer.<br>Then what to say.</h3><p>The turn model decides <strong>when</strong> to request a reply. Gemini generates <strong>what</strong> to say, and ElevenLabs voices it.</p><p>A turn decision, a generated reply, and scheduled playback are separate events. The replay records each stage; sound reaching the listener is not measured by these timestamps.</p><a class="text-link" href="https://github.com/vinhbin/stutterturn/blob/55c8617/agent/CONTRACT.md">Read the runtime contract →</a></aside>
+      <div class="signal-pipeline" aria-label="Audio to turn decision">
+        <article class="signal-stage"><span class="model-eyebrow">01 / Listen</span><div class="signal-icon" aria-hidden="true">&#9602;&#9605;&#9607;&#9603;&#9601;&#9601;&#9601;&#9605;&#9607;&#9602;</div><h3>The current turn</h3><p>16 kHz mono audio<br>Silero VAD &middot; 0.2 s silence gate</p></article>
+        <article class="signal-stage"><span class="model-eyebrow">02 / Represent</span><div class="feature-icon" aria-hidden="true"></div><h3>80 &times; 800 features</h3><p>Whisper feature extractor<br>Up to eight seconds of audio</p></article>
+        <article class="signal-stage model-stage"><span class="model-eyebrow">03 / Infer</span><div class="network-icon" aria-hidden="true">FP32 <span>&rarr;</span> p</div><h3>Is the turn complete?</h3><p>Smart Turn v3.2 &rarr; adapted X1<br>ONNX Runtime on Vultr</p></article>
+        <article class="signal-stage"><span class="model-eyebrow">04 / Decide</span><div class="decision-icon" aria-hidden="true"><span>HOLD</span><span>REPLY</span></div><h3>Score vs. threshold</h3><p>Stock &ge; 0.50 &middot; X1 &ge; 0.60<br>Resumed speech can cancel a reply</p></article>
       </div>
+      <p class="specimen-note diagram-caption">Conceptual processing diagram; the waveform and feature texture are schematic.</p>
+      <div class="reply-handoff"><div><span class="model-eyebrow">The turn model decides when</span><h3>Hold the turn, or hand it off.</h3></div><div class="handoff-chain"><span>Turn complete</span><b aria-hidden="true">&rarr;</b><span>Gemini <small>generates the reply</small></span><b aria-hidden="true">&rarr;</b><span>ElevenLabs <small>voices the reply</small></span></div></div>
+      <p class="specimen-note">A decision, generated reply, and scheduled playback are separate events. These timestamps do not measure sound reaching the listener. <a href="https://github.com/vinhbin/stutterturn/blob/55c8617/agent/CONTRACT.md">Runtime contract</a></p>
     </section>
 
     <section id="training" class="guide-section training-section" aria-labelledby="training-title">
-      <div class="guide-section-heading"><h2 id="training-title">Adapted for pauses. Tested for tradeoffs.</h2><p>03 / Training &amp; selection</p></div>
-      <div class="training-layout">
-        <div class="training-mix"><p class="model-eyebrow">W3 training sampling mix</p><p class="mix-headline">80<span>/</span>20</p><div class="mix-bar" aria-hidden="true"><span></span><span></span></div><p><strong>80% original-model replay</strong><br>20% stutter-focused examples, split between unfinished and completed examples.</p><p class="specimen-note">Training sampling proportions, not a train/test split.</p></div>
-        <div class="training-story"><h3>Fine-tune → blend → export → replay</h3><p>W3 fine-tuned reconstructed stock FP32 weights. X1 uses a weight blend: 75% of the W3 epoch-one checkpoint and 25% stock, then an ONNX export and a 0.60 decision threshold.</p><p>The replay compares that complete configuration with Stock FP32 at 0.50. It can show different behavior; it cannot attribute the difference to training alone.</p><p class="training-status"><strong>Exploratory X1:</strong> post-hoc candidate selected after v4 results; fifth adaptive look at dev/guard, not a v4 pass. Human confirmation remains pending and the reserved final test stays sealed.</p><p class="run-log-links"><a href="https://github.com/vinhbin/stutterturn/blob/55c8617/model/evidence/2026-10-10/runs/W3/config.json">Training configuration</a><a href="https://github.com/vinhbin/stutterturn/blob/55c8617/model/specs/x1-blend-check-v1.md">X1 selection protocol</a></p></div>
+      <div class="guide-section-heading"><h2 id="training-title">Teach the pause.<br>Preserve the conversation.</h2><p>03 / Training &amp; selection</p></div>
+      <div class="training-board">
+        <figure class="mixture-figure"><figcaption><span class="model-eyebrow">W3 / Sampling recipe</span><h3>80 / 10 / 10</h3></figcaption><div id="mixture-grid" class="mixture-grid" aria-hidden="true"></div><ul class="mixture-legend"><li><i></i><strong>80%</strong> Original-model replay</li><li><i></i><strong>10%</strong> Unfinished stutter examples</li><li><i></i><strong>10%</strong> Completed-speech proxies</li></ul><p class="specimen-note">Sampling probabilities during training, not a train/test split or unique-example counts.</p></figure>
+        <div class="blend-figure"><p class="model-eyebrow">From W3 to exploratory X1</p><h3>Fine-tune. Blend. Export.</h3><div class="blend-equation"><div><strong>75<span>%</span></strong><p>W3 epoch 1</p></div><b>+</b><div><strong>25<span>%</span></strong><p>Stock FP32</p></div></div><div class="blend-strip" aria-hidden="true"><span></span><span></span></div><div class="blend-output"><span>Blended weights</span><b aria-hidden="true">&rarr;</b><span>ONNX</span><b aria-hidden="true">&rarr;</b><strong>X1 @ 0.60</strong></div><p class="specimen-note">W3: AdamW &middot; learning rate 1e-5 &middot; batch 32 &middot; 590 steps.<br>The deployed comparison changes both weights and threshold.</p></div>
       </div>
-      <div class="model-question"><h3>The target is a better conversation.</h3><p>Fewer premature replies <strong>and</strong> prompt replies after genuine completion. Stock with a longer wait is a baseline to beat. The saved replay below the hero shows both overlap and response timing; it is not a general efficacy result.</p></div>
+      <p class="specimen-note evidence-context">Exploratory development results using proxy labels; human confirmation is pending. The reserved final test stays sealed.</p>
+      <details class="chart-values"><summary>Training and selection context</summary><p>X1 is a post-hoc candidate from the fifth adaptive look at dev/guard data, not a v4 pass or held-out accuracy result.</p></details>
+      <div class="chart-heading"><div><p class="model-eyebrow">W3 / All saved checkpoints</p><h3>Follow the training run.</h3></div><p>Threshold 0.50 throughout</p></div>
+      <div id="training-curves" class="training-curves"></div><noscript><p class="specimen-note">Enable JavaScript to view the development charts, or inspect the linked W3 and X4 checkpoint metrics below.</p></noscript>
+      <p class="specimen-note">Premature decisions use 352 stutter-block proxies; first-check completion uses 680 end-of-turn proxies. Connecting lines guide the eye between measured checkpoints.</p>
+      <div class="chart-heading"><div><p class="model-eyebrow">W3 / X4 in-loop checkpoint metrics</p><h3>Measure when to hold. Measure when to reply.</h3></div><p>Every metric uses a 0&ndash;100% scale</p></div>
+      <p class="snapshot-intro"><strong>W3 is our fine-tuned model. X1 is our deployed blend.</strong> These are in-loop W3/X4 checkpoint metrics, not the later X1 full benchmark. Changing the threshold alone moves the baseline. These development results do not establish a general improvement.</p>
+      <p class="snapshot-intro"><strong>Why use the blend?</strong> W3 epoch 1 leads three of these four metrics. Its hold specificity is 92.61%, below stock's 93.54%; our selection rule required no drop on that guard measure. X1 at 0.60 trades some of W3's gains for 93.73% hold specificity. It is a constrained choice, not the best score in every column. <a href="https://github.com/vinhbin/stutterturn/blob/55c8617/model/specs/x1-blend-check-v1.md">Inspect the selection rule</a>.</p>
+      <div class="experiment-key"><span class="stock-key">Stock @ 0.50</span><span class="threshold-key">Stock @ 0.60</span><span class="w3-key">Our W3 epoch 1 @ 0.50</span><span class="x1-key">Our X1 blend @ 0.60</span></div>
+      <div id="experiment-charts" class="experiment-charts"></div>
+      <details class="chart-values"><summary>Inspect exact values and training loss</summary><div id="experiment-values" class="chart-table-wrap"></div><div id="checkpoint-values" class="chart-table-wrap"></div></details>
+      <p class="run-log-links"><a href="https://github.com/vinhbin/stutterturn/blob/55c8617/model/evidence/2026-10-10/runs/W3/config.json">W3 training configuration</a><a href="https://github.com/vinhbin/stutterturn/blob/55c8617/model/evidence/2026-10-10/runs/W3/metrics.jsonl">W3 checkpoint metrics</a><a href="https://github.com/vinhbin/stutterturn/blob/55c8617/model/evidence/2026-10-10/runs/X4/metrics.jsonl">X4 blend and threshold metrics</a></p>
     </section>
 
     <section id="current-demo" class="guide-section" aria-labelledby="current-demo-title">
@@ -83,6 +95,7 @@
     <section id="run-log-evidence" class="guide-section" aria-labelledby="run-log-title">
       <div class="guide-section-heading"><h2 id="run-log-title">Five recordings: Stock FP32 vs. our X1 model</h2><p>Run-log evidence</p></div>
       <p class="snapshot-intro">Each of these five recordings was replayed through Stock FP32 and our X1 candidate on the current Vultr backend. All ten runs completed with generated speech rendered in the browser. Both use a 0.2 s silence gate; thresholds are 0.5 and 0.6. Tiger Data queries supply the decisions, cancellations, and scheduled audio below. This is saved evidence, not live backend or database status. New runs require explicit ingestion.</p>
+      <p class="specimen-note evidence-context"><strong>Reading the timing:</strong> X1's first reported reply audio was later in 4 of 5 pairs. All five X1 first-completion decisions used the silence fallback. These scheduled event times are not acoustic latency; provider timing also varies between runs.</p>
       <div id="tiger-chart" data-snapshot="../tiger/model-five.json"><p class="tgr-note">Enable JavaScript to view the run-log chart, or <a href="../tiger/model-five.json">read the saved snapshot data</a>.</p></div>
       <p class="run-log-links"><a href="../tiger/model-five.json">Snapshot data</a><a href="../tiger/schema.sql">SQL query definitions</a><a href="../tiger/README.md">Data pipeline and limitations</a></p>
     </section>
