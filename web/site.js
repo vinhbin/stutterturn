@@ -32,6 +32,17 @@ function fitConsole() {
 
 if (consoleFrame) {
   consoleFrame.addEventListener('load', fitConsole);
+  const requested = new URLSearchParams(location.search);
+  const preset = new URLSearchParams();
+  for (const key of ['source', 'config']) {
+    const value = requested.get(key);
+    if (value && value.length <= 200) preset.set(key, value);
+  }
+  if (preset.size) {
+    const target = '../demo-ui/?' + preset.toString();
+    consoleFrame.src = target;
+    document.querySelectorAll('a[href="../demo-ui/"]').forEach(link => { link.href = target; });
+  }
   if (consoleFrame.contentDocument?.readyState === 'complete') fitConsole();
 }
 

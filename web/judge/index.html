@@ -11,7 +11,9 @@
   <link rel="stylesheet" href="../site.css">
   <link rel="stylesheet" href="../judge.css">
   <link rel="stylesheet" href="../tiger/chart.css">
+  <link rel="stylesheet" href="../tiger/comparison.css">
   <script src="../tiger/chart.js" defer></script>
+  <script src="../tiger/comparison.js" defer></script>
 </head>
 <body class="judge-guide">
   <a class="skip-link" href="#main">Skip to judge guide</a>
@@ -23,10 +25,18 @@
     <section class="guide-opening" aria-labelledby="guide-title">
       <div class="guide-introduction">
         <h1 id="guide-title">Evaluate when<br>the agent answers.</h1>
-        <p class="guide-deck">StutterTurn makes voice-agent turn decisions inspectable. Hear the same recorded speech with stock, longer-wait, and exploratory adapted configurations. Compare the turn decision with when the agent actually replies.</p>
-        <div class="guide-actions"><a class="button button-primary" href="../live/">Open live workspace <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a><a class="button button-quiet" href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2">Inspect evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div>
+        <p class="guide-deck">StutterTurn makes voice-agent turn decisions inspectable. Start with Stock FP32 versus our X1 candidate on a longer recording, then hear a fresh replay. Compare the turn decision with when the agent actually replies.</p>
+        <div class="guide-actions"><a class="button button-primary" href="../live/">Open live workspace <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a><a class="button button-quiet" href="https://github.com/vinhbin/stutterturn/tree/21acc2c/agent/evidence/2026-10-11-long-replay">Inspect evidence <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M5 5h10v10"/></svg></a></div>
       </div>
-      <aside class="guide-hypothesis" aria-labelledby="hypothesis-title"><h2 id="hypothesis-title">The claim we’re testing</h2><p>Can an adapted turn model avoid answering during a speaker’s pause, while still responding promptly? A longer wait on the stock model is a baseline it must beat.</p><p class="guide-caveat">The saved five-clip replay below examines early decisions. It does not yet establish better interruption rates or completed-turn response delay.</p><a class="text-link" href="#evaluation-steps">Follow the evaluation steps <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12m-5-5 5 5 5-5"/></svg></a></aside>
+      <aside class="guide-hypothesis" aria-labelledby="hypothesis-title"><h2 id="hypothesis-title">The claim we’re testing</h2><p>Can an adapted turn model avoid answering during a speaker’s pause, while still responding promptly? A longer wait on the stock model is a baseline it must beat.</p><p class="guide-caveat">The longer replay below shows our X1 configuration holding an early pause that Stock FP32 answers. It is one selected example, not a general efficacy result.</p><a class="text-link" href="#evaluation-steps">Follow the evaluation steps <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12m-5-5 5 5 5-5"/></svg></a></aside>
+    </section>
+
+    <section id="long-replay" class="guide-section" aria-labelledby="long-replay-title">
+      <div class="guide-section-heading"><h2 id="long-replay-title">Stock FP32 vs. our model</h2><p>Longer replay · 11 Oct 2026</p></div>
+      <div id="model-comparison" data-snapshot="../tiger/comparison.json"><p class="snapshot-intro">Load the saved Tiger Data comparison of our X1 candidate and Stock FP32, or <a href="../tiger/comparison.json">read the comparison data</a>.</p></div>
+      <div class="guide-actions"><a class="button button-primary" href="../live/?source=demo-long-WomenWhoStutter_19_1238s.wav&amp;config=candidate">Hear our model</a><a class="button button-quiet" href="../live/?source=demo-long-WomenWhoStutter_19_1238s.wav&amp;config=stock_fp32">Hear Stock FP32</a></div>
+      <p class="cmp-context">Sign in, then click Start. These links preselect the same 10.4-second recording and configuration for a fresh live replay. Generated replies and provider timing may differ from the saved runs above.</p>
+      <p class="run-log-links"><a href="../tiger/comparison.json">Saved comparison data</a><a href="../tiger/comparison.sql">Comparison SQL</a><a href="https://github.com/vinhbin/stutterturn/tree/21acc2c/agent/evidence/2026-10-11-long-replay">Pinned run logs and notes</a></p>
     </section>
 
     <section id="current-demo" class="guide-section" aria-labelledby="current-demo-title">
@@ -38,7 +48,7 @@
     </section>
 
     <section id="replay-evidence" class="recorded-snapshot guide-section" aria-labelledby="snapshot-title">
-      <div class="guide-section-heading"><h2 id="snapshot-title">What the recorded replay shows</h2><p class="snapshot-date">Snapshot · 10 Oct 2026</p></div>
+      <div class="guide-section-heading"><h2 id="snapshot-title">Secondary baseline: Stock vs. Patient</h2><p class="snapshot-date">Snapshot · 10 Oct 2026</p></div>
       <p class="snapshot-intro">Corrected replay v2 covers five SEP-28k recordings and ten runs. Stock and patient use the same stock INT8 turn model. The changed setting is how much silence precedes a model check.</p>
       <div class="snapshot-comparison" role="region" aria-label="Recorded configuration comparison" tabindex="0">
         <table>
@@ -52,7 +62,7 @@
     </section>
 
     <section id="run-log-evidence" class="guide-section" aria-labelledby="run-log-title">
-      <div class="guide-section-heading"><h2 id="run-log-title">Inspect each recorded run</h2><p>Run-log evidence</p></div>
+      <div class="guide-section-heading"><h2 id="run-log-title">Historical five-clip timelines</h2><p>Run-log evidence</p></div>
       <p class="snapshot-intro">Compare the first completion decision, cancelled replies, and reported first audio for each recording. This saved snapshot comes from Tiger Data queries over stored run events. It shows ten current runs; ten superseded runs were excluded. New Vultr runs are not automatically ingested. It is not live backend or database status.</p>
       <div id="tiger-chart" data-snapshot="../tiger/snapshot.json"><p class="tgr-note">Enable JavaScript to view the run-log chart, or <a href="../tiger/snapshot.json">read the saved snapshot data</a>.</p></div>
       <p class="run-log-links"><a href="../tiger/snapshot.json">Snapshot data</a><a href="../tiger/schema.sql">SQL query definitions</a><a href="../tiger/README.md">Data pipeline and limitations</a></p>
@@ -62,7 +72,7 @@
       <div class="evaluation-intro"><h2 id="evaluation-title">How to evaluate it</h2><p>Use the live workspace for runs. Use the recorded artifacts to check what the evidence supports.</p><a class="text-link" href="../live/">Open live workspace <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a></div>
       <ol class="evaluation-steps">
         <li><span class="evaluation-number" aria-hidden="true">01</span><div><h3>Keep the recording fixed</h3><p>Sign in to the workspace and wait for automatic connection, then choose a recording. Use Retry connection if loading fails. Keep the same source for every comparison. These are recorded inputs; this path does not capture a live microphone or phone call.</p></div></li>
-        <li><span class="evaluation-number" aria-hidden="true">02</span><div><h3>Compare one configuration at a time</h3><p>Run Stock (INT8), then start a fresh run with Patient: the silence gate changes from 0.2 s to 1.0 s on the same model. To explore the adapted candidate, compare against Stock (FP32). The candidate was not included in the historical five-clip replay and is not a promoted model.</p></div></li>
+        <li><span class="evaluation-number" aria-hidden="true">02</span><div><h3>Compare one configuration at a time</h3><p>Start with Stock (FP32), then use a fresh run for our X1 candidate on the longer source above. Then compare Stock (INT8) with Patient: the silence gate changes from 0.2 s to 1.0 s on the same model. The candidate was not included in the historical five-clip replay and is not a promoted model.</p></div></li>
         <li><span class="evaluation-number" aria-hidden="true">03</span><div><h3>Separate a decision from a response</h3><p>Listen to the source and reply, then find the turn-complete decision, resumed caller speech, and first reported agent audio. A reply can be cancelled before it plays. The event record separates these moments; server-scheduled times are not measured speaker output.</p></div></li>
         <li><span class="evaluation-number" aria-hidden="true">04</span><div><h3>Check the artifacts and the limits</h3><p>Match the run’s source, configuration, and model metadata to the logs. Treat mock or development preview events as synthetic. The historical five-clip replay uses three-second excerpts followed by five seconds of synthetic silence; those clips cannot establish completed-turn response delay.</p></div></li>
       </ol>
@@ -76,13 +86,13 @@
         <li><h3>Hold or reply</h3><p>The policy waits or requests a response. Resumed speech can cancel that request.</p><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></li>
         <li><h3>Gemini → ElevenLabs → Browser</h3><p>Gemini generates the reply. ElevenLabs speech streams to Web Audio alongside the caller recording.</p></li>
       </ol>
-      <p class="architecture-note">The workspace plays source and reply audio. Browser rendering, Stop, and Reset were tested, and listening was confirmed. Acoustic timing and natural resumption during an already audible reply still need evaluation. <a href="https://github.com/vinhbin/stutterturn/blob/667460f/agent/CONTRACT.md">Inspect the event and browser audio contract</a> and <a href="https://github.com/vinhbin/stutterturn/tree/bcf50d1/agent">the implementation used for the saved runs</a>.</p>
+      <p class="architecture-note">The workspace plays source and reply audio. Browser rendering, Stop, and Reset were tested, and listening was confirmed. Acoustic timing and natural resumption during an already audible reply still need evaluation. <a href="https://github.com/vinhbin/stutterturn/blob/667460f/agent/CONTRACT.md">Inspect the event and browser audio contract</a> and <a href="https://github.com/vinhbin/stutterturn/tree/667460f/agent">the implementation used for the longer replay</a>.</p>
     </section>
 
     <section class="guide-section scope-section" aria-labelledby="scope-title">
       <div class="guide-section-heading"><h2 id="scope-title">What works today.</h2><p>Updated · 11 Oct 2026</p></div>
       <div class="scope-columns">
-        <div><h3>Built and exercised</h3><ul><li>Vultr-hosted replay with stock INT8, stock FP32, patient, and an exploratory adapted candidate.</li><li>Gemini replies and ElevenLabs speech played in the browser, with automatic connection and playback controls.</li><li>A shared caller/agent timeline, decision events, run metadata, and event ledger.</li><li>A corrected five-clip replay with ten saved logs and a Tiger Data query snapshot.</li></ul></div>
+        <div><h3>Built and exercised</h3><ul><li>Vultr-hosted replay with stock INT8, stock FP32, patient, and an exploratory adapted candidate.</li><li>Gemini replies and ElevenLabs speech played in the browser, with automatic connection and playback controls.</li><li>A shared caller/agent timeline, decision events, run metadata, and event ledger.</li><li>A Tiger Data comparison of Stock FP32 and X1 on a 10.4-second source, plus the historical five-clip baseline.</li></ul></div>
       </div>
       <div class="guide-next"><a class="button button-primary" href="../live/">Open live workspace <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a><p>Repository links require access. The pinned evidence is an engineering snapshot, not a validated efficacy result.</p></div>
     </section>

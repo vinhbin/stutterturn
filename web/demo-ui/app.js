@@ -132,6 +132,13 @@
 
   function renderConfigs() {
     state.configs = state.adapter.getConfigurations();
+    if (!state.presetConfigApplied && state.configs.some(function (cfg) { return cfg.available; })) {
+      var requestedConfig = new URLSearchParams(location.search).get('config');
+      if (state.configs.some(function (cfg) { return cfg.id === requestedConfig && cfg.available; })) {
+        state.selectedConfig = requestedConfig;
+      }
+      state.presetConfigApplied = true;
+    }
     var chosen = selectedConfig();
     if (!chosen || !chosen.available) {
       var available = state.configs.find(function (cfg) { return cfg.available; });
@@ -163,6 +170,11 @@
   function renderSources() {
     var previous = el['source-select'].value;
     state.sources = typeof state.adapter.getSources === 'function' ? state.adapter.getSources() : [];
+    if (!state.presetSourceApplied && state.sources.length) {
+      var requestedSource = new URLSearchParams(location.search).get('source');
+      if (state.sources.some(function (source) { return source.file === requestedSource; })) { previous = requestedSource; }
+      state.presetSourceApplied = true;
+    }
     el['source-select'].replaceChildren();
     if (!state.sources.length) {
       var empty = document.createElement('option'); empty.value = '';

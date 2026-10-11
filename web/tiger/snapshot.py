@@ -32,6 +32,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ingest  # noqa: E402  (shared parsing, connection resolution, superseded flag)
 
 OUT_PATH = Path(__file__).resolve().parent / "snapshot.json"
+HISTORICAL_DIRS = {
+    "agent/evidence/2026-10-10-first-replay",
+    "agent/evidence/2026-10-10-replay-v2",
+}
 
 CAVEATS = [
     "5 clips, one run per configuration for each clip, one show (HeStutters). Per-clip values only; no rates or aggregates.",
@@ -87,7 +91,7 @@ def per_run_from_log(item: dict) -> dict:
 
 
 def rows_offline() -> tuple[list[dict], dict]:
-    parsed = ingest.collect()
+    parsed = [i for i in ingest.collect() if i['run']['evidence_dir'] in HISTORICAL_DIRS]
     current = [i for i in parsed if not i["run"]["superseded"]]
     rows = [per_run_from_log(i) for i in current]
     meta = evidence_meta(
@@ -112,7 +116,7 @@ def rows_live(url: str) -> tuple[list[dict], dict]:
         cur.execute("SELECT * FROM run_outcomes WHERE NOT superseded")
         outcomes = {r["run_id"]: r for r in cur.fetchall()}
         cur.execute("SELECT run_id, config, source_id, source_duration_s, commit_sha, evidence_dir, superseded FROM runs")
-        runs = cur.fetchall()
+        runs = [r for r in cur.fetchall() if r['evidence_dir'] in HISTORICAL_DIRS]
 
     rows = []
     for run in (r for r in runs if not r["superseded"]):

@@ -7,8 +7,11 @@ into TigerData (managed Postgres/TimescaleDB), asks the judge questions as
 named SQL views, and renders the answers on a static chart block whose every
 number traces back to those queries over real committed logs.
 
-**Status: embedded at `/judge/`; the committed snapshot came from Tiger Data.**
-Niko reports a live ingest of 20 runs / 302 events in
+**Status: `/judge/` leads with the longer Stock FP32 versus X1 comparison from
+Tiger Data.** The database now holds 22 runs / 353 events. See the longer
+comparison section below for its exact run selection and export verification.
+
+The secondary historical snapshot began with Niko's ingest of 20 runs / 302 events in
 [PR #26](https://github.com/vinhbin/stutterturn/pull/26). The resulting
 `snapshot.json`, generated at `2026-10-10T21:43:03Z`, was committed as
 `5d4ee9c` and merged with that PR. It contains ten current runs over five
@@ -126,3 +129,26 @@ own `run_ended` summaries (`run_outcomes`).
 Keep the saved-export limitation in the submission: the browser does not
 query Tiger Data directly. Per `docs/claims-ledger.md` L-34, sponsor entries
 must describe actual use and comply with the event's prize requirements.
+
+## Longer hosted comparison (October 11)
+
+The primary `/judge/` comparison uses `comparison.sql` and `comparison.py` to
+select exactly the two committed runs in
+[`2026-10-11-long-replay`](../../agent/evidence/2026-10-11-long-replay/README.md).
+Both were ingested into Tiger Data: **22 runs / 353 events** total, including
+10 superseded runs / 152 superseded events. The two new runs add 51 events.
+
+`python web/tiger/comparison.py` queries the database and refuses to publish
+unless every selected field matches the original logs. No offline publishing
+mode is provided. `comparison.json` contains query and log checksums, run IDs,
+model hashes, settings, decisions, speech activity, scheduled audio, cancellation
+and timeout events. The browser displays that saved export, not live DB status.
+New runs still require explicit ingestion. Credentials never reach the browser.
+
+The original `snapshot.py` is now scoped to its two historical evidence folders,
+so ingesting the longer comparison cannot silently change the five-clip chart.
+The old `snapshot.json` is unchanged.
+
+Verify: `python -m unittest discover -s web/tiger -p test_comparison.py -q`.
+Listening links preselect the same recording and configuration for a fresh run;
+no saved PCM is claimed, and page loading never starts a paid run.
