@@ -1,7 +1,7 @@
 # Vultr backend — October 11, 2026
 
 The existing Vultr instance now runs the replay backend as well as the public
-presentation site. Deployed application revision: `cad4d50fa292`.
+presentation site. Deployed application revision: `667460f45fdd` (browser audio increment).
 
 ## Open it
 
@@ -22,11 +22,17 @@ require HTTPS Basic Authentication. The Python listener binds only to 127.0.0.1.
 - Run logging and the HTTP/WebSocket event service.
 - Caddy HTTPS and the presentation site.
 
-**Audio is not delivered to the browser.** The headless service runs without
-`--play`; it logs PCM receipt and duration, not speaker or browser playback.
-The hosted UI states that no audio plays. Hosting this backend does not establish
-audible-interruption rates, unchanged response latency, or candidate promotion.
-The existing laptop speaker demo remains separate.
+**Browser audio is enabled.** The service runs with `--browser-audio`; the browser
+requests PCM on its authenticated WebSocket and uses Web Audio to play the source
+recording and generated reply. Click Start to unlock sound. Volume, Stop, and
+Reset control playback; caller resumption cancels the corresponding reply.
+Generated reply text appears in the console; the source has no verified transcript.
+
+The player buffers 250 ms from source receipt. Logged audio times are server
+sample schedules, not measured acoustic output. Chromium checks measured nonzero
+digital source/reply output. Hosting and playback do not establish interruption
+rates, unchanged response latency, or candidate promotion. See the new
+[browser audio verification packet](proofs/vultr-browser-audio/README.md).
 
 Two real API smoke runs completed with provider replies and no reported timeouts,
 one stock FP32 and one candidate, on the same three-second training-show clip.
@@ -38,7 +44,7 @@ These are deployment checks, not efficacy evaluation. See the
 | Item | Location |
 |---|---|
 | Service | `stutterturn-agent.service` |
-| Active source | `/opt/stutterturn/current` → `releases/cad4d50fa292` |
+| Active source | `/opt/stutterturn/current` → `releases/667460f45fdd` |
 | Environment / provider keys | `/opt/stutterturn/shared/agent.env` (mode 600) |
 | Private model files / audio | `/opt/stutterturn/shared/models`, `shared/audio` |
 | Saved server logs | `/opt/stutterturn/shared/runs` |
@@ -91,8 +97,18 @@ systemctl disable --now stutterturn-agent
 “Vultr hosts our public site and runs our Python voice-agent backend, including
 ONNX turn-model inference, Gemini response requests, ElevenLabs speech generation,
 and the HTTPS/WebSocket API used by our comparison console. The hosted console
-shows live decision and response-generation events; audible playback is currently
-demonstrated separately on our laptop.”
+shows live decision and response-generation events and plays the source recording
+and generated speech in the browser through an authenticated audio transport.”
 
 The older judge-page snapshot remains a historical replay packet; these deployment
 runs have not been ingested into its Tiger Data chart.
+
+## Roll back just the browser audio increment
+
+The prior event-only release is retained. Its static files and service unit are
+backed up under `/opt/stutterturn/backups/667460f45fdd/`. Restore that unit, the
+saved `demo-ui/` and `live/` files, point `current` to `releases/cad4d50fa292`, and
+set the existing env file's `STUTTERTURN_REVISION` back to `cad4d50fa292`.
+Then run `systemctl daemon-reload` and `systemctl restart stutterturn-agent`.
+Keep the existing credentials and provider keys. The older static-only rollback
+above disables the backend entirely and is a different operation.

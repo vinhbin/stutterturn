@@ -28,7 +28,7 @@ StutterTurn is a working research prototype for developers building voice agents
 
 Our comparison interface replays the same real recording through stock Smart Turn, a longer-wait stock configuration, and an exploratory adapted candidate. A shared timeline exposes speech activity, completion decisions, cancelled replies, and reported response-audio events.
 
-The backend now runs on **Vultr**, including turn-model inference, **Gemini** response requests, **ElevenLabs** speech generation, and the HTTP/WebSocket API that feeds the console. The hosted console displays live run events. Our separate laptop setup plays the source recording and generated speech through its speakers; browser audio is not yet implemented.
+The backend now runs on **Vultr**, including turn-model inference, **Gemini** response requests, **ElevenLabs** speech generation, and the HTTP/WebSocket API that feeds the console. The authenticated hosted console plays the source recording and generated reply in the browser while displaying live run events. Start enables sound; volume, Stop, and Reset control playback. Our laptop setup remains available too.
 
 We also built an evidence pipeline in **Tiger Data** that turns saved run events into queryable timelines and a judge-facing chart. That chart is a saved database-query snapshot; new cloud runs are not automatically ingested yet.
 
@@ -47,7 +47,7 @@ The replay agent processes audio with **Silero VAD and ONNX Runtime**, maintains
 Each sponsor has a specific role:
 
 - **Google Gemini API — generating the reply.** When the turn policy decides to answer, we send the captured audio to Gemini. Its system instruction asks for a brief, useful response and avoids unsolicited commentary about how the person speaks. If their intent is unclear, it requests clarification.
-- **ElevenLabs — producing the agent's speech.** Gemini's text goes to ElevenLabs streaming text-to-speech. Our laptop playback system handles the returned PCM alongside the source recording, including buffering, stopping, and cancellation. The Vultr backend also calls ElevenLabs and records receipt of the generated audio.
+- **ElevenLabs — producing the agent's speech.** Gemini's text goes to ElevenLabs streaming text-to-speech. The Vultr backend streams the returned PCM over the authenticated WebSocket. Web Audio plays it alongside the source recording on a shared timeline, with bounded buffering, volume control, and cancellation when the caller resumes. Generated reply text also appears in the console.
 - **Tiger Data — explaining what happened.** We store run metadata in PostgreSQL and timestamped events in a TimescaleDB hypertable. SQL views reconstruct completion decisions, cancellations, and response timing. The saved database snapshot comes from an ingestion of **20 runs and 302 events**; analysis excludes superseded runs. The judge chart displays this query-generated snapshot.
 - **Vultr — running the application.** Our existing instance hosts the HTTPS site and runs the Python backend, ONNX inference, Gemini requests, and ElevenLabs requests. Caddy proxies the HTTP/WebSocket API, while systemd manages the backend. Demo controls require authentication, provider keys stay server-side, and the small instance admits one replay at a time.
 
@@ -63,15 +63,15 @@ The frontend uses HTML, CSS, and JavaScript. It connects to the hosted backend w
 
 **The benchmark and agent must see comparable inputs.** We corrected a missing pre-roll issue in the replay path. Further parity checks exposed differences between offline checks and the streaming agent, including later-turn input boundaries. We documented those differences rather than treating the two paths as interchangeable.
 
-**Moving a laptop demo into the cloud changes playback.** A headless server can run inference and receive generated speech, but delivering that speech to a visitor's speakers needs a browser audio transport. We deployed and verified the backend and live event interface while keeping this boundary explicit.
+**Moving a laptop demo into the cloud changes playback.** A headless server can run inference and receive generated speech, but delivering that speech to a visitor's speakers needs a browser audio transport. We added an authenticated PCM transport and a Web Audio player, then checked that real source and reply audio rendered in Chromium. Server sample schedules, browser buffering, and acoustic output remain distinct measurements.
 
 ## Accomplishments that we're proud of
 
-- **A cloud-hosted voice-agent backend that actually runs.** Stock FP32 and exploratory candidate replays completed on Vultr with real Gemini replies and ElevenLabs audio receipt, with no timeouts in those two deployment checks. An authenticated browser run also completed through the hosted console.
-- **An adapted candidate running in the complete agent.** We exported and loaded an exploratory candidate and captured stock-versus-candidate runs on the same recording, with local playback available separately from cloud execution.
+- **A cloud-hosted voice-agent backend that actually runs.** Stock FP32 and exploratory candidate replays completed on Vultr with real Gemini replies and ElevenLabs speech rendered by the authenticated browser. We measured nonzero digital audio for both the source and reply. A later provider timeout is retained in the verification record; these smoke checks do not establish service reliability or model efficacy.
+- **An adapted candidate running in the complete agent.** We exported and loaded an exploratory candidate and captured stock-versus-candidate runs on the same recording, with both laptop playback and browser playback from the hosted backend.
 - **A verified route from released weights to training and back.** Our synthetic reconstruction and export checks matched reference probabilities within approximately **1.2 × 10⁻⁷**.
 - **Evidence that can be traced.** Model identities, configurations, run logs, SQL queries, and saved results connect displayed observations to their underlying artifacts.
-- **Tested integration boundaries.** Thirty backend tests passed locally and on the Vultr host. We also checked authenticated browser operation, rejected unauthenticated controls, restricted source selection, and the single-run limit.
+- **Tested integration boundaries.** Forty backend tests passed locally and on the Vultr host. Browser checks cover audio sequencing, cancellation, stale messages, and draining the final buffer. We also checked authenticated browser operation, rejected unauthenticated controls, restricted source selection, and the single-run limit.
 
 Our current X1 candidate is **post-hoc and exploratory**, chosen after v4 results in a fifth look at reused development and guard data. It is not a v4 pass or a promoted release. Its agent runs demonstrate integration; broader improvement still requires human-reviewed confirmation and response-delay evaluation.
 
@@ -90,14 +90,14 @@ Failed experiments were useful engineering results. They showed where our data a
 1. Complete human review of pause, resumption, and completed-turn boundaries, retaining enough surrounding context to judge them.
 2. Evaluate the fixed exploratory candidate on a frozen confirmation set before considering promotion.
 3. Measure premature responses, completed-turn response delay, cancellations, and nonresponses together for both stuttered and fluent speech.
-4. Deliver audio from the Vultr backend to the browser and automatically ingest new cloud runs into Tiger Data.
+4. Expand browser compatibility and human listening checks, and automatically ingest new cloud runs into Tiger Data.
 5. Expand to longer recordings, more speakers, and additional forms of disfluency, then explore microphone and telephone input.
 6. Work with people who stutter to evaluate usefulness and interaction preferences.
 7. Publish appropriate model and benchmark artifacts after confirming their release terms.
 
 ## Built with
 
-Python · PyTorch · ONNX · ONNX Runtime · Hugging Face Transformers · NumPy · Smart Turn v3.2 · Silero VAD · Gemini API · ElevenLabs · Tiger Data · PostgreSQL · TimescaleDB · Vultr · Caddy · WebSockets · JavaScript · HTML · CSS · haan · SEP-28k
+Python · PyTorch · ONNX · ONNX Runtime · Hugging Face Transformers · NumPy · Smart Turn v3.2 · Silero VAD · Gemini API · ElevenLabs · Tiger Data · PostgreSQL · TimescaleDB · Vultr · Caddy · WebSockets · Web Audio API · JavaScript · HTML · CSS · haan · SEP-28k
 
 ## Try it out
 
@@ -106,7 +106,7 @@ Python · PyTorch · ONNX · ONNX Runtime · Hugging Face Transformers · NumPy 
 - [Hosted replay console — demo login required](https://64-177-51-1.sslip.io/live/)
 - [Source repository — access required until made public](https://github.com/vinhbin/stutterturn)
 
-The hosted console runs real inference and response generation on Vultr and displays the event trace. It does not yet play audio in the browser. The judge guide's saved chart describes its historical replay packet, not newly generated cloud runs.
+The hosted console runs real inference and response generation on Vultr and displays the event trace. Click Start to hear the recording and generated speech; use volume, Stop, or Reset to control playback. The judge guide's saved chart describes its historical replay packet, not newly generated cloud runs.
 
 ## Credits and disclosures
 
@@ -122,13 +122,13 @@ Our speech examples use real recordings; nobody imitates stuttering. StutterTurn
 
 ## Optional sponsor-specific fields
 
-**Best Use of ElevenLabs:** We integrated ElevenLabs streaming speech into a voice-agent replay system that investigates whether premature turn decisions become spoken interruptions. Generated audio participates in our laptop playback, stop, and cancellation lifecycle. The deployed Vultr backend also generates speech through ElevenLabs, making it part of the running application rather than narration added to a video.
+**Best Use of ElevenLabs:** We integrated ElevenLabs streaming speech into a voice-agent replay system that investigates whether premature turn decisions become spoken interruptions. Generated speech streams from our Vultr backend to the browser and participates in the source/reply timeline, Stop, Reset, volume, and cancellation lifecycle. Chromium checks verify digital rendering of real ElevenLabs replies. Laptop playback remains available as well.
 
 **Best Use of Gemini API:** Gemini receives captured audio when our turn policy decides to respond and generates the agent's reply. We use a dedicated system instruction for brief, useful responses without unsolicited commentary on the speaker's speech. Verified requests now run from Vultr as part of the complete response-generation pipeline.
 
 **Best Use of Tiger Data:** We model voice-agent behavior as a time series, storing run metadata in PostgreSQL and timestamped events in a TimescaleDB hypertable. SQL views connect decisions, resumed speech, cancelled replies, and response timing. Our judge chart displays a reproducible database-query snapshot over real run logs; automatic ingestion of new Vultr runs is next.
 
-**Best Use of Vultr:** Vultr hosts our public HTTPS site and runs our Python voice-agent backend, including ONNX turn-model inference, Gemini response requests, ElevenLabs speech generation, and the HTTP/WebSocket API used by the comparison console. We verified real stock and exploratory candidate replays on the instance and a complete browser-controlled run. Demo controls are authenticated, API keys stay server-side, and systemd manages the service. Browser audio remains separate work.
+**Best Use of Vultr:** Vultr hosts our public HTTPS site and runs our Python voice-agent backend, including ONNX turn-model inference, Gemini response requests, ElevenLabs speech generation, and the HTTP/WebSocket API used by the comparison console. We verified real stock and exploratory candidate replays on the instance, including source and generated speech rendered in Chromium. Demo controls are authenticated, API keys stay server-side, and systemd manages the service. Audio uses the authenticated WebSocket and Web Audio; measured acoustic timing remains future evaluation.
 
 ## Team-only publishing notes — do not paste into the story
 

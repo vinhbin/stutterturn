@@ -8,7 +8,7 @@ In our exploratory measurement on real recordings, the standard open model's INT
 |---|---|
 | Main track | AI/ML |
 | Team | Vinh · Guttuu · Niko · Kareem |
-| Demo / Devpost | [Hosted site](https://64-177-51-1.sslip.io/) and [login-protected cloud replay console](https://64-177-51-1.sslip.io/live/); no browser audio. Devpost pending. |
+| Demo / Devpost | [Hosted site](https://64-177-51-1.sslip.io/) and [login-protected cloud replay console](https://64-177-51-1.sslip.io/live/); browser audio enabled. Devpost pending. |
 | Intended core integrations | Gemini agent responses and ElevenLabs voice — both ran in the [saved replay v2](agent/evidence/2026-10-10-replay-v2/) |
 | Other integrations | Vultr hosts the site and now runs the [replay backend](docs/vultr-backend.md), including ONNX inference and Gemini/ElevenLabs requests. Tiger Data generated the [judge chart snapshot](web/tiger/snapshot.json), merged in [PR #26](https://github.com/vinhbin/stutterturn/pull/26); this is a saved database export, not live connection status. Phone transport and Vultr training remain unimplemented. |
 
@@ -22,7 +22,7 @@ Legend: ✅ published with saved evidence (branch/commit linked where not yet me
 |---|---|---|
 | Exploratory stock baseline on real recordings (INT8 CPU build; energy-derived labels, listen-through pending) | ✅ | [benchmark/RESULTS.md](benchmark/RESULTS.md) |
 | Agent contract and runnable stock/patient **web replay** agent (Gemini reply, ElevenLabs voice) | ✅ | [agent/CONTRACT.md](agent/CONTRACT.md) v0.1 · [replay v2](agent/evidence/2026-10-10-replay-v2/) (supersedes the [first replay](agent/evidence/2026-10-10-first-replay/)) · [PR #11](https://github.com/vinhbin/stutterturn/pull/11), [PR #14](https://github.com/vinhbin/stutterturn/pull/14) |
-| Vultr-hosted inference, provider calls and authenticated replay API | ✅ | [Deployment proof](docs/proofs/vultr-backend/README.md), revision `cad4d50fa292`; stock FP32 and exploratory X1 ran with services on. Browser audio and candidate promotion remain separate. |
+| Vultr-hosted inference, provider calls and authenticated replay API | ✅ | [Deployment proof](docs/proofs/vultr-backend/README.md), revision `cad4d50fa292`; stock FP32 and exploratory X1 ran with services on. See the [browser audio increment](docs/proofs/vultr-browser-audio/README.md); candidate promotion remains separate. |
 | Landing page, judge view and run console wired to the real backend | ✅ | [web/](web/README.md) · [saved model-only runs](web/evidence/2026-10-10-ui-integration/) · [PR #12](https://github.com/vinhbin/stutterturn/pull/12) |
 | Stock-weight recovery, synthetic update and ONNX export/reload parity (mechanics only, not adaptation) | ✅ | [docs/proofs/model-mechanics/](docs/proofs/model-mechanics/README.md) |
 | Frozen show-separated split manifests v1 and matched eval-runner spec | ✅ | [benchmark/splits/v1/](benchmark/splits/v1/) · [benchmark/specs/](benchmark/specs/) · [PR #9](https://github.com/vinhbin/stutterturn/pull/9) |
@@ -59,7 +59,7 @@ For the presentation site and run console, from current main:
 python -m http.server 8041 --bind 127.0.0.1 --directory web
 ```
 
-`/` is the landing page, `/judge/` the guided judge view and `/live/` the run console; `/judges/` and `/demo-ui/` remain available. Vultr now serves these routes and a login-protected replay backend. The HTTPS console defaults to the site's backend; sign in, Connect, then start a fresh run. It displays real inference and response-generation events, with no browser audio. See [cloud setup and evidence](docs/vultr-backend.md). Local laptop playback remains available through `python agent/server.py --play` ([agent setup](agent/README.md)). The separate no-backend preview is synthetic and labeled. The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
+`/` is the landing page, `/judge/` the guided judge view and `/live/` the run console; `/judges/` and `/demo-ui/` remain available. Vultr now serves these routes and a login-protected replay backend. The HTTPS console defaults to the site's backend; sign in, Connect, then start a fresh run. It displays real inference and response-generation events and plays the recording and generated speech in the browser. Click Start to enable sound; volume, Stop, and Reset control playback. See [cloud setup and evidence](docs/vultr-backend.md). Local laptop playback remains available through `python agent/server.py --play` ([agent setup](agent/README.md)). The separate no-backend preview is synthetic and labeled. The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
 
 ## Scope and limits
 

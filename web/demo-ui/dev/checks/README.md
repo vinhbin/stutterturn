@@ -130,3 +130,26 @@ suite passed 48/48. The Tiger chart integration suite passed 52/52.
 guard failed 2 adapter checks; removing the UI's `(reported)` audio-start
 suffix failed 1 browser check; both originals restored and re-passed.
 See `web/demo-ui/verification.md` for the dated record.
+
+
+## Browser audio extension — October 11
+
+`node web/demo-ui/dev/checks/audio-checks.mjs` runs eight synthetic playback and
+adapter lifecycle checks: shared timeline, generation cancellation, Stop, stale
+runs, bounded payloads, late chunks, and draining before the final summary.
+
+`python web/demo-ui/dev/checks/audio-browser-check.py` renders synthetic PCM in
+Chromium's OfflineAudioContext, checking source/reply mixing, cancellation and
+silence after Stop. Requires Python Playwright plus Chromium.
+
+For authenticated real-provider smoke runs, pass `--access-file PRIVATE_JSON
+--out OUTPUT_DIR`. The private JSON contains `url`, `username`, `password`. This
+mode incurs provider usage; it measures source/reply/mixed digital Web Audio peaks,
+Stop during generated speech, Reset during a restarted source, and saves event
+logs without PCM or credentials. A pass does not verify human listening or
+acoustic latency. The [hosted packet](../../../../docs/proofs/vultr-browser-audio/README.md)
+records the deployed result, including an earlier Gemini timeout.
+
+Latest regression counts: 38 adapter, 20 console, 52 site, eight audio lifecycle.
+The site test now expects the committed Tiger Data query snapshot's provenance,
+while still distinguishing the saved chart from a live database connection.

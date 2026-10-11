@@ -109,8 +109,15 @@ with sync_playwright() as p:
             runs.append({'config': config, **result})
             print(json.dumps({'completed': config, 'run_id': result['id'], 'peaks': result['peaks']}), flush=True)
         # Stop during a real generated reply, then reset and restart the source.
-        frame.locator('#btn-start').click()
-        iframe.wait_for_function('window.audioProbe && audioProbe.peaks.agent > .001 && audioPlayer.nodes.size > 0', timeout=45000)
+        stop_attempts = []
+        for attempt in range(2):
+            frame.locator('#btn-start').click()
+            expect(frame.locator('#run-phase')).to_have_text('running', timeout=20000)
+            iframe.wait_for_function("(window.audioProbe && audioProbe.peaks.agent > .001 && audioPlayer.nodes.size > 0) || document.querySelector('#run-phase').textContent === 'ended'", timeout=45000)
+            stop_attempts.append(iframe.evaluate('({id:audioProbe.id, agentPeak:audioProbe.peaks.agent})'))
+            if stop_attempts[-1]['agentPeak'] > .001:
+                break
+        assert stop_attempts[-1]['agentPeak'] > .001, stop_attempts
         frame.locator('#btn-stop').click()
         page.wait_for_timeout(300)
         stop_reply = iframe.evaluate('({pending:audioPlayer.nodes.size, peak:audioProbe.latest})')
@@ -126,7 +133,7 @@ with sync_playwright() as p:
         assert not errors, errors
         report = {'url': access['url'], 'browser': 'Chromium', 'tls_verification': True,
                   'synthetic_render': rendered, 'real_runs': runs, 'stop_generated_reply': stop_reply,
-                  'reset_source_after_restart': reset_source, 'page_errors': errors,
+                  'reset_source_after_restart': reset_source, 'stop_attempts': stop_attempts, 'page_errors': errors,
                   'limit': 'Digital Web Audio graph measured; human listening and acoustic latency not measured.'}
         (args.out / 'browser-audio-check.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
         page.screenshot(path=str(args.out / 'hosted-audio-console.png'), full_page=True)

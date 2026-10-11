@@ -32,7 +32,7 @@ The separate preview requires no server and also remains labeled synthetic.
 
 A real server must permit the page's HTTP origin for discovery. An HTTPS page
 needs an HTTPS/WSS backend. Never put API keys in the page or URL. The
-contract carries events, **not browser audio**.
+contract carries events, with an optional authenticated `pcm16-v1` browser-audio extension. A backend advertising `browser_audio` enables source/reply playback on Start, volume control, and immediate Stop/Reset. See [the contract](../../agent/CONTRACT.md#optional-browser-audio-pcm16-v1).
 
 ## Reading the display
 

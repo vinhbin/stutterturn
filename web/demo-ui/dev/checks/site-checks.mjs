@@ -221,7 +221,7 @@ try {
     assert(/Stock.*0\.2 s.*4 of 5/s.test(await rows.nth(0).innerText()), 'stock snapshot changed without revising its evidence check');
     assert(/Patient.*1\.0 s.*0 of 5/s.test(await rows.nth(1).innerText()), 'patient snapshot changed without revising its evidence check');
     assert(/not current backend status/i.test(text), 'recorded result is presented as current backend status');
-    assert(/not been human-reviewed/i.test(text) && /speaker playback is unverified/i.test(text) && /browser plays no audio/i.test(text),
+    assert(/not been human-reviewed/i.test(text) && /speaker playback is unverified/i.test(text) && /saved chart plays no audio/i.test(text),
       'snapshot omits label or playback limitations');
     const evidence = snapshot.locator('a[href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2"]');
     assert(await evidence.isVisible(), 'snapshot does not link directly to the pinned v2 evidence');
