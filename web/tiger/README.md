@@ -38,7 +38,7 @@ export does not report a current database connection or backend health.
 3. **Copy the service connection string** (looks like
    `postgres://user:password@host:port/tsdb?sslmode=require`) into **one** of:
    - environment variable `TIGER_SERVICE_URL`, or
-   - the file `~/.tiger_conn` (on this machine `C:/Users/Binep/.tiger_conn`),
+   - the file `~/.tiger_conn` in your home directory,
      the URL alone on one line.
 
    The connection string lives only there — never in code, never committed.

@@ -18,3 +18,10 @@ dist/
 *.pt
 *.flac
 *.f32
+# Hacklanta comparison notes, not project source
+research_notes/
+reports/
+# Local video production: teammates' faces, voice files, SEP-28k excerpts (never commit)
+video/
+# Local agent/tool state
+.claude/
