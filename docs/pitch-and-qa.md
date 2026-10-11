@@ -121,6 +121,23 @@ Known and untested — it's in the limits list and the plan (replay through the 
 **Q: Your own agent replay showed no audible interruption — doesn't that mean stock is fine?**
 No. In the saved [replay v2](../agent/evidence/2026-10-10-replay-v2/README.md) (5 SEP-28k block clips × stock/patient, executed on `bcf50d1`; it supersedes the first replay, whose model input lacked the pre-roll), stock decided "complete" inside the labelled gap in 4 of 5 clips. In 3 of those, the speaker resumed before the reply arrived and it was cancelled before any audio; in the fourth, the 3 s clip ended before overlap could be observed. The roughly 1.6–3.5 s reply delay is what hid those premature decisions — a faster reply path or a longer block would make them audible, and that was not tested. Patient made no early in-gap decision on these 5 clips, but 5 clips support no rates, and this does not show that the patient configuration prevents interruptions. Labels remain exploratory, energy-derived and not human-reviewed.
 
+## Q&A — the demo video (what a judge might point at)
+
+**Q: Your teammate says "it answers without the dead air," but there's a ~2-second pause before the agent speaks.**
+Two steps happen in that silence. On the demo clip (run `20261011T041446Z-candidate-7091`), her speech in the excerpt ends at 8.48 s and our model decides "finished" at 8.67 s, about 0.2 s later. The remaining ~2 s, until the reply starts at 10.74 s, is Gemini writing the reply and ElevenLabs voicing it. Every configuration pays that generation time, stock included. The model's own decision adds only ~0.2 s, and on this clip stock decides at the same moment (8.67 s, run `…cd9b`).
+
+**Q: The "COMPLETE 0.83" flag: is that 0.83 seconds?**
+No. Every decision flag shows the model's confidence that the caller has finished, not a time. "COMPLETE 0.83" is an 83% confident "done" call at 8.67 s; "WAIT 0.54" in the block is below the candidate's 0.6 threshold, so it holds.
+
+**Q: Doesn't your model also decide "complete" at 7.07 s while she's still talking?**
+Yes, at a later pause, with confidence 0.97. She resumed at 7.68 s, so that reply was cancelled before any audio. We say "it holds through the block," not "it never decides early." Development data still shows premature decisions on 31% of stutter blocks.
+
+**Q: Does your model beat simply waiting 0.8 s? The video says that wait still misses 20%.**
+Don't claim it does. The 20% (0.8 s timeout) comes from the exploratory 200-clip benchmark, and our 31.3% comes from the show-separated development set. These are different test sets, and we have not run a timeout on the same development items. The defensible point is that a fixed wait is charged to every caller, while the model changes the decision itself, so a finished caller can still be answered after 0.2 s. They can also be combined. Note that the candidate answers at its first check on about 53% of finished turns and otherwise falls back to the 3 s timer.
+
+**Q: Why did the patient setting leave ~5 seconds of silence in the live demo?**
+On the demo clip, patient waits 1 s before the model checks. At the real end the model said "WAIT 0.02" (not done), so the agent held until the 3 s silence fallback, then spent ~1.5 s generating the reply. On the same clip patient still called "COMPLETE 0.91" inside the block at 2.46 s (cancelled before audio). One clip shows the trade-off; it is not a rate.
+
 ## Q&A — the fine-tune and how we test against other models
 
 **Q: Your fine-tuned number doesn't exist yet. What if it fails?**
