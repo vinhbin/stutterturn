@@ -99,7 +99,7 @@ Updated for the judge-page model/training story. Keep the approved human opening
 | 0:43 | Guttuu | Switch to `/live/`. **Stock Smart Turn v3.2 (FP32)** → **Start fresh run** | Gemini timeout → keep talking; finish on the decision row. Restart the server after the pitch, not during. |
 | ~1:05 | Guttuu | When the run ends, note the run ID. Select **StutterTurn candidate**, same source → **Start fresh run** | No audio → check the laptop's output device and that you clicked the page first. Otherwise point at the timeline. |
 | 1:42 | Niko | Switch to `/judge/#training` | — |
-| 2:13 | Kareem | Switch to `/judge/` → evidence links → Tiger chart | Hosted page down → local `http://127.0.0.1:8041/judge/` |
+| 2:13 | Kareem | Switch to `/judge/#long-replay`; point to overlap and final-reply timing cards | Hosted page down: local `http://127.0.0.1:8041/judge/#long-replay` |
 | 2:42 | Vinh | Landing page. Hands off. | — |
 
 **Fallback line if the backend is down** (Guttuu says it instead of the live lines): *"These are saved runs of the same recording through the stock model and our candidate. They show model decisions and reported response events; this is not a live execution."* Then show the saved long-replay comparison on the hosted `/judge/` page. Do not debug in front of judges.
