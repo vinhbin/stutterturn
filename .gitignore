@@ -1,6 +1,7 @@
 # audio clips: SEP-28k podcast audio stays out of the repo (copyright with podcast owners)
 audio/
 *.wav
+!agent/assets/fixed-reply.wav
 *.mp3
 # upstream model repo clone and weights
 smart-turn/

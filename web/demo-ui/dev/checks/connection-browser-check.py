@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright, expect
 root = Path(__file__).resolve().parents[2]
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
-    for scenario in ('healthy', 'unavailable', 'authentication', 'dropped'):
+    for scenario in ('healthy', 'unavailable', 'authentication', 'dropped', 'fixed'):
         context = browser.new_context()
         page = context.new_page()
         errors, requests, sockets, messages = [], [], [], []
@@ -23,7 +23,8 @@ with sync_playwright() as p:
                     request.fulfill(status=failure[0], body='Unavailable')
                     return
                 data = {
-                    '/v0/health': dict(ok=True, contract='0.1', browser_audio='pcm16-v1'),
+                    '/v0/health': dict(ok=True, contract='0.1', browser_audio='pcm16-v1',
+                                       response=dict(mode='fixed' if scenario == 'fixed' else 'live_api', delay_s=1.0)),
                     '/v0/configurations': [dict(id='stock', label='Stock model', available=True),
                                            dict(id='candidate', label='Candidate model', available=True)],
                     '/v0/sources': [dict(source_id='First recording', file='first.wav', duration_s=3),
@@ -58,6 +59,12 @@ with sync_playwright() as p:
         expect(page.locator('#source-select option')).to_have_count(2)
         expect(page.locator('#config-group input:enabled')).to_have_count(2)
         expect(page.locator('#btn-start')).to_be_enabled()
+        if scenario == 'fixed':
+            expect(page.locator('#response-mode-banner')).to_be_visible()
+            expect(page.locator('#response-mode-banner')).to_contain_text('1.0 s simulated delay')
+            expect(page.locator('#response-mode-banner')).to_contain_text('No Gemini or ElevenLabs calls')
+        else:
+            expect(page.locator('#response-mode-banner')).to_be_hidden()
         expect(page.locator('#btn-retry')).to_be_hidden()
         page.locator('#source-select').select_option('second.wav')
         page.locator('input[value="candidate"]').check()

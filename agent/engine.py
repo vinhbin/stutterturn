@@ -351,6 +351,7 @@ class Run:
         self.source_name = os.path.basename(source)
         self.audio = load_source(source)
         self.services = services
+        self.response_metadata = getattr(services, "response_metadata", {"mode": "live_api" if services else "off"})
         self.listener = listener
         self.run_id = (f"{dt.datetime.now(dt.timezone.utc):%Y%m%dT%H%M%SZ}-{config}-"
                        f"{secrets.token_hex(2)}")
@@ -450,7 +451,9 @@ class Run:
         if self.services is None:
             self.event(t, "info", "response_requested", detail="services off")
             return
-        self.event(t, "info", "response_requested", detail=f"gemini {self.services.gemini_model}")
+        detail = (f"fixed prerecorded reply; {self.response_metadata['delay_s']:.3f} s simulated delay"
+                  if self.response_metadata["mode"] == "fixed" else f"gemini {self.services.gemini_model}")
+        self.event(t, "info", "response_requested", detail=detail)
         self._generation += 1
         self._player_generation = self.player.begin_agent() if self.player else None
         self.agent_audio_start = self.agent_audio_end = self._accepted_audio_end = None
@@ -494,7 +497,8 @@ class Run:
                 return
             if not current():
                 return
-            self.s["llm_latency_s"] = round(time.monotonic() - t_req, 3)
+            latency_key = "fixed_wait_s" if self.response_metadata["mode"] == "fixed" else "llm_latency_s"
+            self.s[latency_key] = round(time.monotonic() - t_req, 3)
             self.s["reply_text"] = text
             if not text:
                 self.event(self.now(), "info", "provider_error", service="gemini",
@@ -693,7 +697,8 @@ class Run:
                     "commit": _commit(),
                     "t0_wall": dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds")
                                .replace("+00:00", "Z"),
-                    "services": "on" if self.services else "off",
+                    "services": "fixed" if self.response_metadata["mode"] == "fixed" else "on" if self.services else "off",
+                    "response": self.response_metadata,
                     "playback": {**self.player.info(), "stream_start_call_s": round(start_elapsed, 6),
                                  "pending_policy": "await_server_schedule" if self.playback_factory else "await_device_consumption"}
                                 if self.player else None})
@@ -837,7 +842,10 @@ class Run:
             reason = "stopped"
 
         summary = dict(self.s)
-        summary["services"] = "on" if self.services else "off"
+        summary["services"] = "fixed" if self.response_metadata["mode"] == "fixed" else "on" if self.services else "off"
+        summary["response"] = self.response_metadata
+        if self.response_metadata["mode"] == "fixed":
+            summary["fixed_audio_first_chunk_s"] = summary.pop("tts_first_audio_s", None)
         summary["chars_used"] = self.services.chars_used if self.services else 0
         summary["turns"] = self.turns
         if self.player is not None:

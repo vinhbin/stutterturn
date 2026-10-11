@@ -5,7 +5,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var el = {};
   [
-    'preview-banner', 'connection-chip', 'status-banner', 'config-group',
+    'preview-banner', 'connection-chip', 'status-banner', 'config-group', 'response-mode-banner',
     'backend-url', 'btn-retry', 'btn-connect', 'btn-disconnect', 'source-select', 'source-note',
     'btn-start', 'btn-stop', 'btn-reset', 'run-phase', 'run-id', 'run-config',
     'run-source', 'start-note', 'source-label', 'current-state', 'state-strip',
@@ -70,6 +70,12 @@
   function refreshChrome() {
     var preview = state.adapter.mode === 'preview';
     var mock = !preview && isSynthetic();
+    var response = state.health && state.health.response;
+    var fixed = !isSynthetic() && response && response.mode === 'fixed';
+    if (el['response-mode-banner']) {
+      el['response-mode-banner'].hidden = !fixed;
+      el['response-mode-banner'].textContent = fixed ? 'CONTROLLED RESPONSE TIMING — Turn models run live. Every configuration uses the same prerecorded reply after a ' + response.delay_s.toFixed(1) + ' s simulated delay. No Gemini or ElevenLabs calls. This is not live API performance.' : '';
+    }
     el['preview-banner'].hidden = !isSynthetic();
     el['preview-banner'].textContent = (preview ? 'DEVELOPMENT PREVIEW' : 'MOCK BACKEND') +
       ' — synthetic events. No audio. No real recording is played. Not model output or benchmark evidence.';
@@ -220,6 +226,7 @@
     renderPairs(el['metadata-body'], [
       ['Backend configuration ID', metadata.config], ['Model', metadata.model],
       ['Model SHA-256', metadata.model_sha256], ['Parameters', metadata.params],
+      ['Response mode', metadata.response],
       ['Services', metadata.services === 'off' ? 'OFF — model-only; no response audio' : metadata.services],
       ['Source ID', source.source_id], ['Source duration', seconds(source.duration_s)],
       ['Source offset', seconds(source.source_offset_s)], ['Backend commit', metadata.commit],
@@ -472,6 +479,8 @@
     el['summary-note'].textContent = (isSynthetic() ? 'SYNTHETIC SUMMARY — not evidence. ' : 'Backend-reported summary; playback unverified. ') +
       'End reason: ' + valueText(ended.reason) + '. Log: ' + valueText(ended.log);
     renderPairs(el['summary-body'], [
+      ['Response mode', summary.response && summary.response.mode === 'fixed' ? 'CONTROLLED — prerecorded reply; no live APIs' : summary.services === 'on' ? 'Live APIs' : summary.services],
+      ['Simulated response delay', summary.response && summary.response.mode === 'fixed' ? seconds(summary.response.delay_s) : 'Not used'],
       ['First turn complete', seconds(summary.first_turn_complete_t)], ['Decision trigger', triggerText(summary.trigger)],
       ['First agent audio (reported)', seconds(summary.first_agent_audio_t)], ['LLM latency', seconds(summary.llm_latency_s)],
       ['TTS first audio latency', seconds(summary.tts_first_audio_s)], ['Caller resumed after decision', summary.speaker_resumed_after_decision],

@@ -35,7 +35,8 @@ def jres(data, status=200):
 
 async def health(request):
     return jres({"ok": True, "contract": engine.CONTRACT_VERSION, "commit": engine._commit(),
-                 "services": "on" if request.app["services"] else "off",
+                 "services": "fixed" if getattr(request.app["services"], "response_metadata", {}).get("mode") == "fixed" else "on" if request.app["services"] else "off",
+                 "response": getattr(request.app["services"], "response_metadata", {"mode": "live_api" if request.app["services"] else "off"}),
                  "browser_audio": "pcm16-v1" if request.app["browser_audio"] else None,
                  "playback": "on" if request.app["play"] else "off"})
 
@@ -188,7 +189,9 @@ def create_app(services=None, play=False, max_runs=1, allowed_origin=None, brows
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--services", choices=["on", "off"], default="on")
+    ap.add_argument("--services", choices=["on", "off", "fixed"], default="on")
+    ap.add_argument("--fixed-response", help="Local mono 16 kHz PCM16 reply WAV for controlled comparisons")
+    ap.add_argument("--fixed-delay", type=float, default=1.0, help="Identical simulated response delay in seconds")
     ap.add_argument("--play", action="store_true",
                     help="play the source and agent speech on this machine's speakers (demo)")
     ap.add_argument("--port", type=int, default=8765)
@@ -196,7 +199,14 @@ def main():
     ap.add_argument("--allowed-origin", help="reject browser WebSockets from other origins")
     ap.add_argument("--browser-audio", action="store_true", help="offer authenticated PCM browser playback")
     a = ap.parse_args()
-    app = create_app(engine.Services() if a.services == "on" else None,
+    if a.services == "fixed":
+        if not a.fixed_response:
+            ap.error('--fixed-response is required with --services fixed')
+        from fixed_response import FixedServices
+        services = FixedServices(a.fixed_response, a.fixed_delay)
+    else:
+        services = engine.Services() if a.services == "on" else None
+    app = create_app(services,
                      a.play, a.max_runs, a.allowed_origin, a.browser_audio)
     print(f"agent server: http://127.0.0.1:{a.port}  services={a.services}", flush=True)
     web.run_app(app, host="127.0.0.1", port=a.port, print=None)
