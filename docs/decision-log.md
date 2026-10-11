@@ -2,6 +2,10 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-014 — v5: preparation approved, run deferred; M5 rule fixed strict (Vinh, delegated)
+
+At approximately 22:20 EDT Vinh delegated the v5 response with the constraint "without affecting our claim." Decision: **preparation only is approved** — the crop builder with its 60-crop human audit gate, dev2 itemization (IStutterSoWhat held out by the pre-registered counts-only rule), and the fresh guard build (new seed, hashes recorded), all reviewable code with **no training run**. The v5 run itself is **not authorized**; that decision follows X1's outcome and the human A/B labels, as a separate recorded entry. The M5 rule for any future v5 selection is fixed now, pre-registered: **strict delta M5 >= 0 on point estimates** — no non-inferiority margin. Guttuu's own ordering stands: v5 sits after X1 and after Niko's frozen confirmation set; **tonight's demo remains stock/patient regardless**, and no v5 number is quotable anywhere. D-009 unchanged. This entry authorizes preparation, not execution, selection, or promotion.
+
 ## 2026-10-10 D-013 — X1: bounded check of the existing blend at 0.6, Option A (approved by Vinh)
 
 At approximately 20:50 EDT Vinh authorized the X1 check and chose **Option A: Guttuu executes on his machine**, where the candidate, caches and audio already reside. Governing protocol: [`model/specs/x1-blend-check-v1.md`](../model/specs/x1-blend-check-v1.md) at commit `79dfc5a` (PR #37), consolidating Guttuu's proposed pre-registration and Niko's revised evaluation view. Execution starts only after **Niko signs off on that spec file** and `preflight_x1.py` passes on the executing machine.
