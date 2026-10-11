@@ -6,18 +6,19 @@ import unittest
 import comparison
 import ingest
 import snapshot
+import model_five
 
 
 class ComparisonTests(unittest.TestCase):
-    def test_selected_logs_keep_hold_and_failure(self):
+    def test_selected_working_logs_keep_hold_and_later_cancellation(self):
         rows = comparison.local_rows()
         comparison.validate(rows)
         stock, candidate = rows
         self.assertEqual(stock['first_decision_t'], 1.664)
         self.assertEqual(candidate['first_decision_name'], 'turn_incomplete')
-        self.assertEqual(stock['reported_overlap_s'], 0.2)
+        self.assertEqual(stock['reported_overlap_s'], 0.05)
         self.assertIsNone(candidate['reported_overlap_s'])
-        self.assertEqual(stock['timeouts'], ['gemini'])
+        self.assertEqual(stock['timeouts'], [])
         for row in rows:
             self.assertTrue(any(e['name'] == 'cancelled' and e['before_audible'] for e in row['events']))
 
@@ -41,6 +42,22 @@ class ComparisonTests(unittest.TestCase):
         saved = json.loads(comparison.OUT.read_text(encoding='utf-8'))
         self.assertFalse(saved['offline_fallback'])
         self.assertEqual(saved['runs'], comparison.local_rows())
+
+    def test_previous_failure_remains_in_archive(self):
+        previous = json.loads((comparison.HERE / 'comparison-previous.json').read_text())
+        self.assertTrue(any(e['error_detail'] == 'empty reply' for e in previous['runs'][0]['events']))
+
+    def test_five_recordings_include_both_models_and_match_logs(self):
+        data = json.loads(model_five.OUT.read_text())
+        rows, meta = snapshot.rows_offline(model_five.SCOPE)
+        self.assertFalse(data['offline_fallback'])
+        self.assertEqual(data['evidence'], meta)
+        self.assertEqual(len(data['clips']), 5)
+        for clip in data['clips']:
+            self.assertEqual(set(clip['configs']), {'stock_fp32', 'candidate'})
+            for config, run in clip['configs'].items():
+                expected = next(r for r in rows if r['run_id'] == run['run_id'])
+                self.assertEqual({**run, 'config': config, 'source_id': clip['source_id']}, expected)
 
 
 if __name__ == '__main__':

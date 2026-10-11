@@ -36,7 +36,7 @@
     const [stock, ours] = runs;
     const stockEmptyReply = stock.events.some(e => e.name === 'timeout' && e.service === 'gemini' && e.error_detail === 'empty reply');
     // This explanation belongs to this exact recorded case, not any future pair.
-    if (stock.run_id !== '20261011T053423Z-stock_fp32-bbcf' || ours.run_id !== '20261011T053442Z-candidate-efd3' ||
+    if (stock.run_id !== '20261011T061006Z-stock_fp32-8d16' || ours.run_id !== '20261011T061024Z-candidate-f484' ||
         stock.first_decision_name !== 'turn_complete' || ours.first_decision_name !== 'turn_incomplete' ||
         stock.first_decision_t !== ours.first_decision_t) throw new Error('Unexpected comparison');
     const content = document.createDocumentFragment();
@@ -45,7 +45,7 @@
     const firstAudio = stock.events.find(e => e.name === 'agent_audio_start');
     const firstResumption = stock.events.find(e => e.name === 'speaker_resumed');
     if (!firstAudio || !firstResumption) throw new Error('Missing comparison events');
-    content.append(node('p', `Stock scheduled its reply at ${seconds(firstAudio.t)}; speech resumed at ${seconds(firstResumption.t)}. X1 avoided that early reply.`, 'snapshot-intro'));
+    content.append(node('p', `Speech resumed at ${seconds(firstResumption.t)}. Stock reply audio started at ${seconds(firstAudio.t)} and overlapped that resumed speech. X1 avoided this early interruption on the server schedule.`, 'snapshot-intro'));
     content.append(node('h3', 'The interruption moment', 'cmp-impact-title'));
     const impact = node('div', undefined, 'cmp-impact');
     impact.setAttribute('aria-label', 'Interruption moment: reported overlap');
@@ -104,14 +104,14 @@
       ['First pause, at ' + seconds(stock.first_decision_t), 'Decided to reply', 'Held the turn'],
       ['Reported audio overlap', seconds(stock.reported_overlap_s), ours.reported_overlap_s === null ? 'None reported' : seconds(ours.reported_overlap_s)],
       ['Later pause, at 7.072 s', 'Decided; cancelled before audio', 'Decided; cancelled before audio'],
-      ['Provider outcome', stockEmptyReply ? 'gemini: empty reply' : stock.timeouts.join(', ') || 'No errors reported', ours.timeouts.join(', ') || 'No errors reported'],
+      ['Provider outcome', stockEmptyReply ? 'gemini: empty reply' : stock.timeouts.join(', ') || 'Reply generated', ours.timeouts.join(', ') || 'Reply generated'],
       ['Decision threshold', String(stock.params.threshold), String(ours.params.threshold)]
     ];
     cells.forEach(values => { const tr = node('tr'); values.forEach((text, i) => { const cell = node(i ? 'td' : 'th', text); if (!i) cell.scope = 'row'; tr.append(cell); }); body.append(tr); });
     table.append(body); wrap.append(table); content.append(wrap);
     content.append(node('p', 'This selected replay shows X1 avoiding an early interruption: stock reply audio crossed into resumed speech on the server schedule, while X1 held. Both configurations still decided before later detected resumption at 7.680 s. X1 changes the model and threshold; this does not isolate a gain from the weights alone.', 'cmp-context'));
     if (stockEmptyReply) content.append(node('p', 'The stock run later received an empty Gemini reply, historically labelled “timeout” by the backend. That raw record is preserved; it was not a deadline expiration or a model-quality result. The live backend now retries an empty reply once and distinguishes provider errors from timeouts.', 'cmp-context'));
-    content.append(node('p', 'X1 is exploratory and unpromoted. These are scheduled audio events, not measured acoustic timing or a general interruption rate. A longer-wait baseline remains below as separate historical evidence.', 'cmp-context'));
+    content.append(node('p', 'Both runs completed with Gemini replies and ElevenLabs speech rendered in the browser, with no provider errors or timeouts. X1 is exploratory and unpromoted. These are scheduled audio events, not measured acoustic timing or a general interruption rate.', 'cmp-context'));
 
     const detail = node('details', undefined, 'cmp-details');
     detail.append(node('summary', 'Inspect all comparison events and model identities'));

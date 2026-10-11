@@ -1,0 +1,281 @@
+{
+  "generated_utc": "2026-10-11T06:21:01Z",
+  "offline_fallback": false,
+  "source_note": "Saved snapshot generated from Tiger Data queries over committed run logs; not live database status.",
+  "evidence": {
+    "dirs": [
+      "agent/evidence/2026-10-11-model-five-replay"
+    ],
+    "commit": "700d34762c1b",
+    "commits": [
+      "700d34762c1b",
+      "ed3d3ec93ce7"
+    ],
+    "contract": "0.1",
+    "runs_current": 10,
+    "runs_superseded_excluded": 0,
+    "clips": 5,
+    "configs": [
+      "candidate",
+      "stock_fp32"
+    ]
+  },
+  "clips": [
+    {
+      "source_id": "HeStutters_1_133.wav",
+      "configs": {
+        "stock_fp32": {
+          "run_id": "20261011T061235Z-stock_fp32-abaa",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.864,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.864,
+          "first_audio_t": 6.9,
+          "gap_s": 2.036,
+          "llm_latency_s": 1.867,
+          "tts_first_audio_s": 0.15
+        },
+        "candidate": {
+          "run_id": "20261011T061243Z-candidate-fad7",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.864,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.864,
+          "first_audio_t": 6.668,
+          "gap_s": 1.804,
+          "llm_latency_s": 1.577,
+          "tts_first_audio_s": 0.208
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_2_57.wav",
+      "configs": {
+        "stock_fp32": {
+          "run_id": "20261011T061254Z-stock_fp32-8626",
+          "source_duration_s": 3.0,
+          "first_complete_t": 5.984,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 5.984,
+          "first_audio_t": 9.389,
+          "gap_s": 3.405,
+          "llm_latency_s": 3.212,
+          "tts_first_audio_s": 0.175
+        },
+        "candidate": {
+          "run_id": "20261011T061306Z-candidate-5ddc",
+          "source_duration_s": 3.0,
+          "first_complete_t": 5.984,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 5.984,
+          "first_audio_t": 10.226,
+          "gap_s": 4.242,
+          "llm_latency_s": 4.078,
+          "tts_first_audio_s": 0.145
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_4_32.wav",
+      "configs": {
+        "stock_fp32": {
+          "run_id": "20261011T061320Z-stock_fp32-d106",
+          "source_duration_s": 3.0,
+          "first_complete_t": 1.12,
+          "trigger": "smart_turn",
+          "prob": 0.857,
+          "speaker_resumed_after_decision": true,
+          "cancelled_before_audio": true,
+          "cancelled_t": 1.536,
+          "cancelled_decision_t": 1.12,
+          "answered_decision_t": 4.992,
+          "first_audio_t": 12.533,
+          "gap_s": 7.541,
+          "llm_latency_s": 7.373,
+          "tts_first_audio_s": 0.15
+        },
+        "candidate": {
+          "run_id": "20261011T061335Z-candidate-d0ce",
+          "source_duration_s": 3.0,
+          "first_complete_t": 4.992,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 4.992,
+          "first_audio_t": 14.858,
+          "gap_s": 9.866,
+          "llm_latency_s": 9.693,
+          "tts_first_audio_s": 0.154
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_5_123.wav",
+      "configs": {
+        "stock_fp32": {
+          "run_id": "20261011T061941Z-stock_fp32-65fb",
+          "source_duration_s": 3.0,
+          "first_complete_t": 0.768,
+          "trigger": "smart_turn",
+          "prob": 0.644,
+          "speaker_resumed_after_decision": true,
+          "cancelled_before_audio": true,
+          "cancelled_t": 1.088,
+          "cancelled_decision_t": 0.768,
+          "answered_decision_t": 5.024,
+          "first_audio_t": 6.418,
+          "gap_s": 1.394,
+          "llm_latency_s": 1.186,
+          "tts_first_audio_s": 0.189
+        },
+        "candidate": {
+          "run_id": "20261011T061951Z-candidate-eb9a",
+          "source_duration_s": 3.0,
+          "first_complete_t": 5.024,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 5.024,
+          "first_audio_t": 6.508,
+          "gap_s": 1.484,
+          "llm_latency_s": 1.328,
+          "tts_first_audio_s": 0.136
+        }
+      }
+    },
+    {
+      "source_id": "HeStutters_5_150.wav",
+      "configs": {
+        "stock_fp32": {
+          "run_id": "20261011T062003Z-stock_fp32-c037",
+          "source_duration_s": 3.0,
+          "first_complete_t": 0.512,
+          "trigger": "smart_turn",
+          "prob": 0.735,
+          "speaker_resumed_after_decision": true,
+          "cancelled_before_audio": true,
+          "cancelled_t": 1.472,
+          "cancelled_decision_t": 0.512,
+          "answered_decision_t": 2.176,
+          "first_audio_t": 4.932,
+          "gap_s": 2.756,
+          "llm_latency_s": 2.361,
+          "tts_first_audio_s": 0.199
+        },
+        "candidate": {
+          "run_id": "20261011T062011Z-candidate-d128",
+          "source_duration_s": 3.0,
+          "first_complete_t": 6.016,
+          "trigger": "fallback_timeout",
+          "prob": null,
+          "speaker_resumed_after_decision": false,
+          "cancelled_before_audio": false,
+          "cancelled_t": null,
+          "cancelled_decision_t": null,
+          "answered_decision_t": 6.016,
+          "first_audio_t": 8.261,
+          "gap_s": 2.245,
+          "llm_latency_s": 2.074,
+          "tts_first_audio_s": 0.153
+        }
+      }
+    }
+  ],
+  "caveats": [
+    "Five 3-second excerpts from one show, one run per configuration. Per-recording observations, not general interruption rates.",
+    "Both use a 0.2 s silence gate. Stock FP32 uses threshold 0.5; our X1 candidate uses 0.6. This compares configurations, not weights alone.",
+    "The source is followed by 5 s synthetic silence. These excerpts do not establish completed-turn response delay.",
+    "Browser source and reply audio rendered in verification. Times are server schedules, not measured acoustic playback.",
+    "Each model pair shares a backend revision. The last two pairs use a 20 s Gemini deadline; earlier pairs use 10 s. Revisions are listed above. Failed earlier service attempts remain in the evidence archive.",
+    "X1 is exploratory and unpromoted. No human-reviewed efficacy conclusion follows from these runs."
+  ],
+  "comparison_label": "Stock FP32 vs our X1 model",
+  "run_metadata": [
+    {
+      "run_id": "20261011T061235Z-stock_fp32-abaa",
+      "commit_sha": "700d34762c1b",
+      "model": "stock-fp32",
+      "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+    },
+    {
+      "run_id": "20261011T061243Z-candidate-fad7",
+      "commit_sha": "700d34762c1b",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "model_sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025"
+    },
+    {
+      "run_id": "20261011T061254Z-stock_fp32-8626",
+      "commit_sha": "700d34762c1b",
+      "model": "stock-fp32",
+      "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+    },
+    {
+      "run_id": "20261011T061306Z-candidate-5ddc",
+      "commit_sha": "700d34762c1b",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "model_sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025"
+    },
+    {
+      "run_id": "20261011T061320Z-stock_fp32-d106",
+      "commit_sha": "700d34762c1b",
+      "model": "stock-fp32",
+      "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+    },
+    {
+      "run_id": "20261011T061335Z-candidate-d0ce",
+      "commit_sha": "700d34762c1b",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "model_sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025"
+    },
+    {
+      "run_id": "20261011T061941Z-stock_fp32-65fb",
+      "commit_sha": "ed3d3ec93ce7",
+      "model": "stock-fp32",
+      "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+    },
+    {
+      "run_id": "20261011T061951Z-candidate-eb9a",
+      "commit_sha": "ed3d3ec93ce7",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "model_sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025"
+    },
+    {
+      "run_id": "20261011T062003Z-stock_fp32-c037",
+      "commit_sha": "ed3d3ec93ce7",
+      "model": "stock-fp32",
+      "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+    },
+    {
+      "run_id": "20261011T062011Z-candidate-d128",
+      "commit_sha": "ed3d3ec93ce7",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "model_sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025"
+    }
+  ]
+}

@@ -64,10 +64,12 @@ with sync_playwright() as p:
             else:
                 expect(comparison).to_contain_text('Our model held the early pause')
                 expect(comparison.locator('tbody tr')).to_have_count(5)
-                expect(comparison).to_contain_text('0.200 s')
+                expect(comparison).to_contain_text('0.050 s')
                 expect(comparison).to_contain_text('None reported')
-                expect(comparison).to_contain_text('gemini')
+                expect(comparison).to_contain_text('Both runs completed with Gemini replies')
+                expect(comparison).not_to_contain_text('Empty Gemini reply')
                 expect(page.locator('#tiger-chart .tgr-lane')).to_have_count(10)
+                expect(page.locator('#tiger-chart .tgr-lane-tag').filter(has_text='Our X1')).to_have_count(10)
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
                 assert comparison.locator('svg text').first.evaluate("e => getComputedStyle(e).stroke") == 'none'
                 if scenario == 'mobile':
@@ -76,7 +78,7 @@ with sync_playwright() as p:
                     assert comparison.locator('td').evaluate_all('cells => cells.every(c => c.scrollWidth <= c.clientWidth)')
                 comparison.locator('summary').click()
                 expect(comparison).to_contain_text('p=0.5432, threshold=0.6')
-                expect(comparison).to_contain_text('20261011T053423Z-stock_fp32-bbcf')
+                expect(comparison).to_contain_text('20261011T061006Z-stock_fp32-8d16')
                 page.locator('a:has-text("Hear our model")').click()
                 frame = page.frame_locator('#console-frame')
                 expect(frame.locator('#source-select')).to_have_value(SOURCE)

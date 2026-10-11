@@ -14,6 +14,8 @@ from playwright.sync_api import sync_playwright, expect
 ap = argparse.ArgumentParser()
 ap.add_argument('--access-file', type=Path)
 ap.add_argument('--out', type=Path)
+ap.add_argument('--source', default='HeStutters_4_32.wav')
+ap.add_argument('--replay-only', action='store_true', help='Check both full replays without additional Stop/Reset runs')
 args = ap.parse_args()
 root = Path(__file__).resolve().parents[4]
 with sync_playwright() as p:
@@ -88,7 +90,7 @@ with sync_playwright() as p:
         expect(frame.locator('#source-select')).to_be_enabled(timeout=20000)
         runs = []
         for config in ('stock_fp32', 'candidate'):
-            frame.locator('#source-select').select_option('HeStutters_4_32.wav')
+            frame.locator('#source-select').select_option(args.source)
             frame.locator(f'input[value="{config}"]').check()
             frame.locator('#btn-start').click()
             expect(frame.locator('#summary-note')).to_contain_text('End reason: completed', timeout=60000)
@@ -105,6 +107,19 @@ with sync_playwright() as p:
             (args.out / (result['id'] + '.jsonl')).write_text(log, encoding='utf-8')
             runs.append({'config': config, **result})
             print(json.dumps({'completed': config, 'run_id': result['id'], 'peaks': result['peaks']}), flush=True)
+        if args.replay_only:
+            summaries = [json.loads((args.out / (r['id'] + '.jsonl')).read_text().splitlines()[-1])['summary'] for r in runs]
+            report = {'url': access['url'], 'source': args.source, 'browser': 'Chromium',
+                      'real_runs': runs, 'summaries': summaries, 'page_errors': errors,
+                      'limit': 'Digital Web Audio rendering; no human listening or acoustic timing measurement.'}
+            (args.out / 'browser-audio-check.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+            page.screenshot(path=str(args.out / 'hosted-audio-console.png'), full_page=True)
+            assert not errors, errors
+            assert all(not s['timeouts'] and not s.get('errors') for s in summaries), summaries
+            context.close()
+            browser.close()
+            print(json.dumps({'real_replays': 'passed', 'timeouts': 0, 'provider_errors': 0}))
+            raise SystemExit(0)
         # Stop during a real generated reply, then reset and restart the source.
         stop_attempts = []
         for attempt in range(2):

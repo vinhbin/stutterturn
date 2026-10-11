@@ -90,8 +90,9 @@ def per_run_from_log(item: dict) -> dict:
     }
 
 
-def rows_offline() -> tuple[list[dict], dict]:
-    parsed = [i for i in ingest.collect() if i['run']['evidence_dir'] in HISTORICAL_DIRS]
+def rows_offline(evidence_dirs=None) -> tuple[list[dict], dict]:
+    scope = HISTORICAL_DIRS if evidence_dirs is None else evidence_dirs
+    parsed = [i for i in ingest.collect() if i['run']['evidence_dir'] in scope]
     current = [i for i in parsed if not i["run"]["superseded"]]
     rows = [per_run_from_log(i) for i in current]
     meta = evidence_meta(
@@ -102,7 +103,7 @@ def rows_offline() -> tuple[list[dict], dict]:
     return rows, meta
 
 
-def rows_live(url: str) -> tuple[list[dict], dict]:
+def rows_live(url: str, evidence_dirs=None) -> tuple[list[dict], dict]:
     import psycopg
     from psycopg.rows import dict_row
 
@@ -116,7 +117,8 @@ def rows_live(url: str) -> tuple[list[dict], dict]:
         cur.execute("SELECT * FROM run_outcomes WHERE NOT superseded")
         outcomes = {r["run_id"]: r for r in cur.fetchall()}
         cur.execute("SELECT run_id, config, source_id, source_duration_s, commit_sha, evidence_dir, superseded FROM runs")
-        runs = [r for r in cur.fetchall() if r['evidence_dir'] in HISTORICAL_DIRS]
+        scope = HISTORICAL_DIRS if evidence_dirs is None else evidence_dirs
+        runs = [r for r in cur.fetchall() if r['evidence_dir'] in scope]
 
     rows = []
     for run in (r for r in runs if not r["superseded"]):
@@ -152,6 +154,7 @@ def evidence_meta(current_rows: list[dict], superseded_n: int, dirs: list[str]) 
     return {
         "dirs": dirs,
         "commit": sorted({r["commit_sha"] for r in current_rows})[0] if current_rows else None,
+        "commits": sorted({r["commit_sha"] for r in current_rows}),
         "contract": "0.1",
         "runs_current": len(current_rows),
         "runs_superseded_excluded": superseded_n,

@@ -62,7 +62,7 @@
     p.appendChild(strong);
     p.appendChild(document.createTextNode(
       ' · generated ' + snap.generated_utc +
-      ' · agent commit ' + snap.evidence.commit +
+      ' · agent commit(s) ' + (snap.evidence.commits || [snap.evidence.commit]).join(', ') +
       ' · contract v' + snap.evidence.contract +
       ' · ' + snap.evidence.runs_current + ' runs / ' + snap.evidence.clips + ' clips' +
       ' · ' + snap.evidence.runs_superseded_excluded + ' superseded runs excluded'));
@@ -110,7 +110,7 @@
 
   function lane(run, tmax) {
     var row = el('div', 'tgr-lane');
-    row.appendChild(el('span', 'tgr-lane-tag', run.config));
+    row.appendChild(el('span', 'tgr-lane-tag', configLabel(run.config)));
     var track = el('div', 'tgr-track');
     track.style.setProperty('--tgr-ticks', String(tmax));
     if (run.source_duration_s) {
@@ -143,7 +143,8 @@
     return row;
   }
 
-  var CONFIG_ORDER = ['stock', 'patient'];
+  var CONFIG_ORDER = ['stock_fp32', 'candidate', 'stock', 'patient'];
+  function configLabel(config) { return {stock_fp32: 'Stock FP32', candidate: 'Our X1'}[config] || config; }
   function orderedConfigs(clip) {
     return CONFIG_ORDER.filter(function (c) { return clip.configs[c]; })
       .concat(Object.keys(clip.configs).filter(function (c) { return CONFIG_ORDER.indexOf(c) < 0; }));
@@ -151,7 +152,7 @@
 
   function timelineFigure(snap, tmax) {
     var fig = el('section', 'tgr-figure');
-    fig.appendChild(el('h4', 'tgr-figtitle', 'First completion decision per clip — stock vs patient'));
+    fig.appendChild(el('h4', 'tgr-figtitle', 'First completion decision per clip — ' + (snap.comparison_label || 'stock vs patient')));
     fig.appendChild(el('p', 'tgr-fignote',
       'When each configuration first decided the turn was complete on the same replayed recording, ' +
       'and what became of it. The shaded band is the real 3 s recording; after it, the agent hears synthetic silence.'));
@@ -160,6 +161,17 @@
     snap.clips.forEach(function (clip) {
       var group = el('div', 'tgr-clip');
       group.appendChild(el('h5', 'tgr-clip-name', clip.source_id));
+      if (clip.configs.candidate && clip.configs.stock_fp32) {
+        var actions = el('p', 'tgr-fignote');
+        ['stock_fp32', 'candidate'].forEach(function (cfg, i) {
+          if (i) actions.appendChild(document.createTextNode(' · '));
+          var link = el('a', null, 'Hear ' + configLabel(cfg));
+          link.href = '../live/?source=' + encodeURIComponent(clip.source_id) + '&config=' + encodeURIComponent(cfg);
+          link.setAttribute('aria-label', 'Hear ' + configLabel(cfg) + ' on ' + clip.source_id + ' in a fresh run');
+          actions.appendChild(link);
+        });
+        group.appendChild(actions);
+      }
       orderedConfigs(clip).forEach(function (cfg) {
         var run = clip.configs[cfg];
         run.config = run.config || cfg;
@@ -176,7 +188,7 @@
     fig.appendChild(el('h4', 'tgr-figtitle', 'Decision → first reported audio, per run'));
     fig.appendChild(el('p', 'tgr-fignote',
       'Time from the latest completion decision before the first reported agent audio event ' +
-      '(Gemini + ElevenLabs latency included, reported beside each bar). Speaker playback remains unverified. ' +
+      '(Gemini + ElevenLabs latency included). Acoustic speaker playback timing remains unverified. ' +
       'Per-run values from 5 clips — not a latency benchmark.'));
     snap.clips.forEach(function (clip) {
       var group = el('div', 'tgr-clip');
@@ -184,7 +196,7 @@
       orderedConfigs(clip).forEach(function (cfg) {
         var run = clip.configs[cfg];
         var row = el('div', 'tgr-gap-row');
-        row.appendChild(el('span', 'tgr-lane-tag', cfg));
+        row.appendChild(el('span', 'tgr-lane-tag', configLabel(cfg)));
         var bar = el('div', 'tgr-gap-bar');
         if (run.gap_s !== null && run.gap_s !== undefined) {
           var fill = el('span', 'tgr-gap-fill');
@@ -197,8 +209,6 @@
         if (run.gap_s !== null && run.gap_s !== undefined) {
           v.appendChild(document.createTextNode('decision ' + secs(run.answered_decision_t) + ' → audio ' + secs(run.first_audio_t) + ' · gap '));
           v.appendChild(el('b', null, secs(run.gap_s)));
-          v.appendChild(document.createTextNode(
-            ' (LLM ' + secs(run.llm_latency_s) + ' · TTS first audio ' + secs(run.tts_first_audio_s) + ')'));
         } else {
           v.textContent = 'no reported agent audio in this run';
         }
@@ -239,7 +249,7 @@
     gmax = Math.ceil(gmax * 2) / 2;
 
     var block = el('section', 'tgr-block');
-    block.setAttribute('aria-label', 'Run-log time series: stock vs patient replay evidence');
+    block.setAttribute('aria-label', 'Run-log time series: ' + (snap.comparison_label || 'stock vs patient') + ' replay evidence');
     var head = el('header', 'tgr-head');
     head.appendChild(el('h3', 'tgr-title', 'Run events over time'));
     head.appendChild(sourceBadge(snap));

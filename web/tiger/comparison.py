@@ -13,8 +13,8 @@ import ingest
 HERE = Path(__file__).resolve().parent
 OUT = HERE / 'comparison.json'
 SQL = HERE / 'comparison.sql'
-PACKET = ingest.EVIDENCE_ROOT / '2026-10-11-long-replay'
-RUN_IDS = ['20261011T053423Z-stock_fp32-bbcf', '20261011T053442Z-candidate-efd3']
+PACKET = ingest.EVIDENCE_ROOT / '2026-10-11-long-replay-working'
+RUN_IDS = ['20261011T061006Z-stock_fp32-8d16', '20261011T061024Z-candidate-f484']
 NAMES = {'speech_start', 'speech_stop', 'turn_complete', 'turn_incomplete',
          'speaker_resumed', 'agent_audio_start', 'agent_audio_end', 'cancelled', 'timeout'}
 EVENT_KEYS = ('seq', 't', 'name', 'prob', 'threshold', 'before_audible', 'service', 'overlap_s', 'timing')

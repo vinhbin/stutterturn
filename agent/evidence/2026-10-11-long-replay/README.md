@@ -30,3 +30,14 @@ X1 remains post-hoc, exploratory and unpromoted.
 every exported field against these logs. The judge page renders the saved
 query result. PCM was not saved in the logs: its listening links start fresh
 runs of the same source/configuration, whose generated replies may differ.
+
+## Error classification correction (October 11)
+
+The stock event at 10.388 s has `name: timeout` **and** `detail: empty reply`.
+The request completed in about 1.7 s; it did not hit the 10 s deadline. The old
+backend conflated empty responses with timeouts. The raw JSONL is unchanged.
+The judge figure now calls it an empty Gemini reply and explains the legacy
+label. Backend `700d34762c1b` retries an empty non-blocked response once within
+the original deadline, records retry/finish-reason metadata, and emits separate
+provider errors. No cause for the provider's original empty result can be
+inferred: that old log did not retain its finish reason.

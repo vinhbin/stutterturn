@@ -248,16 +248,21 @@ try {
       'chart overstates audio events as verified playback');
     assert(/not.*live.*status/i.test(await page.locator('#run-log-evidence').innerText()),
       'saved chart is not distinguished from live status');
-    assert(/0\.512 s/.test(text) && /9\.406 s/.test(text), 'per-run values do not match pinned evidence');
+    const pinned = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'model-five.json'), 'utf8'));
+    for (const c of pinned.clips) for (const r of Object.values(c.configs)) {
+      assert(text.includes(r.first_complete_t.toFixed(3) + ' s'), 'per-run values do not match pinned evidence');
+    }
+    assert(await chart.locator('.tgr-lane-tag').filter({ hasText: 'Our X1' }).count() === 10, 'our model is missing from five-clip charts');
     const clip = chart.locator('.tgr-figure').first().locator('.tgr-clip').filter({ hasText: 'HeStutters_4_32.wav' });
     const modelMarks = clip.locator('.tgr-track .tgr-mark-complete');
-    assert(await modelMarks.count() === 1, 'later fallback is incorrectly marked as a model decision');
+    const expectedMarks = Object.values(pinned.clips.find(c => c.source_id === 'HeStutters_4_32.wav').configs).filter(r => r.trigger === 'smart_turn').length;
+    assert(await modelMarks.count() === expectedMarks, 'fallback is incorrectly marked as a model decision');
   });
   for (const scenario of ['unavailable', 'missing provenance', 'database snapshot']) {
     await test('judge chart handles ' + scenario + ' without inventing live database status', async () => {
-      const data = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'snapshot.json'), 'utf8'));
+      const data = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'model-five.json'), 'utf8'));
       const chartPage = await reduced.newPage();
-      await chartPage.route('**/tiger/snapshot.json', route => {
+      await chartPage.route('**/tiger/model-five.json', route => {
         if (scenario === 'unavailable') return route.fulfill({ status: 404, body: '' });
         if (scenario === 'missing provenance') delete data.offline_fallback;
         else {
@@ -345,7 +350,7 @@ try {
     assert(await fallback.locator('#guide-title').isVisible(), 'no-JS guide title hidden');
     assert(await fallback.locator('.evaluation-steps > li').count() === 4, 'no-JS evaluation steps missing');
     assert(await fallback.locator('#replay-evidence').isVisible(), 'no-JS evidence summary hidden');
-    assert(await fallback.locator('#tiger-chart a[href="../tiger/snapshot.json"]').isVisible(),
+    assert(await fallback.locator('#tiger-chart a[href="../tiger/model-five.json"]').isVisible(),
       'no-JS chart fallback provides no direct evidence data');
     assert(await fallback.locator('#console-frame, #btn-start').count() === 0, 'no-JS guide contains run controls');
     await (await routeLink(fallback.locator('.guide-next'), '/live/')).click();
