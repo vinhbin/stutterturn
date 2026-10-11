@@ -1,0 +1,38 @@
+[
+ {
+  "split": "dev",
+  "group": "fluent",
+  "kind": "unfinished",
+  "label_source": "energy_vad",
+  "n": 1518,
+  "premature_n": 685,
+  "premature_rate": 0.4513,
+  "premature_ci95": [
+   0.4264,
+   0.4764
+  ],
+  "infer_ms": {
+   "n": 1253,
+   "mean": 21.23,
+   "p95": 21.554
+  }
+ },
+ {
+  "split": "dev",
+  "group": "stuttered",
+  "kind": "unfinished",
+  "label_source": "energy_vad",
+  "n": 352,
+  "premature_n": 132,
+  "premature_rate": 0.375,
+  "premature_ci95": [
+   0.326,
+   0.4267
+  ],
+  "infer_ms": {
+   "n": 266,
+   "mean": 16.21,
+   "p95": 17.895
+  }
+ }
+]

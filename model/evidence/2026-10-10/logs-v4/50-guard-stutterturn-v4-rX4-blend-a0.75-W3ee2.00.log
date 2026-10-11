@@ -1,0 +1,1 @@
+{"model": "stutterturn-v4-rX4-blend-a0.75-W3ee2.00.onnx", "model_sha256": "e771e39fb5de7f9de599f120e66444eb07763dcdfe1026e36e7ffda8e65b2119", "threshold": 0.5, "n": 3000, "n_pos": 1484, "n_neg": 1516, "M4_recall_full": 0.9535, "M4b_recall_end_plus_0.2": 0.9225, "M4b_n": 1484, "M4b_skipped_no_speech": 0, "M5_specificity_full": 0.9281, "synthetic_n": 948}

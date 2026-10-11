@@ -1,0 +1,27 @@
+guard negatives 1516, positives 1484; lost = stock<=0.5 and candidate>0.6
+
+Mean change in p(complete) vs stock FP32, and lost negatives, by clip length (guard negatives):
+length       n               v2 V2/e2.00               v3 W3/e1.00               v3 W3/e2.00       v4 blend 0.75xe2.00
+0-3s        54        dp +0.238, lost  7        dp +0.161, lost  4        dp +0.154, lost  3        dp +0.093, lost  2
+3-5s       335        dp +0.050, lost 12        dp +0.029, lost  8        dp +0.022, lost  6        dp +0.009, lost  4
+5-8s       289        dp +0.014, lost  2        dp +0.003, lost  4        dp +0.009, lost  5        dp +0.004, lost  3
+>=8s       838        dp +0.008, lost  5        dp +0.001, lost  6        dp +0.009, lost 12        dp +0.006, lost  7
+
+Mean change on guard positives (all lengths): {'v2 V2/e2.00': -0.0057, 'v3 W3/e1.00': -0.0001, 'v3 W3/e2.00': 0.003, 'v4 blend 0.75xe2.00': 0.0052}
+
+Negatives lost by all 4 candidates at 0.6: 9
+  orpheus_grammar_1      synthetic=True   1.79s  stock 0.019 -> 0.68, 0.61, 0.80, 0.68
+  liva_1                 synthetic=False  2.42s  stock 0.016 -> 0.88, 0.99, 0.99, 0.98
+  orpheus_grammar_1      synthetic=True   3.16s  stock 0.330 -> 0.85, 0.89, 0.78, 0.69
+  human_5                synthetic=False  3.28s  stock 0.025 -> 0.93, 0.80, 0.85, 0.66
+  human_convcollector_1  synthetic=False  3.73s  stock 0.433 -> 0.94, 0.96, 0.97, 0.93
+  human_5                synthetic=False  4.34s  stock 0.093 -> 0.97, 0.96, 0.95, 0.79
+  orpheus_midfiller_1    synthetic=True   5.89s  stock 0.209 -> 0.80, 0.72, 0.87, 0.74
+  chirp3_1               synthetic=True   6.08s  stock 0.482 -> 0.61, 0.71, 0.65, 0.63
+  liva_1                 synthetic=False 13.37s  stock 0.302 -> 0.78, 0.85, 0.81, 0.65
+
+Training clip lengths (model input seconds):
+  sep_pos.jsonl      n= 35198 median 1.64s, share < 4 s 1.00
+  stutter_neg.jsonl  n=  6190 median 1.78s, share < 4 s 1.00
+  orig_replay.jsonl  n=  6000 median 8.88s, share < 4 s 0.16
+  replay negatives   n=  3013 median 8.95s, share < 4 s 0.17
