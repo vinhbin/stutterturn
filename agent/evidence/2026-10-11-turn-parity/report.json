@@ -1,0 +1,488 @@
+{
+ "tool": "agent/check_turn_parity.py",
+ "commit": "dd29875",
+ "sources": [
+  "HVSA_0_1.wav",
+  "HVSA_0_10.wav"
+ ],
+ "schedule": {
+  "frame_s": 0.032,
+  "agent_check_after_s": 0.224,
+  "bench_check_after_s": 0.2,
+  "expected_end_delta_samples": -384,
+  "pre_roll_frames": 6
+ },
+ "results": [
+  {
+   "case": "delayed_onset",
+   "desc": "1.5 s silence, then HVSA_0_1.wav (speech-trimmed), 1.2 s silence",
+   "run_id": "20261011T032708Z-stock_fp32-83b1",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 2.272,
+     "decision": "turn_complete",
+     "silence_start_s": 2.08,
+     "agent_range": [
+      26112,
+      36864
+     ],
+     "bench_range": [
+      26112,
+      36480
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.5272,
+     "p_bench_own_slice": 0.740128,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    },
+    {
+     "check": 1,
+     "decision_t": 4.608,
+     "decision": "turn_incomplete",
+     "silence_start_s": 4.416,
+     "agent_range": [
+      38912,
+      74240
+     ],
+     "bench_range": [
+      26112,
+      73856
+     ],
+     "start_delta": -12800,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.152,
+     "p_bench_own_slice": 0.04026,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": true,
+     "divergence": "documented: agent restarts at the turn's onset; turn_onset uses the clip's first onset"
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-fp32"
+  },
+  {
+   "case": "preroll_clipped",
+   "desc": "HVSA_0_1.wav starting 2 frames before its first speech frame",
+   "run_id": "20261011T032722Z-stock_fp32-87ba",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 2.816,
+     "decision": "turn_incomplete",
+     "silence_start_s": 2.624,
+     "agent_range": [
+      10240,
+      45568
+     ],
+     "bench_range": [
+      10240,
+      45184
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.152,
+     "p_bench_own_slice": 0.063555,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-fp32"
+  },
+  {
+   "case": "sub_threshold_pause",
+   "desc": "HVSA_0_1.wav + 0.064 s pause + HVSA_0_10.wav",
+   "run_id": "20261011T032731Z-stock_fp32-1583",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 3.616,
+     "decision": "turn_incomplete",
+     "silence_start_s": 3.424,
+     "agent_range": [
+      14848,
+      58368
+     ],
+     "bench_range": [
+      14848,
+      57984
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0091,
+     "p_bench_own_slice": 0.007295,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    },
+    {
+     "check": 1,
+     "decision_t": 5.248,
+     "decision": "turn_incomplete",
+     "silence_start_s": 5.056,
+     "agent_range": [
+      14848,
+      84480
+     ],
+     "bench_range": [
+      14848,
+      84096
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0086,
+     "p_bench_own_slice": 0.007622,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-fp32"
+  },
+  {
+   "case": "second_turn",
+   "desc": "HVSA_0_1.wav + 3.6 s silence (fallback completes turn 1) + HVSA_0_10.wav",
+   "run_id": "20261011T032744Z-stock_fp32-638f",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 3.104,
+     "decision": "turn_incomplete",
+     "silence_start_s": 2.912,
+     "agent_range": [
+      14848,
+      50176
+     ],
+     "bench_range": [
+      14848,
+      49792
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.152,
+     "p_bench_own_slice": 0.063555,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    },
+    {
+     "check": 1,
+     "decision_t": 7.104,
+     "decision": "turn_incomplete",
+     "silence_start_s": 6.912,
+     "agent_range": [
+      101376,
+      114176
+     ],
+     "bench_range": [
+      14848,
+      113792
+     ],
+     "start_delta": -86528,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.04,
+     "p_bench_own_slice": 0.016969,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": true,
+     "divergence": "documented: agent restarts at the turn's onset; turn_onset uses the clip's first onset"
+    },
+    {
+     "check": 2,
+     "decision_t": 8.768,
+     "decision": "turn_incomplete",
+     "silence_start_s": 8.576,
+     "agent_range": [
+      101376,
+      140800
+     ],
+     "bench_range": [
+      14848,
+      140416
+     ],
+     "start_delta": -86528,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.2661,
+     "p_bench_own_slice": 0.009065,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": true,
+     "divergence": "documented: agent restarts at the turn's onset; turn_onset uses the clip's first onset"
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-fp32"
+  },
+  {
+   "case": "delayed_onset",
+   "desc": "1.5 s silence, then HVSA_0_1.wav (speech-trimmed), 1.2 s silence",
+   "run_id": "20261011T032802Z-stock-0f44",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 2.272,
+     "decision": "turn_complete",
+     "silence_start_s": 2.08,
+     "agent_range": [
+      26112,
+      36864
+     ],
+     "bench_range": [
+      26112,
+      36480
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.9647,
+     "p_bench_own_slice": 0.968528,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    },
+    {
+     "check": 1,
+     "decision_t": 4.608,
+     "decision": "turn_incomplete",
+     "silence_start_s": 4.416,
+     "agent_range": [
+      38912,
+      74240
+     ],
+     "bench_range": [
+      26112,
+      73856
+     ],
+     "start_delta": -12800,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0692,
+     "p_bench_own_slice": 0.047724,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": true,
+     "divergence": "documented: agent restarts at the turn's onset; turn_onset uses the clip's first onset"
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-int8"
+  },
+  {
+   "case": "preroll_clipped",
+   "desc": "HVSA_0_1.wav starting 2 frames before its first speech frame",
+   "run_id": "20261011T032814Z-stock-e0cd",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 2.816,
+     "decision": "turn_incomplete",
+     "silence_start_s": 2.624,
+     "agent_range": [
+      10240,
+      45568
+     ],
+     "bench_range": [
+      10240,
+      45184
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0692,
+     "p_bench_own_slice": 0.041053,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-int8"
+  },
+  {
+   "case": "sub_threshold_pause",
+   "desc": "HVSA_0_1.wav + 0.064 s pause + HVSA_0_10.wav",
+   "run_id": "20261011T032823Z-stock-502d",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 3.616,
+     "decision": "turn_incomplete",
+     "silence_start_s": 3.424,
+     "agent_range": [
+      14848,
+      58368
+     ],
+     "bench_range": [
+      14848,
+      57984
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0353,
+     "p_bench_own_slice": 0.016363,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    },
+    {
+     "check": 1,
+     "decision_t": 5.248,
+     "decision": "turn_incomplete",
+     "silence_start_s": 5.056,
+     "agent_range": [
+      14848,
+      84480
+     ],
+     "bench_range": [
+      14848,
+      84096
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0191,
+     "p_bench_own_slice": 0.011535,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-int8"
+  },
+  {
+   "case": "second_turn",
+   "desc": "HVSA_0_1.wav + 3.6 s silence (fallback completes turn 1) + HVSA_0_10.wav",
+   "run_id": "20261011T032836Z-stock-635e",
+   "checks": [
+    {
+     "check": 0,
+     "decision_t": 3.104,
+     "decision": "turn_incomplete",
+     "silence_start_s": 2.912,
+     "agent_range": [
+      14848,
+      50176
+     ],
+     "bench_range": [
+      14848,
+      49792
+     ],
+     "start_delta": 0,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.0692,
+     "p_bench_own_slice": 0.041053,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": false
+    },
+    {
+     "check": 1,
+     "decision_t": 7.104,
+     "decision": "turn_incomplete",
+     "silence_start_s": 6.912,
+     "agent_range": [
+      101376,
+      114176
+     ],
+     "bench_range": [
+      14848,
+      113792
+     ],
+     "start_delta": -86528,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.384,
+     "p_bench_own_slice": 0.047724,
+     "decisions_agree": true,
+     "bench_input_fallback": false,
+     "second_turn": true,
+     "divergence": "documented: agent restarts at the turn's onset; turn_onset uses the clip's first onset"
+    },
+    {
+     "check": 2,
+     "decision_t": 8.768,
+     "decision": "turn_complete",
+     "silence_start_s": 8.576,
+     "agent_range": [
+      101376,
+      140800
+     ],
+     "bench_range": [
+      14848,
+      140416
+     ],
+     "start_delta": -86528,
+     "end_delta": -384,
+     "h1_slice_reconstructed": true,
+     "h2_max_dfeat": 0.0,
+     "h2_dp": 0.0,
+     "p_agent_logged": 0.9076,
+     "p_bench_own_slice": 0.016363,
+     "decisions_agree": false,
+     "bench_input_fallback": false,
+     "second_turn": true,
+     "divergence": "documented: agent restarts at the turn's onset; turn_onset uses the clip's first onset"
+    }
+   ],
+   "hard_failed": [],
+   "passed": true,
+   "model": "stock-int8"
+  }
+ ],
+ "passed": true
+}
