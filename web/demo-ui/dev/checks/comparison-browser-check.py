@@ -63,7 +63,12 @@ with sync_playwright() as p:
                 expect(comparison.locator('table')).to_have_count(0)
             else:
                 expect(comparison).to_contain_text('Our model held the early pause')
-                expect(comparison.locator('tbody tr')).to_have_count(5)
+                expect(comparison.locator('tbody tr')).to_have_count(7)
+                # Stock has an earlier interrupted reply; final timing must ignore it.
+                expect(comparison.locator('.cmp-waiting')).to_contain_text('1.916 s')
+                expect(comparison.locator('.cmp-waiting')).to_contain_text('2.421 s')
+                final_decision = comparison.locator('tr').filter(has_text='Decision after final detected speech stop')
+                expect(final_decision.locator('td')).to_have_text(['0.192 s', '0.192 s'])
                 expect(comparison).to_contain_text('0.050 s')
                 expect(comparison).to_contain_text('None reported')
                 expect(comparison).to_contain_text('Both runs completed with Gemini replies')

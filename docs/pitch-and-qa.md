@@ -1,6 +1,6 @@
 # StutterTurn — team prep packet (pitch, live demo, Q&A)
 
-**For:** Vinh, Guttuu, Niko, Kareem · **Updated:** Sun Oct 11, 2026 · **Evidence as of:** main `6b201bb`
+**For:** Vinh, Guttuu, Niko, Kareem · **Updated:** Sun Oct 11, 2026 · **Evidence:** pinned October 11 hosted replay pair and W3/X1 artifacts; judge-page presentation updated October 11
 
 Read the whole thing once. Know your own section cold, and know **Part 3A** as a team. Every number here comes from a saved file or run in the repo. If a judge asks something not covered, answer only what you know and offer to show the evidence.
 
@@ -11,62 +11,56 @@ Read the whole thing once. Know your own section cold, and know **Part 3A** as a
 
 ---
 
-# Part 1 — The live pitch (3:00 cap, target 2:57)
+# Part 1 — The live pitch (3:00 cap)
 
-Only the quoted lines are spoken. Times are rehearsal targets; time it aloud with the actual two runs.
+Updated for the judge-page model/training story. Keep the approved human opening; the middle now connects training, interruption, and waiting. About 245 spoken words plus a target 40-second replay slot; time the actual delivery before judging. Only quoted text is spoken. Hypothetical call abandonment is motivation, not a measured outcome.
 
-### 0:00–0:46 · Vinh — the problem
+### 0:00–0:43 · Vinh — the person and the problem
 *Screen: landing page. No audio playing.*
 
 > More than three million Americans stutter.
 >
 > Imagine calling to refill a prescription. You get stuck on a word, and the automated voice starts answering before you've finished.
 >
-> That pause can still be part of speaking.
+> You may have to repeat yourself—or give up on the call. A pause can still be part of speaking.
 >
-> In our first offline check of two hundred recordings labeled with stutter blocks, Smart Turn predicted "finished" in a hundred and sixteen detected pauses: fifty-eight percent. Those are model decisions, not measured interruptions, and the boundaries still need human review.
+> In our first offline check, Smart Turn predicted “finished” in fifty-eight percent of detected pauses across two hundred block-labeled recordings. These were model decisions; the boundaries still need human review.
 >
-> We're building StutterTurn to give people time to finish.
+> StutterTurn asks: can we avoid those premature replies without making every response slower?
+
+### 0:43–1:42 · Guttuu — hear the comparison
+*Screen: hosted `/live/`, signed in. Use the same long source, Stock FP32 first, X1 second. Silence gate stays 0.2 s; thresholds are 0.50/0.60. Let each run finish before the next. Do not speak over the audio.*
+
+> This is the same real recording through stock and our experimental candidate, X1. The model and threshold change; the silence wait stays the same. Listen for the speaker continuing, and watch when the agent decides to reply.
+
+*[Target 40 seconds for two complete rehearsed runs. If the pair takes longer, shorten the surrounding spoken sections; never truncate it and claim completion.]*
+
+### 1:42–2:13 · Niko — what we trained
+*Screen: `/judge/#training`, then the model pipeline if asked.*
+
+> We adapted Smart Turn with an eighty-twenty mix of original-model replay and stutter-focused examples. X1 blends the fine-tuned checkpoint with stock weights, then runs through ONNX.
 >
-> Guttuu will show you how we test that.
+> In our saved example, X1 holds an early pause that stock answers. We also show the wait for the final reply. X1 is exploratory; human confirmation is still pending.
 
-### 0:46–1:50 · Guttuu — the live agent
-*Screen: hosted `/live/`, signed in, development preview OFF. Same recording for both runs: first **Stock Smart Turn v3.2 (FP32)**, then **StutterTurn candidate** (X1).*
+### 2:13–2:42 · Kareem — show the evidence
+*Screen: `/judge/#long-replay`. Point to both the overlap and final-reply timing cards. These are saved runs, not automatically the fresh pair just heard.*
 
-> I built our replay agent with Gemini replies and ElevenLabs speech.
+> Vultr runs our inference and voice backend. Gemini generates replies; ElevenLabs voices them.
 >
-> This is a live replay of a real recording. First the stock model, then our experimental candidate, X1. The model and its threshold change; the silence wait stays the same. Watch the decision row.
+> Tiger Data stores the run events behind this comparison. We expose decisions, resumed speech, overlap, and response timing so you can inspect the tradeoff.
 
-*[Up to 40 seconds for both runs. Don't talk over the audio. Show what actually happens. Never promise an interruption.]*
+### 2:42–2:57 · Vinh — close
+*Screen: landing page or judge-page opening. Stop clicking.*
 
-> That demonstrates the pipeline. It doesn't establish that our adapted model is better.
-
-### 1:50–2:21 · Niko — training and evaluation
-*Screen: the X1 result and its status. Keep visible: "Post-hoc exploratory candidate selected after v4 results; fifth adaptive look at dev/guard; not a v4 pass."*
-
-> I built the evaluation pipeline and helped establish the training and export path.
+> The goal is simple: room to finish, and a prompt reply when you're done.
 >
-> One experiment mixed eighty percent original-model replay data with twenty percent stutter-focused examples.
->
-> We test early decisions and missed completions on development examples. Waiting longer can trade fewer early decisions for slower replies.
->
-> X1 passed a post-hoc exploratory development check. Human confirmation and audio acceptance are still pending. Our reserved final test remains sealed.
+> StutterTurn. Let people finish.
 
-### 2:21–2:46 · Kareem — making it inspectable
-*Screen: `/judge/` → evidence links → the Tiger Data chart.*
+**Exact saved-pair answer if asked:** Stock reported 0.050 s scheduled overlap; X1 reported none. From the final VAD speech-stop event at 8.480 s to the next scheduled reply, stock took 1.916 s and X1 2.421 s. Both final decisions came 0.192 s after that detected stop. These are server-scheduled intervals, not acoustic measurements, human-confirmed completion delay, or evidence that the model caused the provider timing difference. Never describe the model score as “percent accurate.”
 
-> I worked on our landing and judge pages and organized links to the evidence.
->
-> The judge page explains the results. The run console operates the replay. This chart is a saved Tiger Data snapshot.
->
-> Our goal is a reusable turn-taking model that developers can evaluate and integrate.
+**If asked about restarting or hanging up:** “That is a consequence we are concerned about, not an outcome our replay measures. We have not measured call abandonment, and we do not claim most callers hang up.”
 
-### 2:46–2:57 · Vinh — close
-*Screen: landing page, "Let people finish." Stop clicking.*
-
-> We want voice agents to answer promptly when someone finishes, and give them room when they haven't.
->
-> StutterTurn: let people finish.
+**Video:** This page/pitch update alone does not require a new video. Review the existing video for claims of validated improvement, call-abandonment rates, or a mislabeled stock/patient comparison before deciding whether a correction is necessary. The final video has not been audited in this pass.
 
 ---
 
@@ -102,11 +96,11 @@ Only the quoted lines are spoken. Times are rehearsal targets; time it aloud wit
 | Clock | Speaker | Operator does | If it goes wrong |
 |---|---|---|---|
 | 0:00 | Vinh | Landing page up | — |
-| 0:46 | Guttuu | Switch to `/live/`. **Stock Smart Turn v3.2 (FP32)** → **Start fresh run** | Gemini timeout → keep talking; finish on the decision row. Restart the server after the pitch, not during. |
+| 0:43 | Guttuu | Switch to `/live/`. **Stock Smart Turn v3.2 (FP32)** → **Start fresh run** | Gemini timeout → keep talking; finish on the decision row. Restart the server after the pitch, not during. |
 | ~1:05 | Guttuu | When the run ends, note the run ID. Select **StutterTurn candidate**, same source → **Start fresh run** | No audio → check the laptop's output device and that you clicked the page first. Otherwise point at the timeline. |
-| 1:50 | Niko | Switch to the X1 tab | — |
-| 2:21 | Kareem | Switch to `/judge/` → evidence links → Tiger chart | Hosted page down → local `http://127.0.0.1:8041/judge/` |
-| 2:46 | Vinh | Landing page. Hands off. | — |
+| 1:42 | Niko | Switch to `/judge/#training` | — |
+| 2:13 | Kareem | Switch to `/judge/` → evidence links → Tiger chart | Hosted page down → local `http://127.0.0.1:8041/judge/` |
+| 2:42 | Vinh | Landing page. Hands off. | — |
 
 **Fallback line if the backend is down** (Guttuu says it instead of the live lines): *"These are saved runs of the same recording through the stock model and our candidate. They show model decisions and reported response events; this is not a live execution."* Then show the saved long-replay comparison on the hosted `/judge/` page. Do not debug in front of judges.
 
@@ -116,7 +110,7 @@ Only the quoted lines are spoken. Times are rehearsal targets; time it aloud wit
 
 Say "watch the decision row," not "listen for the interruption."
 
-**Framing rule for this demo:** X1 is an exploratory candidate. Its audio acceptance and human confirmation checks aren't finished. The demo shows one clip; it is not proof the model is better. Guttuu's closing line ("It doesn't establish that our adapted model is better") stays in.
+**Framing rule for this demo:** X1 remains exploratory. Show both the early hold and final reply timing. Describe the observed pair precisely; broader improvement and human confirmation remain unestablished. The spoken explanation in Part 1 and the visible evidence labels carry this distinction.
 
 ---
 
@@ -243,10 +237,10 @@ Run their own turn-taking stack against the benchmark, and (once released) load 
 Every event (decision, generation, playback, cancellation) is logged separately as JSONL and streamed to the browser over a WebSocket. On the hosted version, all of this runs on our Vultr server, and the recording plus the agent's reply are streamed to your browser and played there.
 
 **Q: Why is there still a ~2 s pause before the agent answers?**
-Two steps. The model decides in about 0.2 s; on the demo clip, speech ends at 8.48 s and the decision lands at 8.67 s. The remaining ~2 s is Gemini writing the reply and ElevenLabs voicing it. Every configuration pays that.
+Separate the decision from scheduled playback. In the pinned pair, the final VAD speech-stop event is at 8.480 s and both configurations decide at 8.672 s: 0.192 s later. Reply audio is scheduled at 10.396 s for stock and 10.901 s for X1, giving intervals of 1.916 s and 2.421 s from that detected stop. Provider and scheduling time contribute; this is not measured acoustic latency or a human-labeled turn ending.
 
 **Q: What does "COMPLETE 0.83" mean?**
-Confidence, not seconds: the model was 83% sure the caller had finished. X1 says "finished" at 0.6 or above.
+A turn-completion score, not seconds or measured accuracy. The model outputs 0.83 and X1 crosses its decision threshold at 0.60. We have not established that this score is calibrated to an 83% chance of being correct.
 
 **Q: Why separate a decision from an interruption?**
 A premature decision starts reply generation, but if the caller resumes before the audio starts, the reply is cancelled and nobody hears it. In replay v2, stock decided "finished" inside the gap on 4 of 5 clips, but 3 replies were cancelled before audio. Fast reply paths would turn more of those into audible cut-offs.
