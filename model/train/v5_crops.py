@@ -38,7 +38,8 @@ SR = C.SR
 FRAME = 512                      # Silero frame at 16 kHz (32 ms)
 VAD_THRESHOLD = 0.5
 MIN_PAUSE_S = 0.15
-FALLBACK_PAUSE_S = 0.10      # Niko's one pre-registered relaxation if the length gate fails
+FALLBACK_RULE = "shortest_onset_for_short_targets"  # Niko, #2 02:56Z: one fallback, then report and stop
+SEP_SHARES = {"stutter_neg.jsonl": 0.5, "sep_pos.jsonl": 0.5}  # W3: p_neg = p_pos = 0.10 -> equal SEP shares
 SHORT_S, SHORT_MIN_FRAC = 2.0, 0.25   # gate: >= 25% of built crops under 2.0 s, per label
 PREROLL_S = 0.10
 MIN_START_S = 0.50
@@ -104,10 +105,18 @@ def candidate_starts(mask, n_samples, min_pause_s=MIN_PAUSE_S):
     return out
 
 
-def choose_start(cands, target_s):
-    """Closest crop length to target; ties -> later start."""
+def effective_pause_s(pause_s):
+    """The pause actually required after rounding up to whole 32 ms frames (0.15 -> 0.16 s)."""
+    return round(int(np.ceil(pause_s * SR / FRAME)) * FRAME / SR, 4)
+
+
+def choose_start(cands, target_s, shortest_for_short=False):
+    """Closest crop length to target; ties -> later start. Fallback rule: when the target is under
+    SHORT_S, take the shortest qualifying onset (all candidates are already >= MIN_LEN_S)."""
     if not cands:
         return None
+    if shortest_for_short and target_s < SHORT_S:
+        return min(cands, key=lambda c: (c[1], -c[0]))
     return min(cands, key=lambda c: (abs(c[1] - target_s), -c[0]))
 
 
@@ -120,43 +129,60 @@ def heldout_keys():
             if r["show"] == HELDOUT_SHOW}
 
 
-def sep_length_pool(data_dir, exclude=frozenset(), info=None):
-    """Empirical SEP training input lengths (s) excluding held-out clips, clipped to [1, 4] s, sorted."""
-    L, dropped = [], 0
-    for fn in ("sep_pos.jsonl", "stutter_neg.jsonl"):
+def sep_length_pool(data_dir, exclude=frozenset(), info=None, shares=SEP_SHARES):
+    """SEP training input-length distribution as the W3 mixture draws it: each source gets its share,
+    rows within a source by their weight; held-out clips excluded; lengths clipped to [1, 4] s.
+    Returns (sorted lengths, cumulative probabilities)."""
+    L, W, dropped = [], [], 0
+    for fn, share in shares.items():
         p = os.path.join(data_dir, fn)
         if not os.path.exists(p):
-            continue
+            sys.exit(f"REFUSING: {fn} missing in {data_dir}")
+        ls, ws = [], []
         for line in open(p):
             r = json.loads(line)
             if r["clip_key"] in exclude:
                 dropped += 1
                 continue
             s = min(r["keep_samples"], r["cut_samples"]) if r.get("keep_samples") else r["cut_samples"]
-            L.append(min(max(s / SR, MIN_LEN_S), MAX_LEN_S))
-    if not L:
-        sys.exit(f"REFUSING: no SEP rows in {data_dir} to set target lengths")
+            ls.append(min(max(s / SR, MIN_LEN_S), MAX_LEN_S))
+            ws.append(float(r.get("weight", 1.0)))
+        if not ls:
+            sys.exit(f"REFUSING: no usable rows in {fn}")
+        tot = sum(ws)
+        L += ls
+        W += [share * w / tot for w in ws]
+    order = np.argsort(L, kind="stable")
+    lens, cdf = np.array(L)[order], np.cumsum(np.array(W)[order])
+    cdf /= cdf[-1]
     if info is not None:
-        info.update({"rows_used": len(L), "heldout_rows_excluded": dropped})
-    return np.sort(np.array(L))
+        info.update({"rows_used": len(L), "heldout_rows_excluded": dropped, "source_shares": shares,
+                     "within_source": "row weight (as the W3 mixture draws)"})
+    return lens, cdf
+
+
+def pool_quantile(pool, q):
+    lens, cdf = pool
+    return float(lens[min(int(np.searchsorted(cdf, q, side="left")), len(lens) - 1)])
 
 
 def target_len(pool, seed, rid):
-    return float(pool[min(int(seeded_u(seed, rid) * len(pool)), len(pool) - 1)])
+    return pool_quantile(pool, seeded_u(seed, rid))
 
 
-def select_crops(replay, masks, pool, seed, min_pause_s):
-    """Crop rows for one pause rule (pure given VAD masks)."""
+def select_crops(replay, masks, pool, seed, min_pause_s, shortest_for_short=False):
+    """Crop rows for one rule (pure given VAD masks)."""
     rows = []
     for r, (mask, n) in zip(replay, masks):
         tgt = target_len(pool, seed, r["id"])
-        pick = choose_start(candidate_starts(mask, n, min_pause_s), tgt)
+        pick = choose_start(candidate_starts(mask, n, min_pause_s), tgt, shortest_for_short)
         if pick is None:
             continue
         start, length, speech = pick
         rows.append({"id": f"crop-{r['id']}", "parent_id": r["id"], "audio": r["audio"],
                      "crop_start_samples": start, "n_samples": n - start, "parent_n_samples": n,
                      "len_s": length, "target_len_s": round(tgt, 4), "speech_s": speech, "min_pause_s": min_pause_s,
+                     "choice_rule": FALLBACK_RULE if shortest_for_short else "closest_to_target",
                      "label": r["label"], "endpoint_bool": r["endpoint_bool"], "dataset": r["dataset"],
                      "synthetic": r["synthetic"]})
     return rows
@@ -192,7 +218,7 @@ def cmd_build(a):
                  "heldout_source": HELDOUT_KEYS if os.path.exists(HELDOUT_KEYS) else "splits/v1/train.csv (show filter)"}
     pool = sep_length_pool(data, held, pool_info)
     vad = Silero()
-    masks = []  # one VAD pass per clip; both pause rules reuse it
+    masks = []  # one VAD pass per clip; both rules reuse it
     for i, r in enumerate(replay):
         assert r["id"] not in guard_ids and r["wav_sha256"] not in guard_wavs, r["id"]
         x = C.read_audio(os.path.join(a.work, r["audio"]))
@@ -200,11 +226,13 @@ def cmd_build(a):
         if (i + 1) % 500 == 0:
             print(f"  VAD {i + 1}/{len(replay)}", flush=True)
     attempts = []
-    for pause in (MIN_PAUSE_S, FALLBACK_PAUSE_S):  # pre-registered: one relaxation, then stop
-        rows = select_crops(replay, masks, pool, a.seed, pause)
+    for rule, shortest in (("closest_to_target", False), (FALLBACK_RULE, True)):  # one fallback, then stop
+        rows = select_crops(replay, masks, pool, a.seed, MIN_PAUSE_S, shortest)
         skipped = len(replay) - len(rows)
         gate = length_gate(rows)
-        attempts.append({"min_pause_s": pause, "crops": len(rows), "skipped_no_onset": skipped, "length_gate": gate})
+        attempts.append({"choice_rule": rule, "min_pause_s": MIN_PAUSE_S,
+                         "effective_min_pause_s": effective_pause_s(MIN_PAUSE_S), "crops": len(rows),
+                         "skipped_no_onset": skipped, "length_gate": gate})
         print(json.dumps(attempts[-1]), flush=True)
         if gate["passed"]:
             break
@@ -212,9 +240,10 @@ def cmd_build(a):
     if not attempts[-1]["length_gate"]["passed"]:
         C.write_json(os.path.join(out, "manifest.json"), {
             "script": "model/train/v5_crops.py", "code_commit": C.git_commit(), "seed": a.seed,
-            "status": "FAILED length gate at 0.15 s and 0.10 s pause: report and stop (no crops written)",
+            "status": "FAILED length gate with closest-to-target and with the shortest-onset fallback: "
+                      "report and stop (no crops written)",
             "attempts": attempts})
-        sys.exit("length gate failed twice: crops not written; report and stop (pre-registered)")
+        sys.exit("length gate failed with both rules: crops not written; report and stop (pre-registered)")
     for r in rows:  # hash the chosen crops' audio
         x = C.read_audio(os.path.join(a.work, r["audio"]))[r["crop_start_samples"]:]
         r["crop_pcm16_sha256"] = C.sha256_bytes((np.clip(x, -1, 1) * 32767).round().astype("<i2").tobytes())
@@ -227,22 +256,36 @@ def cmd_build(a):
                 "source": {"data_dir": a.data, "orig_replay_sha256": C.sha256_file(os.path.join(data, "orig_replay.jsonl")),
                            "manifest_sha256": C.sha256_file(os.path.join(data, "manifest.json"))},
                 "rule": {"vad": "silero (agent/models, sha pinned), frame 512, prob >= 0.5",
-                         "min_pause_s_used": attempts[-1]["min_pause_s"], "preroll_s": PREROLL_S, "min_start_s": MIN_START_S,
+                         "min_pause_s": MIN_PAUSE_S, "effective_min_pause_s": effective_pause_s(MIN_PAUSE_S),
+                         "choice_rule_used": attempts[-1]["choice_rule"], "preroll_s": PREROLL_S, "min_start_s": MIN_START_S,
                          "len_s": [MIN_LEN_S, MAX_LEN_S], "min_speech_s": MIN_SPEECH_S,
-                         "target": "seeded draw from SEP input lengths clipped to [1, 4] s; closest onset, ties later"},
+                         "target": "seeded draw from the weighted SEP input-length distribution (held-out show "
+                                   "excluded), clipped to [1, 4] s; closest onset, ties later"},
                 "sep_length_pool": pool_info,
-                "sep_target_quantiles_s": {q: round(float(np.quantile(pool, q)), 3) for q in (0.1, 0.25, 0.5, 0.75, 0.9)},
+                "sep_target_quantiles_s": {q: round(pool_quantile(pool, q), 3) for q in (0.1, 0.25, 0.5, 0.75, 0.9)},
                 "replay_rows": len(replay), "crops": len(rows), "skipped_no_onset": skipped,
                 "crops_by_label": {"0": lab.count(0), "1": lab.count(1)},
                 "len_quantiles_s": {q: round(float(np.quantile([r["len_s"] for r in rows], q)), 3)
                                     for q in (0.1, 0.25, 0.5, 0.75, 0.9)} if rows else None,
                 "replay_crops_sha256": C.sha256_file(path),
-                "length_gate_rule": f">= {SHORT_MIN_FRAC:.0%} of crops under {SHORT_S} s per label; one fallback "
-                                    f"{MIN_PAUSE_S} -> {FALLBACK_PAUSE_S} s pause, then stop (Niko, #2 2026-10-11T02:41Z)",
+                "length_gate_rule": f">= {SHORT_MIN_FRAC:.0%} of crops under {SHORT_S} s per label; one fallback: "
+                                    f"shortest qualifying onset for rows with target < {SHORT_S} s, then report and stop "
+                                    f"(Niko, #2 2026-10-11T02:56Z)",
                 "attempts": attempts,
                 "guard_disjoint": True, "audit": "pending (audit-export, then audit-check)"}
     C.write_json(os.path.join(out, "manifest.json"), manifest)
     print(json.dumps({k: manifest[k] for k in ("crops", "skipped_no_onset", "crops_by_label", "len_quantiles_s", "attempts")}))
+
+
+def audit_sample(crops, seed):
+    """The seeded audit sample: {label: [crop rows]} (first AUDIT_PER_LABEL by sha256(seed:audit:id))."""
+    out = {}
+    for lab in (1, 0):
+        pick = sorted([c for c in crops if c["label"] == lab], key=lambda c: seeded_u(seed + ":audit", c["id"]))
+        if len(pick) < AUDIT_PER_LABEL:
+            sys.exit(f"REFUSING: only {len(pick)} crops with label {lab}")
+        out[lab] = pick[:AUDIT_PER_LABEL]
+    return out
 
 
 def cmd_audit_export(a):
@@ -253,11 +296,9 @@ def cmd_audit_export(a):
         sys.exit(f"REFUSING: {out} exists")
     os.makedirs(os.path.join(out, "audio"))
     rows = []
+    sample = audit_sample(crops, a.seed)
     for lab, name in ((1, "complete"), (0, "incomplete")):
-        pick = sorted([c for c in crops if c["label"] == lab], key=lambda c: seeded_u(a.seed + ":audit", c["id"]))
-        if len(pick) < AUDIT_PER_LABEL:
-            sys.exit(f"REFUSING: only {len(pick)} crops with label {lab}")
-        for c in pick[:AUDIT_PER_LABEL]:
+        for c in sample[lab]:
             aid = f"A{len(rows) + 1:02d}"
             full = C.read_audio(os.path.join(a.work, c["audio"]))
             sf.write(os.path.join(out, "audio", f"{aid}-crop.wav"), full[c["crop_start_samples"]:], SR, subtype="PCM_16")
@@ -316,7 +357,11 @@ def cmd_audit_check(a):
         "claimed_labels_match_build": all(r["crop_id"] in built and
                                           {"complete": 1, "incomplete": 0}[r["claimed_label"]] == built[r["crop_id"]]["label"]
                                           for r in rows),
-        "no_duplicate_crops": len({r["crop_id"] for r in rows}) == len(rows)}
+        "no_duplicate_crops": len({r["crop_id"] for r in rows}) == len(rows),
+        "no_duplicate_audit_ids": len({r["audit_id"] for r in rows}) == len(rows),
+        "matches_seeded_export_sample": {(r["crop_id"], r["claimed_label"]) for r in rows} == {
+            (c["id"], "complete" if lab == 1 else "incomplete")
+            for lab, cs in audit_sample(list(built.values()), readme.get("seed", "")).items() for c in cs}}
     out = audit_result(rows)
     out.update({"binding": binding, "passed": out["passed"] and all(binding.values()),
                 "worksheet": a.worksheet, "worksheet_sha256": C.sha256_file(path),
@@ -341,6 +386,9 @@ def require_audit(work, crops):
 
 
 def cmd_stock_diagnostic(a):
+    res_path = os.path.join(a.work, a.crops, "stock_diagnostic.json")
+    if os.path.exists(res_path):
+        sys.exit(f"REFUSING: {res_path} exists")
     crops = [json.loads(l) for l in open(os.path.join(a.work, a.crops, "replay_crops.jsonl"))]
     if a.limit:
         crops = sorted(crops, key=lambda c: seeded_u("diag", c["id"]))[:a.limit]
@@ -356,7 +404,7 @@ def cmd_stock_diagnostic(a):
     out = {"diagnostic": "stock FP32 decision flip rate, full clip vs crop, threshold 0.5 (report only; never a filter)",
            "n": len(crops), "by_label": {str(k): {"flips": v[0], "n": v[1], "rate": round(v[0] / max(v[1], 1), 4)}
                                          for k, v in flips.items()}}
-    C.write_json(os.path.join(a.work, a.crops, "stock_diagnostic.json"), out)
+    C.write_json(res_path, out)
     print(json.dumps(out, indent=1))
 
 
@@ -410,11 +458,16 @@ def selftest():
     ok &= check("audit 'unsure' counts as not valid", not audit_result(rows(30, 26, unsure=4))["passed"])
     r = rows(30, 30); r[0]["reviewer"] = ""
     ok &= check("audit requires reviewer", not audit_result(r)["passed"])
-    # Niko's fallback: a 0.12 s pause qualifies at 0.10 s but not at 0.15 s
+    # pause parameter and frame rounding (0.15 s requires 0.16 s after rounding)
     mask6, n6 = m([(0.1, 2.0), (2.13, 4.0)], 4.5)
     ok &= check("0.12 s pause: rejected at 0.15 s", candidate_starts(mask6, n6, 0.15) == [])
     ok &= check("0.12 s pause: accepted at 0.10 s", len(candidate_starts(mask6, n6, 0.10)) == 1)
     g_rows = [{"label": l, "len_s": x} for l in (0, 1) for x in (1.5, 2.5, 3.0, 3.5)]
+    ok &= check("effective pause 0.15 -> 0.16 s", effective_pause_s(0.15) == 0.16)
+    cands = [(48000, 1.2, 1.0), (32000, 2.2, 1.5), (16000, 3.2, 2.0)]
+    ok &= check("closest rule picks 2.2 s for a 1.8 s target", choose_start(cands, 1.8)[1] == 2.2)
+    ok &= check("fallback picks the shortest (1.2 s) for a 1.8 s target", choose_start(cands, 1.8, True)[1] == 1.2)
+    ok &= check("fallback leaves targets >= 2 s on the closest rule", choose_start(cands, 3.0, True)[1] == 3.2)
     ok &= check("length gate passes at 25% under 2 s", length_gate(g_rows)["passed"])
     g_rows[0]["len_s"] = 2.2
     ok &= check("length gate fails if one label < 25%", not length_gate(g_rows)["passed"])
@@ -422,19 +475,25 @@ def selftest():
     import tempfile
     with tempfile.TemporaryDirectory() as td:
         with open(os.path.join(td, "sep_pos.jsonl"), "w") as f:
-            f.write(json.dumps({"clip_key": "Keep_1_1", "cut_samples": 32000}) + "\n")
-            f.write(json.dumps({"clip_key": "IStutterSoWhat_1_1", "cut_samples": 16000}) + "\n")
+            f.write(json.dumps({"clip_key": "Keep_1_1", "cut_samples": 32000, "weight": 1.0}) + "\n")
+            f.write(json.dumps({"clip_key": "IStutterSoWhat_1_1", "cut_samples": 16000, "weight": 1.0}) + "\n")
+        with open(os.path.join(td, "stutter_neg.jsonl"), "w") as f:
+            f.write(json.dumps({"clip_key": "Keep_2_1", "cut_samples": 48000, "weight": 3.0}) + "\n")
+            f.write(json.dumps({"clip_key": "Keep_2_2", "cut_samples": 64000, "weight": 1.0}) + "\n")
         info = {}
         pl = sep_length_pool(td, {"IStutterSoWhat_1_1"}, info)
-        ok &= check("held-out rows excluded from the length pool", list(pl) == [2.0] and info["heldout_rows_excluded"] == 1)
+        ok &= check("held-out rows excluded from the length pool", 1.0 not in list(pl[0]) and info["heldout_rows_excluded"] == 1)
+        # shares 0.5/0.5; within stutter_neg weights 3:1 -> P(2.0)=0.5, P(3.0)=0.375, P(4.0)=0.125
+        ok &= check("pool weighted by source share and row weight",
+                    np.allclose(pl[1], [0.5, 0.875, 1.0]) and pool_quantile(pl, 0.6) == 3.0, f"{pl}")
         # audit result is bound to the build
         cd = os.path.join(td, "crops"); wd = os.path.join(td, "audit"); os.makedirs(cd); os.makedirs(wd)
         C.write_json(os.path.join(cd, "manifest.json"), {"x": 1})
-        built = [{"id": f"crop-{l}{k}", "label": l} for l in (0, 1) for k in range(AUDIT_PER_LABEL)]
+        built = [{"id": f"crop-{l}{k}", "label": l} for l in (0, 1) for k in range(AUDIT_PER_LABEL + 5)]
         with open(os.path.join(cd, "replay_crops.jsonl"), "w") as f:
             f.writelines(json.dumps(r) + "\n" for r in built)
         def run_check(rows, readme_sha):
-            C.write_json(os.path.join(wd, "README.json"), {"crops_manifest_sha256": readme_sha})
+            C.write_json(os.path.join(wd, "README.json"), {"crops_manifest_sha256": readme_sha, "seed": "s"})
             with open(os.path.join(wd, "crop_audit.csv"), "w", newline="") as f:
                 w = csv.DictWriter(f, fieldnames=AUDIT_FIELDS, lineterminator="\n"); w.writeheader()
                 w.writerows({**{k: "" for k in AUDIT_FIELDS}, **r} for r in rows)
@@ -446,8 +505,10 @@ def selftest():
                 cmd_audit_check(ns)
             except SystemExit as e:
                 return e.code == 0, json.load(open(rp)) if os.path.exists(rp) else None
-        good = [{"audit_id": f"A{i}", "crop_id": r["id"], "claimed_label": "complete" if r["label"] else "incomplete",
-                 "reviewer": "r", "reviewed_at": "2026-10-11", "label_still_valid": "yes"} for i, r in enumerate(built)]
+        smp = audit_sample(built, "s")
+        good = [{"audit_id": f"A{i}", "crop_id": c["id"], "claimed_label": "complete" if c["label"] else "incomplete",
+                 "reviewer": "r", "reviewed_at": "2026-10-11", "label_still_valid": "yes"}
+                for i, c in enumerate(smp[1] + smp[0])]
         msha = C.sha256_file(os.path.join(cd, "manifest.json"))
         import contextlib, io as _io
         with contextlib.redirect_stdout(_io.StringIO()):
@@ -455,9 +516,16 @@ def selftest():
             p2, _ = run_check(good, "0" * 64)
             bad = [dict(r) for r in good]; bad[0]["crop_id"] = "crop-not-built"
             p3, _ = run_check(bad, msha)
+            notseeded = [dict(r) for r in good]
+            notseeded[0]["crop_id"] = next(c["id"] for c in built if c["label"] == 1 and c not in smp[1])
+            p4, _ = run_check(notseeded, msha)
+            dup = [dict(r) for r in good]; dup[1]["audit_id"] = dup[0]["audit_id"]
+            p5, _ = run_check(dup, msha)
         ok &= check("audit bound to this build passes and is written", p1 and r1 and r1["passed"])
         ok &= check("audit from another build refused", not p2)
         ok &= check("audit naming an unbuilt crop refused", not p3)
+        ok &= check("audit with a built but non-sampled crop refused", not p4)
+        ok &= check("audit with duplicate audit_ids refused", not p5)
         ok &= check("require_audit refuses a failed audit", _refuses(lambda: require_audit(td, "crops")))
         with contextlib.redirect_stdout(_io.StringIO()):
             run_check(good, msha)

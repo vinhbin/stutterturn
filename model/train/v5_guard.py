@@ -74,23 +74,36 @@ def main():
         sys.exit(f"REFUSING: --first-shard {a.first_shard} overlaps the old guard's shards 0-{old['shards_read'] - 1}")
     spec = dict(B.GUARD)
     shards = range(a.first_shard, spec["n_shards"])
+    record_path = os.path.join(a.work, a.out + "-fetch.json")
     if a.stage == "fetch":
-        total = 0
+        if os.path.exists(record_path):
+            sys.exit(f"REFUSING: {record_path} exists (the shard list is pinned once)")
+        total, record = 0, []
         for k in shards:
-            total += len(B.fetch_shard(a.work, spec, k))
+            n = len(B.fetch_shard(a.work, spec, k))
+            total += n
+            record.append({"shard": k, "english_rows": n, "rows_jsonl_sha256": C.sha256_file(
+                os.path.join(B.cache_dir(a.work, spec["tag"], k), "rows.jsonl"))})
             if total >= a.cap * 1.2:  # headroom for exclusions and stratification
                 break
-        print(f"FETCH DONE: {total} English rows from shards {a.first_shard}..{k}")
+        C.write_json(record_path, {"source": {k: spec[k] for k in ("repo", "revision")}, "first_shard": a.first_shard,
+                                   "cap": a.cap, "shards": record, "code_commit": C.git_commit()})
+        print(f"FETCH DONE: {total} English rows from shards {[r['shard'] for r in record]}; pinned in {record_path}")
         return
+    if not os.path.exists(record_path):
+        sys.exit("no pinned shard list: run --stage fetch first")
+    record = json.load(open(record_path))
+    pinned = [r["shard"] for r in record["shards"]]
+    cached = sorted(k for k in shards if os.path.exists(os.path.join(B.cache_dir(a.work, spec["tag"], k), "rows.jsonl")))
+    if cached != pinned:
+        sys.exit(f"REFUSING: cached guard shards {cached} != pinned fetch list {pinned}")
     pool, used = [], []
-    for k in shards:
-        p = os.path.join(B.cache_dir(a.work, spec["tag"], k), "rows.jsonl")
-        if not os.path.exists(p):
-            break
+    for r in record["shards"]:
+        p = os.path.join(B.cache_dir(a.work, spec["tag"], r["shard"]), "rows.jsonl")
+        if C.sha256_file(p) != r["rows_jsonl_sha256"]:
+            sys.exit(f"REFUSING: shard {r['shard']} rows.jsonl changed since fetch")
         pool += [json.loads(l) for l in open(p)]
-        used.append(k)
-    if not pool:
-        sys.exit("shard cache empty: run --stage fetch first")
+        used.append(r["shard"])
     excl = [json.loads(l) for f in ("guard.jsonl", "orig_replay.jsonl") for l in open(os.path.join(a.work, a.data, f))]
     chosen, counts = select_fresh(pool, {r["id"] for r in excl}, {r["wav_sha256"] for r in excl}, a.cap, a.seed)
     out = os.path.join(a.work, a.out)
@@ -102,7 +115,8 @@ def main():
     C.write_json(os.path.join(out, "manifest.json"), {
         "script": "model/train/v5_guard.py", "code_commit": C.git_commit(), "seed": a.seed,
         "source": {k: spec[k] for k in ("repo", "revision")}, "language_filter": "eng",
-        "shards_used": used, "excluded_against": {"data_dir": a.data,
+        "shards_used": used, "fetch_record_sha256": C.sha256_file(record_path),
+        "excluded_against": {"data_dir": a.data,
                                                   "manifest_sha256": C.sha256_file(os.path.join(a.work, a.data, "manifest.json"))},
         "counts": counts, "guard_sha256": sha,
         "tally": {"n": len(rows), "endpoint_true": sum(r["endpoint_bool"] for r in rows),

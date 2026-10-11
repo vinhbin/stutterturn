@@ -21,35 +21,55 @@ import build_items as BI  # noqa: E402
 
 OUT = os.path.join(BI.BASE, "items", "dev2-v1")
 MIN_BLOCKS = 100
-# Niko's pre-registration (#2, 2026-10-11T02:41Z): drop held-out-show clips that earlier work exposed
+# Niko's pre-registration (#2, 2026-10-11T02:41Z and binding review 02:56Z): drop held-out-show clips
+# that earlier work exposed, plus every clip whose audio overlaps one of them in the same episode.
 EXPOSURE_FILES = ["benchmark/data/block_eval.csv", "benchmark/data/fluent_eval.csv",
-                  "benchmark/data/block_candidates.csv", "benchmark/data/fluent_candidates.csv"]
-EXPOSURE_DIRS = ["agent/evidence"]
+                  "benchmark/data/block_candidates.csv", "benchmark/data/fluent_candidates.csv",
+                  "benchmark/data/model_block_results.csv", "benchmark/fixtures/agent-onset-v1/onsets.csv",
+                  "benchmark/runs/legacy-items/block.jsonl"]
+EXPOSURE_DIRS = ["agent/evidence", "web/evidence"]
+EXPECTED_EXPOSED = 13      # pinned before the build (8 block_eval + 5 more in block_candidates)
+EXPECTED_NEIGHBOURS = 14   # same-episode clips whose [start, stop) overlaps an exposed clip
 
 
 def exposed_keys(show):
-    """{key: [sources]} for clips of `show` named in earlier eval files or agent evidence."""
-    import csv as _csv
+    """{key: [sources]} for clips of `show` named anywhere in the exposure sources (full-text scan).
+    Refuses if a listed source is missing."""
     import re
     root = os.path.dirname(BI.BASE)
     pat = re.compile(re.escape(show) + r"_\d+_\d+")
     out = defaultdict(set)
+    paths = []
     for rel in EXPOSURE_FILES:
         p = os.path.join(root, rel)
-        if not os.path.exists(p):
-            continue
-        for r in _csv.DictReader(open(p, newline="", encoding="utf-8")):
-            for k in pat.findall(r.get("file", "")):
-                out[k].add(rel)
+        if not os.path.isfile(p):
+            sys.exit(f"REFUSING: exposure source missing: {rel}")
+        paths.append(p)
     for rel in EXPOSURE_DIRS:
-        for dirpath, _d, files in os.walk(os.path.join(root, rel)):
-            for fn in files:
-                try:
-                    txt = open(os.path.join(dirpath, fn), encoding="utf-8", errors="ignore").read()
-                except OSError:
-                    continue
-                for k in set(pat.findall(txt)):
-                    out[k].add(os.path.relpath(os.path.join(dirpath, fn), root).replace("\\", "/"))
+        d = os.path.join(root, rel)
+        if not os.path.isdir(d):
+            sys.exit(f"REFUSING: exposure source missing: {rel}")
+        paths += [os.path.join(dp, fn) for dp, _d, fs in os.walk(d) for fn in fs]
+    for p in paths:
+        txt = open(p, encoding="utf-8", errors="ignore").read()
+        for k in set(pat.findall(txt)):
+            out[k].add(os.path.relpath(p, root).replace("\\", "/"))
+    return {k: sorted(v) for k, v in sorted(out.items())}
+
+
+def overlapping_neighbours(rows, exposed):
+    """Clips (not themselves exposed) in the same episode whose [start, stop) overlaps an exposed clip."""
+    by_key = {r["clip_key"]: r for r in rows}
+    out = defaultdict(list)
+    for k in exposed:
+        e = by_key.get(k)
+        if e is None:
+            continue
+        for r in rows:
+            if r["clip_key"] in exposed or r["ep_id"] != e["ep_id"]:
+                continue
+            if float(r["start"]) < float(e["stop"]) and float(e["start"]) < float(r["stop"]):
+                out[r["clip_key"]].append(k)
     return {k: sorted(v) for k, v in sorted(out.items())}
 
 
@@ -89,7 +109,12 @@ def main():
     held = {r["clip_key"] for s in ("dev", "test") for r in BI.read_csv(os.path.join(BI.SPLITS_DIR, f"{s}.csv"))}
     assert not {r["clip_key"] for r in all_rows} & held, "held-out show overlaps dev/test"
     exposed = exposed_keys(show)
-    rows = [r for r in all_rows if r["clip_key"] not in exposed]  # items only; training still excludes all
+    neighbours = overlapping_neighbours(all_rows, exposed)
+    if len(exposed) != EXPECTED_EXPOSED or len(neighbours) != EXPECTED_NEIGHBOURS:
+        sys.exit(f"REFUSING: exposure scan found {len(exposed)} exposed / {len(neighbours)} overlapping clips, "
+                 f"pinned {EXPECTED_EXPOSED} / {EXPECTED_NEIGHBOURS}; re-review before building")
+    drop = set(exposed) | set(neighbours)
+    rows = [r for r in all_rows if r["clip_key"] not in drop]  # items only; training still excludes all
     empty = set()
     ep = os.path.join(BI.AUDIO, "empty_on_mirror.txt")
     if os.path.exists(ep):
@@ -121,7 +146,9 @@ def main():
         "show_counts": show_counts, "heldout_show": show, "heldout_clips": len(all_rows),
         "exposure_exclusion": {"rule": "drop held-out-show clips named in " + ", ".join(EXPOSURE_FILES + EXPOSURE_DIRS)
                                        + " (Niko, #2 2026-10-11T02:41Z); items only, training excludes every show clip",
-                               "excluded": len(exposed), "keys": exposed},
+                               "excluded": len(exposed), "keys": exposed,
+                               "overlapping_neighbours": {"rule": "same ep_id, half-open [start, stop) overlap",
+                                                          "excluded": len(neighbours), "keys": neighbours}},
         "itemized_clips": len(rows),
         "vad_params": BI.vad_params(), "tallies": {k: dict(sorted(v.items())) for k, v in sorted(T.items())},
         "item_counts": {"main": cnt(mi), "end_of_window": cnt(ei), "stuttered_completed": cnt(si)},
@@ -131,7 +158,8 @@ def main():
                "no model has been scored on these items"}
     with open(os.path.join(out, "manifest.json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(manifest, f, indent=1)
-    print(json.dumps({"heldout_show": show, "exposure_excluded": len(exposed), "itemized_clips": len(rows),
+    print(json.dumps({"heldout_show": show, "exposure_excluded": len(exposed), "neighbours_excluded": len(neighbours),
+                      "itemized_clips": len(rows),
                       "item_counts": manifest["item_counts"]}, indent=1))
 
 
@@ -154,8 +182,20 @@ def selftest():
     ok &= real == "IStutterSoWhat"
     ex = exposed_keys("IStutterSoWhat")
     in_eval = [k for k, v in ex.items() if "benchmark/data/block_eval.csv" in v]
-    cond = len(in_eval) == 8 and all(k.startswith("IStutterSoWhat_") for k in ex)
+    cond = len(in_eval) == 8 and len(ex) == EXPECTED_EXPOSED and all(k.startswith("IStutterSoWhat_") for k in ex)
     print(f"  {'ok' if cond else 'FAIL'}: exposure scan finds the 8 block_eval keys ({len(ex)} exposed in total)")
+    ok &= cond
+    train = BI.read_csv(os.path.join(BI.SPLITS_DIR, "train.csv"))
+    show_rows = [r for r in train if r["show"] == "IStutterSoWhat"]
+    nb_all = overlapping_neighbours(show_rows, ex)
+    nb_eval = overlapping_neighbours(show_rows, set(in_eval))
+    cond = len(nb_all) == EXPECTED_NEIGHBOURS and len(nb_eval) == 10
+    print(f"  {'ok' if cond else 'FAIL'}: overlapping neighbours {len(nb_all)} of all exposed, {len(nb_eval)} of block_eval (Niko: 14 / 10)")
+    ok &= cond
+    syn = [{"clip_key": "a", "ep_id": "1", "start": "0", "stop": "3"}, {"clip_key": "b", "ep_id": "1", "start": "3", "stop": "6"},
+           {"clip_key": "c", "ep_id": "1", "start": "2.9", "stop": "5"}, {"clip_key": "d", "ep_id": "2", "start": "0", "stop": "3"}]
+    cond = overlapping_neighbours(syn, {"a"}) == {"c": ["a"]}
+    print(f"  {'ok' if cond else 'FAIL'}: half-open overlap (touching clip kept, other episode kept)")
     ok &= cond
     print("SELFTEST " + ("PASSED" if ok else "FAILED"))
     sys.exit(0 if ok else 1)
