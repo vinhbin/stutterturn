@@ -53,6 +53,7 @@ Use the item kinds from `confirm.jsonl`: stuttered/fluent × unfinished/complete
 
 - **Timing:** the agent checks 7 frames × 32 ms = 0.224 s after its VAD speech-stop; the runner checks 0.2 s after the labelled silence start. The offset is the same for every arm, so the X − S comparison stays fair, but absolute delays aren't the agent's.
 - **Mid-turn pauses:** the runner checks only at the labelled pause or turn end. The agent also checks at any VAD pause earlier in the clip, which isn't evaluated here.
+- **First-turn evidence only** (added before any label exists, from Guttuu's agent/benchmark parity cases, [PR #42](https://github.com/vinhbin/stutterturn/pull/42)): `turn_onset` keeps the clip's **first** onset, so it scores each item as if no earlier `turn_complete` had reset the agent's turn. The real agent **restarts its input at the next turn's onset after any `turn_complete`**. In the parity cases, decisions agreed on 10/10 first turns but only 5/6 later turns. These results therefore describe the agent's first decision in a clip, not its behaviour after an earlier decision. This is a reporting limit only; no criterion changes.
 - **Not measured:** tail delay and audible response delay, which PLAN asks for. They belong to (c) audio acceptance, not here.
 - **Small n:** about 20 items or fewer per cell, the same two shows as dev, and proxy-free human labels. These are feasibility results.
 

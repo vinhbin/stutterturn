@@ -71,6 +71,7 @@ LIMITS = [
     "but absolute delays aren't the agent's.",
     "- **Mid-turn pauses:** the runner checks only at the labelled pause or turn end. The agent also checks at any "
     "VAD pause earlier in the clip, which isn't evaluated here.",
+    "- **First-turn evidence only** (added before any label exists, from Guttuu's agent/benchmark parity cases, [PR #42](https://github.com/vinhbin/stutterturn/pull/42)): `turn_onset` keeps the clip's **first** onset, so it scores each item as if no earlier `turn_complete` had reset the agent's turn. The real agent **restarts its input at the next turn's onset after any `turn_complete`**. In the parity cases, decisions agreed on 10/10 first turns but only 5/6 later turns. These results therefore describe the agent's first decision in a clip, not its behaviour after an earlier decision. This is a reporting limit only; no criterion changes.",
     "- **Not measured:** tail delay and audible response delay, which PLAN asks for. They belong to (c) audio "
     "acceptance, not here.",
     "- **Small n:** about 20 items or fewer per cell, the same two shows as dev, and proxy-free human labels. "
