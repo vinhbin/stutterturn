@@ -1,0 +1,2 @@
+OSError: [Errno 22] Invalid argument: 'C:/Users/Guttu/st-train/work/runs/X4/blend-a0.75-W3ee2.00.pt\r'
+{"onnx": "C:/Users/Guttu/st-train/work\\exports\\stutterturn-v4-rX4-blend-a0.75-W3ee2.00.onnx", "sha256": "e771e39fb5de7f9de599f120e66444eb07763dcdfe1026e36e7ffda8e65b2119", "parity": [{"batch_size": 1, "max_abs_prob_error": 1.1920928955078125e-07}, {"batch_size": 2, "max_abs_prob_error": 2.086162567138672e-06}]}

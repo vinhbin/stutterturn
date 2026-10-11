@@ -1,0 +1,40 @@
+{
+ "model_id": "stutterturn-v2-rV3-c0.51",
+ "sha256": "e2b2299759b6e68d68745882df2f9949ebc6156bbb635ed6a55a709e6ed42954",
+ "base_model": "stock-fp32",
+ "threshold": 0.5,
+ "precision": "fp32",
+ "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee",
+ "dev_manifest_sha256": "3b2ff1facea5bd01397a511178d41de04ddca8042c924399c0f18f04c3492c15",
+ "training_config": "1d642421d71ffc7a3062645b9d90233cb0c90252bd2f8aa9fe4d7dbe6b87b096",
+ "code_commit": "ab52b022e2716d6195d402f5fd4e3c729c419741-dirty",
+ "export": {
+  "opset": 18,
+  "sigmoid_wrapper": true,
+  "eval_mode": true,
+  "dynamo": false
+ },
+ "parity_max_abs_error": 5.960464477539063e-08,
+ "parity": [
+  {
+   "batch_size": 1,
+   "max_abs_prob_error": 5.960464477539063e-08
+  },
+  {
+   "batch_size": 2,
+   "max_abs_prob_error": 5.960464477539063e-08
+  }
+ ],
+ "status": "dev-candidate",
+ "provenance": {
+  "source": "checkpoint",
+  "run_id": "V3",
+  "checkpoint": "ckpt-e0.51.pt",
+  "checkpoint_sha256": "b3ea50185799651488fb94b0dc07497a5e94bf17616f4df58cebf8dd1a0ff372",
+  "step": 50,
+  "epoch": 0.505,
+  "training_config": "1d642421d71ffc7a3062645b9d90233cb0c90252bd2f8aa9fe4d7dbe6b87b096",
+  "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee"
+ },
+ "license": "non-commercial research use (training data includes SEP-28k, CC BY-NC 4.0)"
+}
