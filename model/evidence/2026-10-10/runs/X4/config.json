@@ -1,0 +1,53 @@
+{
+ "run_id": "X4",
+ "method": "weight-space interpolation (WiSE-FT); no training",
+ "formula": "theta = (1 - alpha) * theta_stock + alpha * theta_source (float tensors)",
+ "alphas": [
+  0.25,
+  0.5,
+  0.75
+ ],
+ "thresholds_recorded": [
+  0.4,
+  0.5,
+  0.6
+ ],
+ "tie_rule": "l2",
+ "init": "stock-fp32 via haan",
+ "init_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+ "haan_commit": "540f97de03f8eb938b871196752206f6d0698791",
+ "stock_reconstruction_parity": {
+  "n": 3,
+  "max_abs_error": 1.30385160446167e-08,
+  "tol": 5e-05
+ },
+ "code_commit": "cae125c23d91d9ef7d3fdcd58944c85438b52869",
+ "prescreen": "prescreen-v3.json",
+ "prescreen_sha256": "8a918f4a78a8e39d973eb7fef3c95ddfb78ec910043c2d5e0f7827a97aaf3838",
+ "sources": [
+  {
+   "cand_id": "W3/ckpt-e2.00.pt",
+   "sha256": "2377e3c6ca023477eb37a3b80a41c6386921371b0cc8f75859b105acd0ede0ee",
+   "epoch": 2.0,
+   "step": 590,
+   "config_json_sha256": "80e004145d20cbcd6d4c3bddc2069c7877a9d09ec3dfaf2399afb7a38d405bc6",
+   "config_sha256": "af0e6f0d9cad59c124887f23a229cfa99a3d6db3a20983300827b43a0e64225c",
+   "run_code_commit": "95c651e4e2f7bbb1f8b2fa57813e2538721b7baa",
+   "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee",
+   "init_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+  },
+  {
+   "cand_id": "W3/ckpt-e1.00.pt",
+   "sha256": "1a60eb6789244e2422fb6724601ce7d3e0d1e0c7dfaa2989cb393b7f6e3507f3",
+   "epoch": 1.0,
+   "step": 295,
+   "config_json_sha256": "80e004145d20cbcd6d4c3bddc2069c7877a9d09ec3dfaf2399afb7a38d405bc6",
+   "config_sha256": "af0e6f0d9cad59c124887f23a229cfa99a3d6db3a20983300827b43a0e64225c",
+   "run_code_commit": "95c651e4e2f7bbb1f8b2fa57813e2538721b7baa",
+   "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee",
+   "init_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be"
+  }
+ ],
+ "validation_data_dir": "data-v2",
+ "validation_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee"
+}

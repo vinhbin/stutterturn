@@ -1,0 +1,37 @@
+{
+ "run_id": "sel-v4-D1-main",
+ "created_utc": "2026-10-11T00:00:59+00:00",
+ "code_commit": "cae125c23d91d9ef7d3fdcd58944c85438b52869",
+ "code_dirty": true,
+ "runner_sha256": "f1d358714c39e1310be3fc9fd9e2c7ea434adb7c1c95ebfef79ab71bdf1830cb",
+ "preproc_version": "smartturn-v3-upstream-1",
+ "config": {
+  "config_id": "agent-v0.1-single-checks",
+  "threshold": 0.5,
+  "vad_stop_s": 0.2,
+  "schedule": "single",
+  "recheck_interval_s": null,
+  "fallback_timeout_s": 3.0,
+  "grid_step_s": 0.01,
+  "grid_scope": "checks"
+ },
+ "config_sha256": "056c8a5149f05ff72d720d5e584a6f42463c0b82cd881eb3576f82955a4f371a",
+ "env": {
+  "python": "3.12.15",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "onnxruntime": "1.29.0",
+  "transformers": "5.19.0",
+  "numpy": "2.2.6",
+  "soundfile": "0.14.0"
+ },
+ "model_id": "stutterturn-v4-rX4-blend-a0.75-W3ee2.00",
+ "model_sha256": "e771e39fb5de7f9de599f120e66444eb07763dcdfe1026e36e7ffda8e65b2119",
+ "items_path": "items\\v1\\dev.jsonl",
+ "items_sha256": "742b645ba7213fecc0753d6c10376e330673b70c0d21d59881f0ca442e962ee3",
+ "vad_model_sha256": null,
+ "cache_hits": 0,
+ "cache_misses": 1870,
+ "model_calls": 1870,
+ "grid_points": 1870,
+ "wall_s": 77.39
+}
