@@ -127,6 +127,8 @@ class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
         services = FakeServices([b"\x00\x40" * 256])
         services.hold = asyncio.Event()
         run, messages = self.make_run(services)
+        # The expected sample interval assumes the first chunk arrives at t=0.
+        run.now = lambda: 0.0
         real_wait_for = asyncio.wait_for
 
         async def fast_timeout(awaitable, timeout):

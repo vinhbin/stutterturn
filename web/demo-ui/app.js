@@ -627,5 +627,8 @@
       }
     }
   });
+  if (window.location.protocol === 'https:') {
+    el['backend-url'].value = window.location.origin;
+  }
   renderConfigs(); renderSources(); clearRun(); refreshChrome(); refreshControls();
 })();

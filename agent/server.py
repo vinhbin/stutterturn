@@ -65,7 +65,11 @@ async def run_log(request):
 
 
 async def ws_handler(request):
-    ws = web.WebSocketResponse(heartbeat=20)
+    origin = request.headers.get("Origin")
+    allowed_origin = request.app["allowed_origin"]
+    if allowed_origin and origin and origin != allowed_origin:
+        raise web.HTTPForbidden(text="Origin not allowed")
+    ws = web.WebSocketResponse(heartbeat=20, max_msg_size=4096)
     await ws.prepare(request)
     queue = asyncio.Queue()
     current = {"run": None, "task": None}
@@ -89,6 +93,7 @@ async def ws_handler(request):
         except Exception as e:
             error(f"run failed: {e}", run.run_id)
         finally:
+            request.app["runtime"]["active_runs"] -= 1
             current["run"] = current["task"] = None
 
     try:
@@ -100,9 +105,18 @@ async def ws_handler(request):
             except ValueError:
                 error("invalid JSON")
                 continue
+            if not isinstance(msg, dict):
+                error("message must be a JSON object")
+                continue
             if msg.get("type") == "start":
                 if current["run"] is not None:
                     error("a run is already in progress on this socket", current["run"].run_id)
+                    continue
+                if request.app["runtime"]["active_runs"] >= request.app["max_runs"]:
+                    error("server busy; another replay is in progress")
+                    continue
+                if msg.get("source") not in engine.list_sources():
+                    error("source must be one of the advertised recordings")
                     continue
                 try:
                     run = engine.Run(msg.get("config", ""), msg.get("source", ""),
@@ -112,6 +126,7 @@ async def ws_handler(request):
                     error(f"cannot start: {e}")
                     continue
                 current["run"] = run
+                request.app["runtime"]["active_runs"] += 1
                 current["task"] = asyncio.create_task(do_run(run))
             elif msg.get("type") == "stop":
                 run = current["run"]
@@ -128,11 +143,30 @@ async def ws_handler(request):
                 await asyncio.gather(current["task"], return_exceptions=True)
         await asyncio.sleep(0.05)
         pump_task.cancel()
+        await asyncio.gather(pump_task, return_exceptions=True)
     return ws
 
 
 async def options(request):
     return web.Response(headers=CORS)
+
+
+def create_app(services=None, play=False, max_runs=1, allowed_origin=None):
+    if max_runs < 1:
+        raise ValueError("max_runs must be positive")
+    app = web.Application()
+    app["services"] = services
+    app["play"] = play
+    app["max_runs"] = max_runs
+    app["runtime"] = {"active_runs": 0}
+    app["allowed_origin"] = allowed_origin
+    app.router.add_get("/v0/health", health)
+    app.router.add_get("/v0/configurations", configurations)
+    app.router.add_get("/v0/sources", sources)
+    app.router.add_get("/v0/runs/{run_id}", run_log)
+    app.router.add_get("/v0/ws", ws_handler)
+    app.router.add_route("OPTIONS", "/{tail:.*}", options)
+    return app
 
 
 def main():
@@ -141,16 +175,11 @@ def main():
     ap.add_argument("--play", action="store_true",
                     help="play the source and agent speech on this machine's speakers (demo)")
     ap.add_argument("--port", type=int, default=8765)
+    ap.add_argument("--max-runs", type=int, default=1, help="global concurrent replay limit")
+    ap.add_argument("--allowed-origin", help="reject browser WebSockets from other origins")
     a = ap.parse_args()
-    app = web.Application()
-    app["services"] = engine.Services() if a.services == "on" else None
-    app["play"] = a.play
-    app.router.add_get("/v0/health", health)
-    app.router.add_get("/v0/configurations", configurations)
-    app.router.add_get("/v0/sources", sources)
-    app.router.add_get("/v0/runs/{run_id}", run_log)
-    app.router.add_get("/v0/ws", ws_handler)
-    app.router.add_route("OPTIONS", "/{tail:.*}", options)
+    app = create_app(engine.Services() if a.services == "on" else None,
+                     a.play, a.max_runs, a.allowed_origin)
     print(f"agent server: http://127.0.0.1:{a.port}  services={a.services}", flush=True)
     web.run_app(app, host="127.0.0.1", port=a.port, print=None)
 

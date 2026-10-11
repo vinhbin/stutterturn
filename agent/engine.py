@@ -100,7 +100,7 @@ def _commit():
                                capture_output=True, text=True, check=True).stdout.strip()
         return sha + ("-dirty" if dirty else "")
     except Exception:
-        return "unknown"
+        return os.getenv("STUTTERTURN_REVISION", "unknown")
 
 
 class ModelUnavailable(Exception):
