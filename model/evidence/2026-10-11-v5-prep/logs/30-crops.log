@@ -1,0 +1,15 @@
+  VAD 500/6000
+  VAD 1000/6000
+  VAD 1500/6000
+  VAD 2000/6000
+  VAD 2500/6000
+  VAD 3000/6000
+  VAD 3500/6000
+  VAD 4000/6000
+  VAD 4500/6000
+  VAD 5000/6000
+  VAD 5500/6000
+  VAD 6000/6000
+{"choice_rule": "closest_to_target", "min_pause_s": 0.15, "effective_min_pause_s": 0.16, "crops": 2774, "skipped_no_onset": 3226, "length_gate": {"0": {"n": 1303, "frac_under_2s": 0.2586, "passed": true}, "1": {"n": 1471, "frac_under_2s": 0.1863, "passed": false}, "passed": false}}
+{"choice_rule": "shortest_onset_for_short_targets", "min_pause_s": 0.15, "effective_min_pause_s": 0.16, "crops": 2774, "skipped_no_onset": 3226, "length_gate": {"0": {"n": 1303, "frac_under_2s": 0.2594, "passed": true}, "1": {"n": 1471, "frac_under_2s": 0.189, "passed": false}, "passed": false}}
+length gate failed with both rules: crops not written; report and stop (pre-registered)

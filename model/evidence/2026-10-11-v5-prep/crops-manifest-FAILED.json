@@ -1,0 +1,48 @@
+{
+ "script": "model/train/v5_crops.py",
+ "code_commit": "e6a6c5c84359a30d13e4bd395c21c7763b7ca240",
+ "seed": "v5-crops-1",
+ "status": "FAILED length gate with closest-to-target and with the shortest-onset fallback: report and stop (no crops written)",
+ "attempts": [
+  {
+   "choice_rule": "closest_to_target",
+   "min_pause_s": 0.15,
+   "effective_min_pause_s": 0.16,
+   "crops": 2774,
+   "skipped_no_onset": 3226,
+   "length_gate": {
+    "0": {
+     "n": 1303,
+     "frac_under_2s": 0.2586,
+     "passed": true
+    },
+    "1": {
+     "n": 1471,
+     "frac_under_2s": 0.1863,
+     "passed": false
+    },
+    "passed": false
+   }
+  },
+  {
+   "choice_rule": "shortest_onset_for_short_targets",
+   "min_pause_s": 0.15,
+   "effective_min_pause_s": 0.16,
+   "crops": 2774,
+   "skipped_no_onset": 3226,
+   "length_gate": {
+    "0": {
+     "n": 1303,
+     "frac_under_2s": 0.2594,
+     "passed": true
+    },
+    "1": {
+     "n": 1471,
+     "frac_under_2s": 0.189,
+     "passed": false
+    },
+    "passed": false
+   }
+  }
+ ]
+}

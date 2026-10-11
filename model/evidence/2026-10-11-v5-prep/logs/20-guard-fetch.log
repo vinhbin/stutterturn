@@ -1,0 +1,7 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+guard shard 00004: 3153 rows, 812 English
+guard shard 00005: 3153 rows, 767 English
+guard shard 00006: 3153 rows, 788 English
+guard shard 00007: 3152 rows, 778 English
+guard shard 00008: 3152 rows, 789 English
+FETCH DONE: 3934 English rows from shards [4, 5, 6, 7, 8]; pinned in C:/Users/Guttu/st-train/work\data-v5-guard-fetch.json

@@ -13,3 +13,8 @@ venv/
 node_modules/
 dist/
 .expo/
+
+# training artifacts (keep under the external --work dir, never in git)
+*.pt
+*.flac
+*.f32

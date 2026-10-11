@@ -1,0 +1,44 @@
+start 03:06:25 UTC at e6a6c5c84359a30d13e4bd395c21c7763b7ca240
+selftests ok
+{
+ "heldout_show": "IStutterSoWhat",
+ "exposure_excluded": 13,
+ "neighbours_excluded": 14,
+ "itemized_clips": 752,
+ "item_counts": {
+  "main": {
+   "fluent/unfinished": 125,
+   "stuttered/unfinished": 69
+  },
+  "end_of_window": {
+   "fluent/completed": 45
+  },
+  "stuttered_completed": {
+   "stuttered/completed": 73
+  }
+ }
+}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+guard shard 00004: 3153 rows, 812 English
+guard shard 00005: 3153 rows, 767 English
+guard shard 00006: 3153 rows, 788 English
+guard shard 00007: 3152 rows, 778 English
+guard shard 00008: 3152 rows, 789 English
+FETCH DONE: 3934 English rows from shards [4, 5, 6, 7, 8]; pinned in C:/Users/Guttu/st-train/work\data-v5-guard-fetch.json
+{"guard_sha256": "cc805e0c3f4372b9da0939874be783a2594552d14eb95227ef659e2021659621", "pool": 3934, "excluded_overlap": 0, "excluded_dup_in_pool": 0, "eligible": 3934, "chosen": 3000, "chosen_endpoint_true": 1475}
+  VAD 500/6000
+  VAD 1000/6000
+  VAD 1500/6000
+  VAD 2000/6000
+  VAD 2500/6000
+  VAD 3000/6000
+  VAD 3500/6000
+  VAD 4000/6000
+  VAD 4500/6000
+  VAD 5000/6000
+  VAD 5500/6000
+  VAD 6000/6000
+{"choice_rule": "closest_to_target", "min_pause_s": 0.15, "effective_min_pause_s": 0.16, "crops": 2774, "skipped_no_onset": 3226, "length_gate": {"0": {"n": 1303, "frac_under_2s": 0.2586, "passed": true}, "1": {"n": 1471, "frac_under_2s": 0.1863, "passed": false}, "passed": false}}
+{"choice_rule": "shortest_onset_for_short_targets", "min_pause_s": 0.15, "effective_min_pause_s": 0.16, "crops": 2774, "skipped_no_onset": 3226, "length_gate": {"0": {"n": 1303, "frac_under_2s": 0.2594, "passed": true}, "1": {"n": 1471, "frac_under_2s": 0.189, "passed": false}, "passed": false}}
+length gate failed with both rules: crops not written; report and stop (pre-registered)
+exit=1

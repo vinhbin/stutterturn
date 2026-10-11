@@ -1,0 +1,18 @@
+{
+ "heldout_show": "IStutterSoWhat",
+ "exposure_excluded": 13,
+ "neighbours_excluded": 14,
+ "itemized_clips": 752,
+ "item_counts": {
+  "main": {
+   "fluent/unfinished": 125,
+   "stuttered/unfinished": 69
+  },
+  "end_of_window": {
+   "fluent/completed": 45
+  },
+  "stuttered_completed": {
+   "stuttered/completed": 73
+  }
+ }
+}
