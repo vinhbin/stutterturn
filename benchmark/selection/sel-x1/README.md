@@ -1,0 +1,5 @@
+# sel-x1: read this first
+
+**X1 is a post-hoc exploratory candidate selected after v4 results; it is not a v4 pass, and it is the fifth adaptive look at dev/guard.** Outcome: `x1_pass_dev_exploratory`, decided only by the E1 @0.60 row (spec `model/specs/x1-blend-check-v1.md` v1.1, executed once at `f5307c1`). Its M5 pass is +3 net rows (p = 0.71) and its M4 margin is 0.26 pt: the bounds are satisfied, not proven. It is not evidence of improvement. Promotion needs (c) audio acceptance and (d) human endpoints on the frozen confirmation set. D-009 is unchanged.
+
+`decision.md` is the selector's verbatim output. Its limits text comes from `--training-spec v4` and says "four pre-registered attempts"; that's stale boilerplate, and the correct count is five adaptive looks. Its 0.40/0.50 rows and `outcome` field are computed by the tool and not used for the X1 decision. The run directories are `benchmark/runs/sel-x1-*`: **124** runs (112 stock-stage + 12 candidate, including 4 report-only G arms).
