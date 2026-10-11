@@ -53,6 +53,28 @@
       const card = node('div'); card.append(node('p', label), node('strong', value)); impact.append(card);
     }
     content.append(impact);
+    // Use the final detected speech stop, not the first reply or source-file end.
+    // Event delivery order can differ from sample time; compare timestamps.
+    const finalTiming = run => {
+      const stops = run.events.filter(e => e.name === 'speech_stop' && Number.isFinite(e.t));
+      if (!stops.length) return {decision: null, audio: null};
+      const stop = Math.max(...stops.map(e => e.t));
+      const after = name => {
+        const times = run.events.filter(e => e.name === name && Number.isFinite(e.t) && e.t >= stop).map(e => e.t);
+        return times.length ? Math.min(...times) - stop : null;
+      };
+      return {decision: after('turn_complete'), audio: after('agent_audio_start')};
+    };
+    const stockFinal = finalTiming(stock), oursFinal = finalTiming(ours);
+    const recordedSeconds = value => value === null ? 'Not recorded' : seconds(value);
+    content.append(node('h3', 'And how long until the final reply?', 'cmp-impact-title'));
+    const waiting = node('div', undefined, 'cmp-impact cmp-waiting');
+    waiting.setAttribute('aria-label', 'Scheduled reply delay after final detected speech stop');
+    for (const [label, value] of [['Stock FP32 · final reply delay', stockFinal.audio], ['Our X1 · final reply delay', oursFinal.audio]]) {
+      const card = node('div'); card.append(node('p', label), node('strong', recordedSeconds(value))); waiting.append(card);
+    }
+    content.append(waiting);
+    content.append(node('p', 'Measured from the final VAD speech-stop event to the next scheduled reply start in each saved run. This includes model, provider, and scheduling time. It is not a human-labeled turn ending or measured speaker latency; a single pair cannot attribute the delay difference to the model.', 'cmp-context'));
     content.append(node('p', 'Saved Tiger Data query · ' + data.generated_utc + ' · 2 Vultr runs · ' + stock.source_duration_s + ' s source', 'cmp-provenance'));
 
     const figure = node('figure', undefined, 'cmp-figure');
@@ -102,6 +124,8 @@
     const body = node('tbody');
     const cells = [
       ['First pause, at ' + seconds(stock.first_decision_t), 'Decided to reply', 'Held the turn'],
+      ['Decision after final detected speech stop', recordedSeconds(stockFinal.decision), recordedSeconds(oursFinal.decision)],
+      ['Scheduled reply after final detected speech stop', recordedSeconds(stockFinal.audio), recordedSeconds(oursFinal.audio)],
       ['Reported audio overlap', seconds(stock.reported_overlap_s), ours.reported_overlap_s === null ? 'None reported' : seconds(ours.reported_overlap_s)],
       ['Later pause, at 7.072 s', 'Decided; cancelled before audio', 'Decided; cancelled before audio'],
       ['Provider outcome', stockEmptyReply ? 'gemini: empty reply' : stock.timeouts.join(', ') || 'Reply generated', ours.timeouts.join(', ') || 'Reply generated'],

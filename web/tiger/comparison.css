@@ -6,6 +6,7 @@
 .cmp-impact > div + div { border-color: #94e3ad; }
 .cmp-impact p { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
 .cmp-impact strong { font: 650 clamp(20px, 3vw, 36px)/1.2 var(--display); }
+.cmp-waiting > div, .cmp-waiting > div + div { border-color: var(--agent); }
 .cmp-figure { margin: 26px 0 0; padding: 24px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; }
 .cmp-figure figcaption { font-weight: 600; margin-bottom: 20px; }
 .cmp-figure svg { display: block; width: 100%; height: auto; stroke: none; }
