@@ -27,7 +27,7 @@ A guarded `open()` refuses any path under `benchmark/runs/`, `benchmark/selectio
    - **Prefix check:** rows with a blank or non-boolean `accepted` count as **present** for the prefix check, but `apply_annotations` rejects them (`accepted_not_boolean`).
 4. **Label → item.** Call `apply_annotations` on a fresh state for split label **`confirm`**: `state = {"confirm": {"main": {}, "eow": {}, "prov": {}, "fts": {}}}`, with `rowmap = {key: ("confirm", dev_row)}` for worksheet keys only.
    - `T = defaultdict(Counter)`, and `Gate` is built from `benchmark/audio/empty_on_mirror.txt` (the empty set if that's absent).
-   - With no energy items, unfinished rows need `block_onset_s` **and** `resumption_s`, with a gap over 0.2 s. For `unfinished_fluent_pause`, the pause onset goes in `block_onset_s`; a blank onset gives `missing_time`. Put this in the reviewer README.
+   - With no energy items, unfinished rows need `block_onset_s` **and** `resumption_s`, with a gap over 0.2 s. For `unfinished_fluent_pause`, the pause onset goes in `block_onset_s`; a blank onset gives `missing_time`. This is stated in `benchmark/confirm/v1/REVIEWER-ADDENDUM.md`; the frozen README isn't edited, because its hash is in the confirm-set manifest.
    - Completed rows need `turn_end_s ≤ clip length − 0.2 s`.
    - Rejections, uncertainty and duplicates are tallied exactly as `apply_annotations` does.
    - Item IDs come out as `confirm-<g>-<k>-<clip_key>`. `label_source` is `"human"`.
