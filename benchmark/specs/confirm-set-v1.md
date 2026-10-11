@@ -75,7 +75,7 @@ The draw is from the clean pool, stratified by show in proportion to pool size w
   - unfinished rows need `block_onset_s` (or the pause onset) and `resumption_s`, with `resumption_s − block_onset_s > 0.2`;
   - completed rows need `turn_end_s ≤ clip length − 0.2 s`;
   - rows that can't meet these are `accepted=false` with the reason.
-- **Turning labels into items is out of scope for v1.** `build_items.py --annotations` re-runs the energy pass on **test** and rewrites `test.jsonl`, which is against D-009's intent, and it merges labels into the full dev item set. A follow-up spec adds a `--confirm-only` mode: dev rows restricted to the worksheet keys, **no test pass**, output only `benchmark/items/confirm-v1/`. Until that exists and is reviewed, this step is **NOT RUN**.
+- **Turning labels into items is out of scope for v1.** `build_items.py --annotations` re-runs the energy pass on **test** and rewrites `test.jsonl`, which is against D-009's intent, and it merges labels into the full dev item set. The follow-up `benchmark/specs/confirm-items-v1.md` (a separate `build_confirm_items.py`, superseding the earlier idea of a `--confirm-only` mode) handles this: dev rows restricted to the worksheet keys, **no test pass**, output only `benchmark/items/confirm-v1/`. Until that exists and is reviewed, this step is **NOT RUN**.
 - **Never used for training or for selecting among candidates.** It's used only to judge an already-selected candidate against stock FP32 @0.5, the comparator @0.55 and patient.
 
 ## Limits (stated wherever results from this set are reported)
