@@ -1,0 +1,39 @@
+{
+ "run_id": "sel-x1-G-B-eow",
+ "created_utc": "2026-10-11T02:16:00+00:00",
+ "code_commit": "f5307c1f572d2981261918870e05333ea97555fb",
+ "code_dirty": true,
+ "runner_sha256": "f1d358714c39e1310be3fc9fd9e2c7ea434adb7c1c95ebfef79ab71bdf1830cb",
+ "preproc_version": "smartturn-v3-upstream-1",
+ "config": {
+  "config_id": "agent-v0.1-turn-checks",
+  "threshold": 0.5,
+  "vad_stop_s": 0.2,
+  "schedule": "single",
+  "recheck_interval_s": null,
+  "fallback_timeout_s": 3.0,
+  "grid_step_s": 0.01,
+  "input_policy": "turn_onset",
+  "pre_roll_s": 0.2,
+  "grid_scope": "checks"
+ },
+ "config_sha256": "fa692783fd19bad6c2d90a68ae306bbed9a6bf579a3c59abe23fbd625cfc0f6c",
+ "env": {
+  "python": "3.12.15",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "onnxruntime": "1.29.0",
+  "transformers": "5.19.0",
+  "numpy": "2.2.6",
+  "soundfile": "0.14.0"
+ },
+ "model_id": "stock-fp32",
+ "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+ "items_path": "items\\v1\\dev_end_of_window.jsonl",
+ "items_sha256": "e30a456895cd61dd203fee319c864a9014097f720581a1fe87611cf6d7f52905",
+ "vad_model_sha256": "2623a2953f6ff3d2c1e61740c6cdb7168133479b267dfef114a4a3cc5bdd788f",
+ "cache_hits": 680,
+ "cache_misses": 0,
+ "model_calls": 0,
+ "grid_points": 680,
+ "wall_s": 10.66
+}

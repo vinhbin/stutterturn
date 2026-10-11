@@ -1,0 +1,21 @@
+{
+ "check": "D-010 promotion 1",
+ "candidate": "X4/blend-a0.75-W3ee1.00.pt",
+ "threshold": 0.6,
+ "rule": ">= stock@0.5 - 0.020",
+ "dev_stu_completed_decide": {
+  "label": "M3s",
+  "candidate_at_threshold": 0.3141,
+  "stock_at_0.5": 0.2416,
+  "delta": 0.0725,
+  "passed": true
+ },
+ "dev_eow_crop_decide": {
+  "label": "M3-crop",
+  "candidate_at_threshold": 0.5162,
+  "stock_at_0.5": 0.5147,
+  "delta": 0.0015,
+  "passed": true
+ },
+ "passed": true
+}

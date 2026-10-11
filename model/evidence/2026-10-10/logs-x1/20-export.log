@@ -1,0 +1,1 @@
+{"onnx": "C:/Users/Guttu/st-train/work\\exports\\stutterturn-x1-rX4-blend-a0.75-W3ee1.00.onnx", "sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025", "parity": [{"batch_size": 1, "max_abs_prob_error": 5.960464477539063e-08}, {"batch_size": 2, "max_abs_prob_error": 1.341104507446289e-06}]}

@@ -1,0 +1,40 @@
+{
+ "model_id": "stutterturn-x1-rX4-blend-a0.75-W3ee1.00",
+ "sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025",
+ "base_model": "stock-fp32",
+ "threshold": 0.5,
+ "precision": "fp32",
+ "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee",
+ "dev_manifest_sha256": "742b645ba7213fecc0753d6c10376e330673b70c0d21d59881f0ca442e962ee3",
+ "training_config": "43abc16b1233ff729798d51eeef5d1a1e04f4c21ac944d9d5d5c9ee59d8c9978",
+ "code_commit": "f5307c1f572d2981261918870e05333ea97555fb",
+ "export": {
+  "opset": 18,
+  "sigmoid_wrapper": true,
+  "eval_mode": true,
+  "dynamo": false
+ },
+ "parity_max_abs_error": 1.341104507446289e-06,
+ "parity": [
+  {
+   "batch_size": 1,
+   "max_abs_prob_error": 5.960464477539063e-08
+  },
+  {
+   "batch_size": 2,
+   "max_abs_prob_error": 1.341104507446289e-06
+  }
+ ],
+ "status": "dev-candidate",
+ "provenance": {
+  "source": "checkpoint",
+  "run_id": "X4",
+  "checkpoint": "blend-a0.75-W3ee1.00.pt",
+  "checkpoint_sha256": "612df85bd3fd0570d4515ed45a37acf299473842ce5017a3b2c00b1c989c74b3",
+  "step": null,
+  "epoch": 0.00068534,
+  "training_config": "43abc16b1233ff729798d51eeef5d1a1e04f4c21ac944d9d5d5c9ee59d8c9978",
+  "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee"
+ },
+ "license": "non-commercial research use (training data includes SEP-28k, CC BY-NC 4.0)"
+}

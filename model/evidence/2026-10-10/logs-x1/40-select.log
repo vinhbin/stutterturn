@@ -1,0 +1,15 @@
+selection sel-x1: 120 planned runs
+  ran sel-x1-D1-main (model_calls=1870)
+  ran sel-x1-D1-eow (model_calls=680)
+  ran sel-x1-E1-main-th0.40 (model_calls=0)
+  ran sel-x1-E1-eow-th0.40 (model_calls=0)
+  ran sel-x1-E1-main-th0.50 (model_calls=0)
+  ran sel-x1-E1-eow-th0.50 (model_calls=0)
+  ran sel-x1-E1-main-th0.60 (model_calls=0)
+  ran sel-x1-E1-eow-th0.60 (model_calls=0)
+  ran sel-x1-G-D1-main (model_calls=1870)
+  ran sel-x1-G-D1-eow (model_calls=680)
+  ran sel-x1-G-D1-main-th0.60 (model_calls=0)
+  ran sel-x1-G-D1-eow-th0.60 (model_calls=0)
+outcome: dev_candidate_passes; wrote C:\Users\Guttu\stutterturn\benchmark\selection\sel-x1
+new runs 12 (stock-stage new 0), reused 112, model_calls 5100, wall 242.9s

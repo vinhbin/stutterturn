@@ -1,0 +1,54 @@
+[
+ {
+  "split": "dev",
+  "group": "fluent",
+  "kind": "unfinished",
+  "label_source": "energy_vad",
+  "n": 1518,
+  "premature_n": 673,
+  "premature_rate": 0.4433,
+  "premature_ci95": [
+   0.4185,
+   0.4684
+  ],
+  "input_start_fallback_n": 124,
+  "n_nonfallback": 1394,
+  "premature_n_nonfallback": 617,
+  "premature_rate_nonfallback": 0.4426,
+  "premature_ci95_nonfallback": [
+   0.4167,
+   0.4688
+  ],
+  "infer_ms": {
+   "n": 1518,
+   "mean": 16.22,
+   "p95": 19.8115
+  }
+ },
+ {
+  "split": "dev",
+  "group": "stuttered",
+  "kind": "unfinished",
+  "label_source": "energy_vad",
+  "n": 352,
+  "premature_n": 122,
+  "premature_rate": 0.3466,
+  "premature_ci95": [
+   0.2988,
+   0.3977
+  ],
+  "input_start_fallback_n": 43,
+  "n_nonfallback": 309,
+  "premature_n_nonfallback": 108,
+  "premature_rate_nonfallback": 0.3495,
+  "premature_ci95_nonfallback": [
+   0.2985,
+   0.4042
+  ],
+  "infer_ms": {
+   "n": 352,
+   "mean": 15.7,
+   "p95": 17.5025
+  }
+ }
+]
