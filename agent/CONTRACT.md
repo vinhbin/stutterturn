@@ -110,7 +110,7 @@ One socket can carry several runs one after another; one run at a time.
 | `audible` | `overlap` | Scheduled agent interval overlaps resumed source speech. `overlap_s` given at `agent_audio_end`; late-chunk gaps and device delay limit this estimate |
 | `info` | `no_response` | Source and trailing silence ended with no `turn_complete` |
 | `info` | `timeout` | A service call (Gemini or ElevenLabs) exceeded its limit; names the service |
-| `info` | `response_retry` | An empty Gemini reply is retried once within the original 10 s deadline; carries `attempt` and `finish_reason` |
+| `info` | `response_retry` | An empty Gemini reply is retried once within the 20 s reply deadline; carries `attempt` and `finish_reason` |
 | `info` | `provider_error` | Gemini returned no usable reply or its request failed; carries `service`, `error_code` and, when available, `finish_reason`; distinct from a timeout |
 | `info` | `playback_error` | Output problem; `code` is `timeline_capacity`, `malformed_pcm`, `output_stalled`, or `device_cleanup`. Details are diagnostic, not proof of physical silence |
 
@@ -182,7 +182,8 @@ Evaluation compares `first_turn_complete_t` and `first_agent_audio_t` against hu
 Optional `summary.errors` lists provider errors, e.g. `gemini:empty_reply`.
 An empty non-blocked Gemini response gets at most one retry (60 output tokens
 on the first attempt, 256 on the retry; spoken text remains capped at 120
-characters). Both attempts share the existing 10 s deadline. Stop and speech
+characters). Both attempts share a 20 s deadline. Run-end reply draining is
+bounded at 30 s to allow the provider and audio to finish. Stop and speech
 resumption cancel that task normally. Provider-blocked responses are not retried.
 Older logs may label `detail: "empty reply"` as `timeout`; preserve those raw
 records and distinguish this legacy classification in displays.

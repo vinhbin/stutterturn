@@ -450,7 +450,7 @@ class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
         real_wait_for = asyncio.wait_for
 
         async def shorten_outer_deadline(awaitable, timeout):
-            return await real_wait_for(awaitable, .02 if timeout == 15 else timeout)
+            return await real_wait_for(awaitable, .02 if timeout == engine.REPLY_DRAIN_TIMEOUT_S else timeout)
 
         with patch.object(engine.SmartTurn, "load", return_value=model), \
                 patch.object(engine, "SileroVAD", return_value=lambda _: next(probabilities)), \

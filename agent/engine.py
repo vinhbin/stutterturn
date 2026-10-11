@@ -23,6 +23,8 @@ SR = 16000
 FRAME = 512                  # Silero v5 needs 512 samples at 16 kHz -> 32 ms frames
 FRAME_S = FRAME / SR         # 0.032
 TRAILING_SILENCE_S = 5.0     # fed after the source ends
+GEMINI_REPLY_TIMEOUT_S = 20
+REPLY_DRAIN_TIMEOUT_S = 30
 CONTRACT_VERSION = "0.1"
 SPEECH_PROB = 0.5
 PRE_ROLL_S = 0.2
@@ -468,9 +470,9 @@ class Run:
             def on_retry(info):
                 if current():
                     self.event(self.now(), "info", "response_retry", service="gemini",
-                               detail="Empty reply; retrying once within the original deadline", **info)
+                               detail="Empty reply; retrying once within the bounded reply deadline", **info)
             try:
-                text = await asyncio.wait_for(self.services.reply_text(audio, on_retry=on_retry), timeout=10)
+                text = await asyncio.wait_for(self.services.reply_text(audio, on_retry=on_retry), timeout=GEMINI_REPLY_TIMEOUT_S)
             except asyncio.TimeoutError:
                 if not current():
                     return
@@ -804,7 +806,7 @@ class Run:
                 self.reply_task.cancel()
             try:
                 await self._until_stopped(asyncio.wait_for(asyncio.shield(self.reply_task),
-                                                          timeout=15))
+                                                          timeout=REPLY_DRAIN_TIMEOUT_S))
             except asyncio.TimeoutError:
                 self.reply_task.cancel()
                 await asyncio.gather(self.reply_task, return_exceptions=True)
