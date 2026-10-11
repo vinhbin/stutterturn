@@ -2,6 +2,14 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-013 — X1: bounded check of the existing blend at 0.6, Option A (approved by Vinh)
+
+At approximately 20:50 EDT Vinh authorized the X1 check and chose **Option A: Guttuu executes on his machine**, where the candidate, caches and audio already reside. Governing protocol: [`model/specs/x1-blend-check-v1.md`](../model/specs/x1-blend-check-v1.md) at commit `79dfc5a` (PR #37), consolidating Guttuu's proposed pre-registration and Niko's revised evaluation view. Execution starts only after **Niko signs off on that spec file** and `preflight_x1.py` passes on the executing machine.
+
+Scope: one existing checkpoint (`blend-a0.75-W3ee1.00.pt`, SHA-256 `612df85b…`), one fixed threshold (0.6), out-id `sel-x1`, one execution ever. Every frozen numerical constraint applies unchanged, including delta M5 >= 0 versus stock and the previously unverified M4b. Outcomes: `x1_fail` or `x1_pass_dev_exploratory`; mandatory wording everywhere: *post-hoc exploratory candidate selected after v4 results; not a v4 pass; fifth adaptive look at dev/guard*. A pass carries little evidential weight (the candidate was chosen after inspecting all 18 in-loop operating points) and authorizes only entry to the promotion pipeline: agent load, matched `turn_onset` runtime comparison, audio acceptance, and human endpoints on a fresh frozen set outside all v1–v4 exposure. V4 remains `dev_nothing_passes`.
+
+In parallel and not gated on X1 (Vinh, same exchange): human A/B labeling proceeds now, and the fresh confirmation set per Niko's revised view is to be chosen and frozen before any scoring. The B cross-check reviewer is still unconfirmed. **D-009 stays in force: reserved final test sealed.** This entry records authorization, not executor start, Niko sign-off, or a result.
+
 ## 2026-10-10 D-012 — Continue the original goal with a bounded interpolation attempt
 
 After W3 failed selection, Vinh rejected treating the stock/patient fallback as the final project scope and asked to continue earning the original claim. Following review of [Guttuu's proposal](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103360382) and the recommendation for bounded interpolation plus parallel human labels, he instructed Codex to respond to Guttuu. [The conditional go-ahead was posted at 19:42 EDT](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097).
