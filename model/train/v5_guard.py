@@ -66,6 +66,9 @@ def main():
         return selftest()
     if not a.work:
         ap.error("--work required")
+    w, root = os.path.realpath(a.work), os.path.realpath(C.ROOT)
+    if os.path.commonpath([w, root]) == root:
+        sys.exit(f"REFUSING: --work {a.work} is inside the repo; FLAC caches must stay outside git")
     old = json.load(open(os.path.join(a.work, a.data, "manifest.json")))["guard"]
     if a.first_shard < old["shards_read"]:
         sys.exit(f"REFUSING: --first-shard {a.first_shard} overlaps the old guard's shards 0-{old['shards_read'] - 1}")

@@ -47,6 +47,8 @@ MIN_SPEECH_S = 0.5
 AUDIT_PER_LABEL = 30
 AUDIT_PASS = 27                  # >= 90% of 30
 DEFAULT_SEED = "v5-crops-1"
+HELDOUT_SHOW = "IStutterSoWhat"   # dev2 (build_dev2_items.py); never shapes training inputs
+HELDOUT_KEYS = os.path.join(C.BENCH, "items", "dev2-v1", "heldout_keys.txt")
 SILERO = os.path.join(C.ROOT, "agent", "models", "silero_vad.onnx")
 SILERO_SHA256 = "2623a2953f6ff3d2c1e61740c6cdb7168133479b267dfef114a4a3cc5bdd788f"
 AUDIT_FIELDS = ["audit_id", "crop_id", "claimed_label", "crop_wav", "context_wav", "crop_start_s",
@@ -109,19 +111,33 @@ def choose_start(cands, target_s):
     return min(cands, key=lambda c: (abs(c[1] - target_s), -c[0]))
 
 
-def sep_length_pool(data_dir):
-    """Empirical SEP training input lengths (s), clipped to [MIN_LEN_S, MAX_LEN_S], sorted."""
-    L = []
+def heldout_keys():
+    """dev2 held-out clip keys: heldout_keys.txt when built, else every train-split clip of the show."""
+    if os.path.exists(HELDOUT_KEYS):
+        return {l.strip() for l in open(HELDOUT_KEYS) if l.strip()}
+    import csv as _csv
+    return {r["clip_key"] for r in _csv.DictReader(open(os.path.join(C.BENCH, "splits", "v1", "train.csv"), newline=""))
+            if r["show"] == HELDOUT_SHOW}
+
+
+def sep_length_pool(data_dir, exclude=frozenset(), info=None):
+    """Empirical SEP training input lengths (s) excluding held-out clips, clipped to [1, 4] s, sorted."""
+    L, dropped = [], 0
     for fn in ("sep_pos.jsonl", "stutter_neg.jsonl"):
         p = os.path.join(data_dir, fn)
         if not os.path.exists(p):
             continue
         for line in open(p):
             r = json.loads(line)
+            if r["clip_key"] in exclude:
+                dropped += 1
+                continue
             s = min(r["keep_samples"], r["cut_samples"]) if r.get("keep_samples") else r["cut_samples"]
             L.append(min(max(s / SR, MIN_LEN_S), MAX_LEN_S))
     if not L:
         sys.exit(f"REFUSING: no SEP rows in {data_dir} to set target lengths")
+    if info is not None:
+        info.update({"rows_used": len(L), "heldout_rows_excluded": dropped})
     return np.sort(np.array(L))
 
 
@@ -171,7 +187,10 @@ def cmd_build(a):
     replay = [json.loads(l) for l in open(os.path.join(data, "orig_replay.jsonl"))]
     guard = [json.loads(l) for l in open(os.path.join(data, "guard.jsonl"))]
     guard_ids, guard_wavs = {r["id"] for r in guard}, {r["wav_sha256"] for r in guard}
-    pool = sep_length_pool(data)
+    held = heldout_keys()
+    pool_info = {"heldout_show": HELDOUT_SHOW, "heldout_keys": len(held),
+                 "heldout_source": HELDOUT_KEYS if os.path.exists(HELDOUT_KEYS) else "splits/v1/train.csv (show filter)"}
+    pool = sep_length_pool(data, held, pool_info)
     vad = Silero()
     masks = []  # one VAD pass per clip; both pause rules reuse it
     for i, r in enumerate(replay):
@@ -211,6 +230,7 @@ def cmd_build(a):
                          "min_pause_s_used": attempts[-1]["min_pause_s"], "preroll_s": PREROLL_S, "min_start_s": MIN_START_S,
                          "len_s": [MIN_LEN_S, MAX_LEN_S], "min_speech_s": MIN_SPEECH_S,
                          "target": "seeded draw from SEP input lengths clipped to [1, 4] s; closest onset, ties later"},
+                "sep_length_pool": pool_info,
                 "sep_target_quantiles_s": {q: round(float(np.quantile(pool, q)), 3) for q in (0.1, 0.25, 0.5, 0.75, 0.9)},
                 "replay_rows": len(replay), "crops": len(rows), "skipped_no_onset": skipped,
                 "crops_by_label": {"0": lab.count(0), "1": lab.count(1)},
@@ -282,12 +302,42 @@ def audit_result(rows):
 
 def cmd_audit_check(a):
     path = os.path.join(a.work, a.worksheet)
+    crops_dir = os.path.join(a.work, a.crops)
+    res_path = os.path.join(crops_dir, "audit_result.json")
+    if os.path.exists(res_path):
+        sys.exit(f"REFUSING: {res_path} exists (one audit result per crop build)")
     rows = list(csv.DictReader(open(path, newline="", encoding="utf-8")))
+    readme = json.load(open(os.path.join(os.path.dirname(path), "README.json")))
+    crops_manifest_sha = C.sha256_file(os.path.join(crops_dir, "manifest.json"))
+    built = {json.loads(l)["id"]: json.loads(l) for l in open(os.path.join(crops_dir, "replay_crops.jsonl"))}
+    binding = {
+        "worksheet_exported_from_this_build": readme.get("crops_manifest_sha256") == crops_manifest_sha,
+        "all_crop_ids_in_build": all(r["crop_id"] in built for r in rows),
+        "claimed_labels_match_build": all(r["crop_id"] in built and
+                                          {"complete": 1, "incomplete": 0}[r["claimed_label"]] == built[r["crop_id"]]["label"]
+                                          for r in rows),
+        "no_duplicate_crops": len({r["crop_id"] for r in rows}) == len(rows)}
     out = audit_result(rows)
-    out.update({"worksheet": a.worksheet, "worksheet_sha256": C.sha256_file(path),
-                "reviewers": sorted({r["reviewer"] for r in rows if r["reviewer"]})})
+    out.update({"binding": binding, "passed": out["passed"] and all(binding.values()),
+                "worksheet": a.worksheet, "worksheet_sha256": C.sha256_file(path),
+                "crops_manifest_sha256": crops_manifest_sha,
+                "reviewers": sorted({r["reviewer"] for r in rows if r["reviewer"]}),
+                "code_commit": C.git_commit()})
+    C.write_json(res_path, out)
     print(json.dumps(out, indent=1))
     sys.exit(0 if out["passed"] else 1)
+
+
+def require_audit(work, crops):
+    """For the (future) v5 mixture builder: refuse crops without a passing, build-bound audit."""
+    d = os.path.join(work, crops)
+    p = os.path.join(d, "audit_result.json")
+    if not os.path.exists(p):
+        sys.exit(f"REFUSING: {crops} has no audit_result.json (run audit-export, human review, audit-check)")
+    r = json.load(open(p))
+    if not r.get("passed") or r.get("crops_manifest_sha256") != C.sha256_file(os.path.join(d, "manifest.json")):
+        sys.exit(f"REFUSING: {crops} audit failed or is bound to a different build")
+    return r
 
 
 def cmd_stock_diagnostic(a):
@@ -308,6 +358,12 @@ def cmd_stock_diagnostic(a):
                                          for k, v in flips.items()}}
     C.write_json(os.path.join(a.work, a.crops, "stock_diagnostic.json"), out)
     print(json.dumps(out, indent=1))
+
+
+def assert_outside_repo(work):
+    w, root = os.path.realpath(work), os.path.realpath(C.ROOT)
+    if os.path.commonpath([w, root]) == root:
+        sys.exit(f"REFUSING: --work {work} is inside the repo; audio/feature caches must stay outside git")
 
 
 def selftest():
@@ -362,9 +418,64 @@ def selftest():
     ok &= check("length gate passes at 25% under 2 s", length_gate(g_rows)["passed"])
     g_rows[0]["len_s"] = 2.2
     ok &= check("length gate fails if one label < 25%", not length_gate(g_rows)["passed"])
+    # held-out show never shapes target lengths
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        with open(os.path.join(td, "sep_pos.jsonl"), "w") as f:
+            f.write(json.dumps({"clip_key": "Keep_1_1", "cut_samples": 32000}) + "\n")
+            f.write(json.dumps({"clip_key": "IStutterSoWhat_1_1", "cut_samples": 16000}) + "\n")
+        info = {}
+        pl = sep_length_pool(td, {"IStutterSoWhat_1_1"}, info)
+        ok &= check("held-out rows excluded from the length pool", list(pl) == [2.0] and info["heldout_rows_excluded"] == 1)
+        # audit result is bound to the build
+        cd = os.path.join(td, "crops"); wd = os.path.join(td, "audit"); os.makedirs(cd); os.makedirs(wd)
+        C.write_json(os.path.join(cd, "manifest.json"), {"x": 1})
+        built = [{"id": f"crop-{l}{k}", "label": l} for l in (0, 1) for k in range(AUDIT_PER_LABEL)]
+        with open(os.path.join(cd, "replay_crops.jsonl"), "w") as f:
+            f.writelines(json.dumps(r) + "\n" for r in built)
+        def run_check(rows, readme_sha):
+            C.write_json(os.path.join(wd, "README.json"), {"crops_manifest_sha256": readme_sha})
+            with open(os.path.join(wd, "crop_audit.csv"), "w", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=AUDIT_FIELDS, lineterminator="\n"); w.writeheader()
+                w.writerows({**{k: "" for k in AUDIT_FIELDS}, **r} for r in rows)
+            rp = os.path.join(cd, "audit_result.json")
+            if os.path.exists(rp):
+                os.remove(rp)
+            ns = argparse.Namespace(work=td, worksheet="audit/crop_audit.csv", crops="crops")
+            try:
+                cmd_audit_check(ns)
+            except SystemExit as e:
+                return e.code == 0, json.load(open(rp)) if os.path.exists(rp) else None
+        good = [{"audit_id": f"A{i}", "crop_id": r["id"], "claimed_label": "complete" if r["label"] else "incomplete",
+                 "reviewer": "r", "reviewed_at": "2026-10-11", "label_still_valid": "yes"} for i, r in enumerate(built)]
+        msha = C.sha256_file(os.path.join(cd, "manifest.json"))
+        import contextlib, io as _io
+        with contextlib.redirect_stdout(_io.StringIO()):
+            p1, r1 = run_check(good, msha)
+            p2, _ = run_check(good, "0" * 64)
+            bad = [dict(r) for r in good]; bad[0]["crop_id"] = "crop-not-built"
+            p3, _ = run_check(bad, msha)
+        ok &= check("audit bound to this build passes and is written", p1 and r1 and r1["passed"])
+        ok &= check("audit from another build refused", not p2)
+        ok &= check("audit naming an unbuilt crop refused", not p3)
+        ok &= check("require_audit refuses a failed audit", _refuses(lambda: require_audit(td, "crops")))
+        with contextlib.redirect_stdout(_io.StringIO()):
+            run_check(good, msha)
+        ok &= check("require_audit accepts a passing, build-bound audit", require_audit(td, "crops")["passed"])
+        C.write_json(os.path.join(cd, "manifest.json"), {"x": 2})  # the build changed after the audit
+        ok &= check("require_audit refuses after the build changes", _refuses(lambda: require_audit(td, "crops")))
+    ok &= check("--work inside the repo refused", _refuses(lambda: assert_outside_repo(C.ROOT)))
     ok &= check("seeded draw is deterministic", seeded_u("s", "a") == seeded_u("s", "a") != seeded_u("t", "a"))
     print("SELFTEST " + ("PASSED" if ok else "FAILED"))
     sys.exit(0 if ok else 1)
+
+
+def _refuses(fn):
+    try:
+        fn()
+    except SystemExit:
+        return True
+    return False
 
 
 def check(name, cond, detail=""):
@@ -387,6 +498,7 @@ def main():
     e.add_argument("--seed", default=DEFAULT_SEED)
     k = sub.add_parser("audit-check")
     k.add_argument("--worksheet", required=True)
+    k.add_argument("--crops", default="data-v5-crops")
     d = sub.add_parser("stock-diagnostic")
     d.add_argument("--crops", default="data-v5-crops")
     d.add_argument("--limit", type=int)
@@ -395,6 +507,7 @@ def main():
         return selftest()
     if not a.work or not a.cmd:
         ap.error("--work and a command are required (or --selftest)")
+    assert_outside_repo(a.work)
     {"build": cmd_build, "audit-export": cmd_audit_export, "audit-check": cmd_audit_check,
      "stock-diagnostic": cmd_stock_diagnostic}[a.cmd](a)
 
