@@ -151,7 +151,8 @@ LiveAdapter.prototype.connect = function () {
       if (typeof self._fetch !== 'function') { throw new Error('Fetch is unavailable in this browser'); }
       return self._fetch(self.baseUrl + path, { signal: controller.signal, cache: 'no-store' });
     }).then(function (response) {
-      if (!response.ok) { throw new Error(path + ': HTTP ' + response.status); }
+      if (response.status === 401) { throw new Error('Please reload the page and sign in with the demo login, then retry the connection (HTTP 401).'); }
+      if (!response.ok) { throw new Error(path + ': HTTP ' + response.status + '. Use Retry connection; the server may be temporarily unavailable.'); }
       return response.json();
     });
     return bounded(request, self._connectTimeout, controller.signal, 'Backend discovery');

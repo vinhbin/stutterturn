@@ -153,3 +153,13 @@ records the deployed result, including an earlier Gemini timeout.
 Latest regression counts: 38 adapter, 20 console, 52 site, eight audio lifecycle.
 The site test now expects the committed Tiger Data query snapshot's provenance,
 while still distinguishing the saved chart from a live database connection.
+
+
+## Hosted automatic connection
+
+`python web/demo-ui/dev/checks/connection-browser-check.py` intercepts HTTPS and
+WebSocket traffic in Chromium. It checks automatic source/model discovery with
+Advanced settings collapsed, recovery from HTTP503 and HTTP401, a dropped socket,
+and that opening the page starts no paid replay. Local HTTP development continues
+to use explicit Connect. Hosted discovery allows15seconds; source/reply audio
+still starts only on the user's Start action.

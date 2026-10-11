@@ -316,3 +316,7 @@ td:nth-child(4) { min-width: 240px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+.connection-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.connection-status .status-banner { flex: 1 1 240px; }
+#btn-retry { flex: 0 0 auto; margin-bottom: 8px; }

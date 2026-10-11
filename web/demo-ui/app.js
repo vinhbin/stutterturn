@@ -6,7 +6,7 @@
   var el = {};
   [
     'preview-banner', 'connection-chip', 'status-banner', 'config-group',
-    'backend-url', 'btn-connect', 'btn-disconnect', 'source-select', 'source-note',
+    'backend-url', 'btn-retry', 'btn-connect', 'btn-disconnect', 'source-select', 'source-note',
     'btn-start', 'btn-stop', 'btn-reset', 'run-phase', 'run-id', 'run-config',
     'run-source', 'start-note', 'source-label', 'current-state', 'state-strip',
     'first-decision', 'first-audible', 'decision-gap', 'event-body', 'event-scroll',
@@ -15,10 +15,11 @@
     'model-contract-status', 'tally', 'tally-note', 'tally-config', 'run-clock', 'timeline-mode', 'timeline-scroll-hint'
   ].forEach(function (id) { el[id] = $(id); });
 
+  var hosted = window.location.protocol === 'https:' && !['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
   var state = {
     adapter: new window.StutterTurnAdapters.blocked(),
     configs: [], sources: [], health: null, discovered: false, selectedConfig: 'stock',
-    runPhase: 'idle', run: null, connecting: false, connectToken: null
+    runPhase: 'idle', run: null, connecting: false, connectToken: null, reconnectOnStart: false
   };
   var EMPTY = '—';
   var DEFAULT_SOURCE = 'No source recording loaded. Source identity and provenance must come from the backend.';
@@ -75,7 +76,7 @@
     el['preview-toggle'].checked = preview;
     el['connection-chip'].className = 'chip ' + (isSynthetic() ? 'chip-preview' : isConnected() ? 'chip-live' : 'chip-blocked');
     el['connection-chip'].textContent = state.connecting ? 'CONNECTING…' : preview ? 'DEVELOPMENT PREVIEW — NOT LIVE' :
-      mock ? (isConnected() ? 'MOCK BACKEND — SYNTHETIC' : 'MOCK BACKEND — DISCONNECTED') : isConnected() ? (state.health && state.health.browser_audio === 'pcm16-v1' ? 'BACKEND CONNECTED — BROWSER AUDIO' : 'BACKEND CONNECTED — PLAYBACK UNVERIFIED') : state.discovered ? 'BACKEND DISCONNECTED' : 'LIVE INTEGRATION: BLOCKED';
+      mock ? (isConnected() ? 'MOCK BACKEND — SYNTHETIC' : 'MOCK BACKEND — DISCONNECTED') : isConnected() ? (state.health && state.health.browser_audio === 'pcm16-v1' ? 'BACKEND CONNECTED — BROWSER AUDIO' : 'BACKEND CONNECTED — PLAYBACK UNVERIFIED') : state.reconnectOnStart ? 'READY TO REPLAY' : state.discovered ? 'BACKEND DISCONNECTED' : hosted ? 'NOT CONNECTED' : 'LIVE INTEGRATION: BLOCKED';
     el['run-source'].textContent = state.adapter.sourceLabel || 'Backend not connected';
     el['audio-note'].textContent = isSynthetic()
       ? 'Synthetic timing only. No audio or benchmark evidence.'
@@ -92,10 +93,11 @@
         'Candidate unavailable unless the backend reports an exported artifact.';
     if (state.connecting) { setStatus('warn', 'Connecting and loading configurations and sources…'); }
     else if (preview) { setStatus('warn', 'Synthetic preview ready. Choose a configuration, then start a fresh run.'); }
-    else if (state.discovered && !isConnected()) { setStatus('warn', 'Backend disconnected. Start a fresh run to reconnect, or use Connect to reload sources. ' + (mock ? 'Mock data is synthetic, with no audio or benchmark evidence.' : 'Audio playback remains unverified.')); }
+    else if (state.reconnectOnStart && state.discovered) { setStatus('ok', 'Ready for another replay. Start reconnects automatically.'); }
+    else if (state.discovered && !isConnected()) { setStatus('warn', 'Connection lost. Use Retry connection to reconnect. ' + (mock ? 'Mock data is synthetic, with no audio or benchmark evidence.' : 'Audio playback remains unverified.')); }
     else if (mock) { setStatus('warn', 'Mock backend connected. Choose a synthetic scenario to exercise the console.'); }
-    else if (isConnected()) { setStatus('ok', 'Backend connected. Choose a source and configuration. Audio playback is unverified.'); }
-    else { setStatus('warn', 'Live integration blocked. Connect a backend or enable development preview in the control desk.'); }
+    else if (isConnected()) { setStatus('ok', 'Connected. Choose a recording and model, then Start to hear the replay.'); }
+    else { setStatus('warn', hosted ? 'Not connected. Use Retry connection to load recordings and models.' : 'Live integration blocked. Connect a backend or enable development preview in the control desk.'); }
   }
 
   function refreshControls() {
@@ -108,6 +110,9 @@
     el['btn-start'].disabled = locked || !ready;
     el['btn-start'].firstChild.textContent = state.runPhase === 'starting' ? 'Starting… ' : 'Start fresh run ';
     el['btn-stop'].disabled = !isActive();
+    el['btn-retry'].hidden = preview || isConnected() || state.reconnectOnStart;
+    el['btn-retry'].disabled = locked;
+    el['btn-retry'].textContent = state.connecting ? 'Connecting…' : 'Retry connection';
     el['btn-connect'].disabled = locked || isConnected();
     el['btn-connect'].textContent = state.connecting ? 'Connecting…' : 'Connect';
     el['btn-disconnect'].disabled = !state.connecting && !isConnected();
@@ -120,7 +125,7 @@
     el['start-note'].hidden = ready && !locked;
     el['start-note'].textContent = state.connecting ? 'Connecting. Reset or Disconnect to cancel.' :
       isActive() ? 'Source and configuration locked. Stop or Reset to cancel.' :
-      !cfg || !cfg.available ? 'Connect a backend or enable development preview.' :
+      !cfg || !cfg.available ? (hosted ? 'Recordings and models load when connected. Use Retry connection if needed.' : 'Connect a backend or enable development preview.') :
       !preview && !state.sources.length ? 'Start is disabled: the backend has no available source recordings.' :
       'Select a source recording before starting.';
   }
@@ -478,7 +483,7 @@
     state.connectToken = null; state.connecting = false;
     stopAdapter();
     if (typeof state.adapter.disconnect === 'function') { state.adapter.disconnect(); }
-    state.health = null; state.discovered = false;
+    state.health = null; state.discovered = false; state.reconnectOnStart = false;
   }
   function setAdapter(mode) {
     disconnectCurrent();
@@ -490,16 +495,18 @@
     if (state.connecting || isConnected() || isActive()) { return; }
     disconnectCurrent();
     var adapter;
-    try { adapter = new window.StutterTurnAdapters.live({ baseUrl: el['backend-url'].value.trim(),
+    try { adapter = new window.StutterTurnAdapters.live({ baseUrl: el['backend-url'].value.trim(), connectTimeoutMs: hosted ? 15000 : 5000,
       onAudioStatus: function (message) { el['audio-status'].textContent = message; } });
       adapter.setVolume(Number(el['audio-volume'].value)); }
     catch (error) { setAdapter('blocked'); setStatus('error', 'Connection error: ' + valueText(error.message || error)); return; }
     state.adapter = adapter;
     adapter.onConnectionChange = function (connection) {
-      if (state.adapter !== adapter || state.connecting || isActive()) { return; }
+      if (state.adapter !== adapter) { return; }
+      state.reconnectOnStart = !connection.connected && connection.reason === 'stopped';
+      if (state.connecting || isActive()) { return; }
       refreshChrome(); refreshControls();
       if (!connection.connected && connection.reason !== 'stopped' && connection.reason !== 'disconnected') {
-        setStatus('error', 'Backend disconnected: ' + connection.reason + '. Start a fresh run to reconnect.');
+        setStatus('error', 'Backend disconnected: ' + connection.reason + '. Use Retry connection to reconnect.');
       }
     };
     var token = {}; state.connectToken = token; state.connecting = true;
@@ -607,6 +614,7 @@
   el['audio-volume'].addEventListener('input', function () {
     if (state.adapter.setVolume) { state.adapter.setVolume(Number(el['audio-volume'].value)); }
   });
+  el['btn-retry'].addEventListener('click', connectBackend);
   el['btn-connect'].addEventListener('click', connectBackend);
   el['btn-disconnect'].addEventListener('click', function () { setAdapter('blocked'); });
   el['source-select'].addEventListener('change', renderSourceNote);
@@ -637,8 +645,11 @@
       }
     }
   });
-  if (window.location.protocol === 'https:') {
+  if (hosted) {
+    document.querySelector('.connection-settings').open = false;
+    document.querySelector('.connection-settings summary').textContent = 'Advanced settings';
     el['backend-url'].value = window.location.origin;
   }
   renderConfigs(); renderSources(); clearRun(); refreshChrome(); refreshControls();
+  if (hosted) { connectBackend(); }
 })();

@@ -7,7 +7,7 @@ presentation site. Deployed application revision: `667460f45fdd` (browser audio 
 
 1. Open <https://64-177-51-1.sslip.io/live/> and sign in with the demo credentials
    supplied separately. Credentials are not stored in the repository.
-2. Click **Connect**. The HTTPS console defaults to the current site as its backend.
+2. The hosted console connects automatically and loads recordings/models. If it fails, use **Retry connection**; the error appears beside it. Backend URL and manual controls are under **Advanced settings**.
 3. Select a source and configuration, then **Start fresh run**. Only one replay
    can run at a time on this 1-CPU / 1-GB instance.
 

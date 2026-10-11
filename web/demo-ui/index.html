@@ -7,7 +7,7 @@
 <title>StutterTurn · Call console</title>
 <link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=connect2">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to console</a>
@@ -17,7 +17,10 @@
 </header>
 <div id="preview-banner" class="preview-banner" hidden>DEVELOPMENT PREVIEW — synthetic fixture events. No audio. Not benchmark evidence.</div>
 <main id="main-content" tabindex="-1">
+  <div class="connection-status">
   <div id="status-banner" class="status-banner warn" role="status" aria-atomic="true">Connect a backend or enable the labeled development preview.</div>
+  <button id="btn-retry" type="button" hidden>Retry connection</button>
+  </div>
   <div class="workspace-toolbar">
     <a class="setup-jump" href="#run-setup">Connection &amp; configuration <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <section class="source-control" aria-labelledby="source-heading">
@@ -132,7 +135,7 @@
   </footer>
 </main>
 <script src="browser-audio.js?v=audio1"></script>
-<script src="adapter.js?v=audio1"></script>
-<script src="app.js?v=audio1"></script>
+<script src="adapter.js?v=connect2"></script>
+<script src="app.js?v=connect2"></script>
 </body>
 </html>

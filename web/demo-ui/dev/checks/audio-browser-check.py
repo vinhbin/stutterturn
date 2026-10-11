@@ -85,9 +85,6 @@ with sync_playwright() as p:
             }
           };
         }''')
-        if not frame.locator('#btn-connect').is_visible():
-            frame.get_by_text('Connection & preview', exact=True).click()
-        frame.locator('#btn-connect').click()
         expect(frame.locator('#source-select')).to_be_enabled(timeout=20000)
         runs = []
         for config in ('stock_fp32', 'candidate'):
