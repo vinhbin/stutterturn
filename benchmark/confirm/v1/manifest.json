@@ -1,0 +1,83 @@
+{
+ "counts": {
+  "E1": 1870,
+  "E2": 680,
+  "E3": 538,
+  "E4_dev": 59,
+  "E5_dev": 80,
+  "E5_removed": 9,
+  "E5_removed_by_category": {
+   "block": 9,
+   "fluent": 0,
+   "other_disfluent": 0
+  },
+  "bucket_sizes": {
+   "completed_fluent_turn": 426,
+   "completed_stuttered_turn": 1413,
+   "unfinished_fluent_pause": 446,
+   "unfinished_stutter_block": 113
+  },
+  "dev_clips": 5882,
+  "exposed_E1_E4": 2831,
+  "fluent_split": {
+   "completed_fluent_turn": 426,
+   "unfinished_fluent_pause": 446
+  },
+  "natural_pause_ge1": {
+   "completed_fluent_turn_list": 133,
+   "fluent_pool": 265,
+   "unfinished_fluent_pause_list": 132
+  },
+  "overlap_excluded": 644,
+  "pool": 2398,
+  "pool_by_category": {
+   "block": 113,
+   "fluent": 872,
+   "other_disfluent": 1413
+  },
+  "pool_by_category_show": {
+   "block": {
+    "MyStutteringLife": 28,
+    "StutteringIsCool": 85
+   },
+   "fluent": {
+    "MyStutteringLife": 190,
+    "StutteringIsCool": 682
+   },
+   "other_disfluent": {
+    "MyStutteringLife": 470,
+    "StutteringIsCool": 943
+   }
+  },
+  "pool_other_categories": 0,
+  "pool_pre_E5": 2407,
+  "pool_pre_E5_by_category": {
+   "block": 122,
+   "fluent": 872,
+   "other_disfluent": 1413
+  },
+  "unexposed": 3051
+ },
+ "exposure_keys_sha256": "a1e2b08247471ffe6c2670740d23e924e60cbb29877e3dfc643d279e92e2ecab",
+ "frozen": true,
+ "git_head": "1c2aa4621881250bb45c6cfe25e14d838180666b",
+ "input_sha256": {
+  "E3_sorted_keys": "f4457c5a5d56389ecb7bb76c09786277338f8e00e8e95be307f7fae35944cfe3",
+  "data/block_candidates.csv": "4757dd290b1c9973bcc6db39d66d2d3cdf32c603f8fabdf3b628286c6160f96c",
+  "data/block_eval.csv": "efa2c706a0cc147b0fb3b564bfb3afa446318cc4011b087fab27fa6d29c25ab4",
+  "items/v1/dev.jsonl": "742b645ba7213fecc0753d6c10376e330673b70c0d21d59881f0ca442e962ee3",
+  "items/v1/dev_end_of_window.jsonl": "e30a456895cd61dd203fee319c864a9014097f720581a1fe87611cf6d7f52905",
+  "items/v1/review_queue_dev.csv": "dcd799ffe6ef899c97cdf7e25e95fef7593e322f5e9be70fde50117aa3ab4254"
+ },
+ "preview_expected_pre_E5": {
+  "exposed": 2831,
+  "overlap": 644,
+  "pool": 2407,
+  "unexposed": 3051
+ },
+ "readme_sha256": "2eeebae43cc6ae5946638f2cc4ef2c759bf5bfbd879809f6e23395ea60106d61",
+ "rule": "no model is run on these keys until the reviewed labels are committed and their sha256 is recorded in the decision log",
+ "script_sha256": "ac7c55380087e64b171e12972dc1c66c75ef0ca5ce30877565de8b98b23c0a3a",
+ "splits_dev_sha256": "3030592364bcf7f7514eb85a59d72323558706aae40cc61fe1ec5ed7dc80b340",
+ "worksheet_sha256": "037190de28e234b2db04b75758ead78f0fab16c2f0a1aa87402478f5e1d4939c"
+}
