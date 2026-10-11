@@ -21,6 +21,36 @@ import build_items as BI  # noqa: E402
 
 OUT = os.path.join(BI.BASE, "items", "dev2-v1")
 MIN_BLOCKS = 100
+# Niko's pre-registration (#2, 2026-10-11T02:41Z): drop held-out-show clips that earlier work exposed
+EXPOSURE_FILES = ["benchmark/data/block_eval.csv", "benchmark/data/fluent_eval.csv",
+                  "benchmark/data/block_candidates.csv", "benchmark/data/fluent_candidates.csv"]
+EXPOSURE_DIRS = ["agent/evidence"]
+
+
+def exposed_keys(show):
+    """{key: [sources]} for clips of `show` named in earlier eval files or agent evidence."""
+    import csv as _csv
+    import re
+    root = os.path.dirname(BI.BASE)
+    pat = re.compile(re.escape(show) + r"_\d+_\d+")
+    out = defaultdict(set)
+    for rel in EXPOSURE_FILES:
+        p = os.path.join(root, rel)
+        if not os.path.exists(p):
+            continue
+        for r in _csv.DictReader(open(p, newline="", encoding="utf-8")):
+            for k in pat.findall(r.get("file", "")):
+                out[k].add(rel)
+    for rel in EXPOSURE_DIRS:
+        for dirpath, _d, files in os.walk(os.path.join(root, rel)):
+            for fn in files:
+                try:
+                    txt = open(os.path.join(dirpath, fn), encoding="utf-8", errors="ignore").read()
+                except OSError:
+                    continue
+                for k in set(pat.findall(txt)):
+                    out[k].add(os.path.relpath(os.path.join(dirpath, fn), root).replace("\\", "/"))
+    return {k: sorted(v) for k, v in sorted(out.items())}
 
 
 def choose_show(train_rows):
@@ -55,9 +85,11 @@ def main():
     show, show_counts = choose_show(train)
     if show != "IStutterSoWhat":
         sys.exit(f"REFUSING: hold-out rule picked {show}, but the proposal pre-registered IStutterSoWhat")
-    rows = [r for r in train if r["show"] == show]
+    all_rows = [r for r in train if r["show"] == show]
     held = {r["clip_key"] for s in ("dev", "test") for r in BI.read_csv(os.path.join(BI.SPLITS_DIR, f"{s}.csv"))}
-    assert not {r["clip_key"] for r in rows} & held, "held-out show overlaps dev/test"
+    assert not {r["clip_key"] for r in all_rows} & held, "held-out show overlaps dev/test"
+    exposed = exposed_keys(show)
+    rows = [r for r in all_rows if r["clip_key"] not in exposed]  # items only; training still excludes all
     empty = set()
     ep = os.path.join(BI.AUDIO, "empty_on_mirror.txt")
     if os.path.exists(ep):
@@ -75,8 +107,8 @@ def main():
     BI.write_jsonl(os.path.join(out, "dev2_end_of_window.jsonl"), ei)
     BI.write_jsonl(os.path.join(out, "dev2_stuttered_completed.jsonl"), si)
     BI.write_jsonl(os.path.join(out, "provenance.jsonl"), pv)
-    with open(os.path.join(out, "heldout_keys.txt"), "w", newline="\n") as f:
-        f.write("\n".join(sorted(r["clip_key"] for r in rows)) + "\n")
+    with open(os.path.join(out, "heldout_keys.txt"), "w", newline="\n") as f:  # every clip of the show
+        f.write("\n".join(sorted(r["clip_key"] for r in all_rows)) + "\n")
     names = ["dev2.jsonl", "dev2_end_of_window.jsonl", "dev2_stuttered_completed.jsonl", "provenance.jsonl", "heldout_keys.txt"]
     cnt = lambda items: dict(Counter(f"{i['group']}/{i['kind']}" for i in items))  # noqa: E731
     manifest = {
@@ -86,7 +118,11 @@ def main():
         "build_eval_sets_sha256": BI.sha256_file(os.path.join(HERE, "build_eval_sets.py")),
         "train_csv_sha256": BI.sha256_file(os.path.join(BI.SPLITS_DIR, "train.csv")),
         "holdout_rule": f"smallest training show with >= {MIN_BLOCKS} block clips (counts only)",
-        "show_counts": show_counts, "heldout_show": show, "heldout_clips": len(rows),
+        "show_counts": show_counts, "heldout_show": show, "heldout_clips": len(all_rows),
+        "exposure_exclusion": {"rule": "drop held-out-show clips named in " + ", ".join(EXPOSURE_FILES + EXPOSURE_DIRS)
+                                       + " (Niko, #2 2026-10-11T02:41Z); items only, training excludes every show clip",
+                               "excluded": len(exposed), "keys": exposed},
+        "itemized_clips": len(rows),
         "vad_params": BI.vad_params(), "tallies": {k: dict(sorted(v.items())) for k, v in sorted(T.items())},
         "item_counts": {"main": cnt(mi), "end_of_window": cnt(ei), "stuttered_completed": cnt(si)},
         "output_sha256": {n: BI.sha256_file(os.path.join(out, n)) for n in names},
@@ -95,7 +131,8 @@ def main():
                "no model has been scored on these items"}
     with open(os.path.join(out, "manifest.json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(manifest, f, indent=1)
-    print(json.dumps({"heldout_show": show, "item_counts": manifest["item_counts"]}, indent=1))
+    print(json.dumps({"heldout_show": show, "exposure_excluded": len(exposed), "itemized_clips": len(rows),
+                      "item_counts": manifest["item_counts"]}, indent=1))
 
 
 def selftest():
@@ -115,6 +152,11 @@ def selftest():
     real, counts = choose_show(BI.read_csv(os.path.join(BI.SPLITS_DIR, "train.csv")))
     print(f"  {'ok' if real == 'IStutterSoWhat' else 'FAIL'}: real split -> {real} {counts.get(real)}")
     ok &= real == "IStutterSoWhat"
+    ex = exposed_keys("IStutterSoWhat")
+    in_eval = [k for k, v in ex.items() if "benchmark/data/block_eval.csv" in v]
+    cond = len(in_eval) == 8 and all(k.startswith("IStutterSoWhat_") for k in ex)
+    print(f"  {'ok' if cond else 'FAIL'}: exposure scan finds the 8 block_eval keys ({len(ex)} exposed in total)")
+    ok &= cond
     print("SELFTEST " + ("PASSED" if ok else "FAILED"))
     sys.exit(0 if ok else 1)
 

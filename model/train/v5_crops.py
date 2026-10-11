@@ -38,6 +38,8 @@ SR = C.SR
 FRAME = 512                      # Silero frame at 16 kHz (32 ms)
 VAD_THRESHOLD = 0.5
 MIN_PAUSE_S = 0.15
+FALLBACK_PAUSE_S = 0.10      # Niko's one pre-registered relaxation if the length gate fails
+SHORT_S, SHORT_MIN_FRAC = 2.0, 0.25   # gate: >= 25% of built crops under 2.0 s, per label
 PREROLL_S = 0.10
 MIN_START_S = 0.50
 MIN_LEN_S, MAX_LEN_S = 1.0, 4.0
@@ -80,10 +82,10 @@ class Silero:
         return np.array(out, dtype=bool)
 
 
-def candidate_starts(mask, n_samples):
+def candidate_starts(mask, n_samples, min_pause_s=MIN_PAUSE_S):
     """[(start_sample, crop_len_s, speech_s)] for every qualifying onset (pure function)."""
     out = []
-    min_pause = int(np.ceil(MIN_PAUSE_S * SR / FRAME))
+    min_pause = int(np.ceil(min_pause_s * SR / FRAME))
     run = 0
     for i, sp in enumerate(mask):
         if not sp:
@@ -127,6 +129,33 @@ def target_len(pool, seed, rid):
     return float(pool[min(int(seeded_u(seed, rid) * len(pool)), len(pool) - 1)])
 
 
+def select_crops(replay, masks, pool, seed, min_pause_s):
+    """Crop rows for one pause rule (pure given VAD masks)."""
+    rows = []
+    for r, (mask, n) in zip(replay, masks):
+        tgt = target_len(pool, seed, r["id"])
+        pick = choose_start(candidate_starts(mask, n, min_pause_s), tgt)
+        if pick is None:
+            continue
+        start, length, speech = pick
+        rows.append({"id": f"crop-{r['id']}", "parent_id": r["id"], "audio": r["audio"],
+                     "crop_start_samples": start, "n_samples": n - start, "parent_n_samples": n,
+                     "len_s": length, "target_len_s": round(tgt, 4), "speech_s": speech, "min_pause_s": min_pause_s,
+                     "label": r["label"], "endpoint_bool": r["endpoint_bool"], "dataset": r["dataset"],
+                     "synthetic": r["synthetic"]})
+    return rows
+
+
+def length_gate(rows):
+    """Niko's build gate: >= SHORT_MIN_FRAC of crops under SHORT_S, for each label (pure)."""
+    out = {}
+    for lab in (0, 1):
+        L = [r["len_s"] for r in rows if r["label"] == lab]
+        frac = sum(x < SHORT_S for x in L) / len(L) if L else 0.0
+        out[str(lab)] = {"n": len(L), "frac_under_2s": round(frac, 4), "passed": bool(L) and frac >= SHORT_MIN_FRAC}
+    return {**out, "passed": all(v["passed"] for v in out.values())}
+
+
 def crop_audio(ref, work):
     """Model-input waveform for a crop reference."""
     x = C.read_audio(os.path.join(work, ref["audio"]))
@@ -144,25 +173,32 @@ def cmd_build(a):
     guard_ids, guard_wavs = {r["id"] for r in guard}, {r["wav_sha256"] for r in guard}
     pool = sep_length_pool(data)
     vad = Silero()
-    rows, skipped = [], 0
+    masks = []  # one VAD pass per clip; both pause rules reuse it
     for i, r in enumerate(replay):
         assert r["id"] not in guard_ids and r["wav_sha256"] not in guard_wavs, r["id"]
         x = C.read_audio(os.path.join(a.work, r["audio"]))
-        tgt = target_len(pool, a.seed, r["id"])
-        pick = choose_start(candidate_starts(vad.mask(x), len(x)), tgt)
-        if pick is None:
-            skipped += 1
-            continue
-        start, length, speech = pick
-        pcm = (np.clip(x[start:], -1, 1) * 32767).round().astype("<i2").tobytes()
-        rows.append({"id": f"crop-{r['id']}", "parent_id": r["id"], "audio": r["audio"],
-                     "crop_start_samples": start, "n_samples": len(x) - start, "parent_n_samples": len(x),
-                     "len_s": length, "target_len_s": round(tgt, 4), "speech_s": speech,
-                     "label": r["label"], "endpoint_bool": r["endpoint_bool"], "dataset": r["dataset"],
-                     "synthetic": r["synthetic"], "crop_pcm16_sha256": C.sha256_bytes(pcm)})
+        masks.append((vad.mask(x), len(x)))
         if (i + 1) % 500 == 0:
-            print(f"  {i + 1}/{len(replay)} replay rows, {len(rows)} crops", flush=True)
+            print(f"  VAD {i + 1}/{len(replay)}", flush=True)
+    attempts = []
+    for pause in (MIN_PAUSE_S, FALLBACK_PAUSE_S):  # pre-registered: one relaxation, then stop
+        rows = select_crops(replay, masks, pool, a.seed, pause)
+        skipped = len(replay) - len(rows)
+        gate = length_gate(rows)
+        attempts.append({"min_pause_s": pause, "crops": len(rows), "skipped_no_onset": skipped, "length_gate": gate})
+        print(json.dumps(attempts[-1]), flush=True)
+        if gate["passed"]:
+            break
     os.makedirs(out)
+    if not attempts[-1]["length_gate"]["passed"]:
+        C.write_json(os.path.join(out, "manifest.json"), {
+            "script": "model/train/v5_crops.py", "code_commit": C.git_commit(), "seed": a.seed,
+            "status": "FAILED length gate at 0.15 s and 0.10 s pause: report and stop (no crops written)",
+            "attempts": attempts})
+        sys.exit("length gate failed twice: crops not written; report and stop (pre-registered)")
+    for r in rows:  # hash the chosen crops' audio
+        x = C.read_audio(os.path.join(a.work, r["audio"]))[r["crop_start_samples"]:]
+        r["crop_pcm16_sha256"] = C.sha256_bytes((np.clip(x, -1, 1) * 32767).round().astype("<i2").tobytes())
     path = os.path.join(out, "replay_crops.jsonl")
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         for r in rows:
@@ -172,7 +208,7 @@ def cmd_build(a):
                 "source": {"data_dir": a.data, "orig_replay_sha256": C.sha256_file(os.path.join(data, "orig_replay.jsonl")),
                            "manifest_sha256": C.sha256_file(os.path.join(data, "manifest.json"))},
                 "rule": {"vad": "silero (agent/models, sha pinned), frame 512, prob >= 0.5",
-                         "min_pause_s": MIN_PAUSE_S, "preroll_s": PREROLL_S, "min_start_s": MIN_START_S,
+                         "min_pause_s_used": attempts[-1]["min_pause_s"], "preroll_s": PREROLL_S, "min_start_s": MIN_START_S,
                          "len_s": [MIN_LEN_S, MAX_LEN_S], "min_speech_s": MIN_SPEECH_S,
                          "target": "seeded draw from SEP input lengths clipped to [1, 4] s; closest onset, ties later"},
                 "sep_target_quantiles_s": {q: round(float(np.quantile(pool, q)), 3) for q in (0.1, 0.25, 0.5, 0.75, 0.9)},
@@ -181,9 +217,12 @@ def cmd_build(a):
                 "len_quantiles_s": {q: round(float(np.quantile([r["len_s"] for r in rows], q)), 3)
                                     for q in (0.1, 0.25, 0.5, 0.75, 0.9)} if rows else None,
                 "replay_crops_sha256": C.sha256_file(path),
+                "length_gate_rule": f">= {SHORT_MIN_FRAC:.0%} of crops under {SHORT_S} s per label; one fallback "
+                                    f"{MIN_PAUSE_S} -> {FALLBACK_PAUSE_S} s pause, then stop (Niko, #2 2026-10-11T02:41Z)",
+                "attempts": attempts,
                 "guard_disjoint": True, "audit": "pending (audit-export, then audit-check)"}
     C.write_json(os.path.join(out, "manifest.json"), manifest)
-    print(json.dumps({k: manifest[k] for k in ("crops", "skipped_no_onset", "crops_by_label", "len_quantiles_s")}))
+    print(json.dumps({k: manifest[k] for k in ("crops", "skipped_no_onset", "crops_by_label", "len_quantiles_s", "attempts")}))
 
 
 def cmd_audit_export(a):
@@ -315,6 +354,14 @@ def selftest():
     ok &= check("audit 'unsure' counts as not valid", not audit_result(rows(30, 26, unsure=4))["passed"])
     r = rows(30, 30); r[0]["reviewer"] = ""
     ok &= check("audit requires reviewer", not audit_result(r)["passed"])
+    # Niko's fallback: a 0.12 s pause qualifies at 0.10 s but not at 0.15 s
+    mask6, n6 = m([(0.1, 2.0), (2.13, 4.0)], 4.5)
+    ok &= check("0.12 s pause: rejected at 0.15 s", candidate_starts(mask6, n6, 0.15) == [])
+    ok &= check("0.12 s pause: accepted at 0.10 s", len(candidate_starts(mask6, n6, 0.10)) == 1)
+    g_rows = [{"label": l, "len_s": x} for l in (0, 1) for x in (1.5, 2.5, 3.0, 3.5)]
+    ok &= check("length gate passes at 25% under 2 s", length_gate(g_rows)["passed"])
+    g_rows[0]["len_s"] = 2.2
+    ok &= check("length gate fails if one label < 25%", not length_gate(g_rows)["passed"])
     ok &= check("seeded draw is deterministic", seeded_u("s", "a") == seeded_u("s", "a") != seeded_u("t", "a"))
     print("SELFTEST " + ("PASSED" if ok else "FAILED"))
     sys.exit(0 if ok else 1)
