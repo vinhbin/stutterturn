@@ -1,11 +1,11 @@
 {
-  "checked_utc": "2026-10-11T06:03:18.870185+00:00",
-  "static_commit": "5175dcdb807a19fdb5c3da8845c3334510fc2b08",
+  "checked_utc": "2026-10-11T06:24:13.764736+00:00",
+  "static_commit": "7bdb1fc785f4fb99698f3bf26e66f4f2ed423648",
   "url": "https://64-177-51-1.sslip.io/judge/#long-replay",
   "paid_runs_started": 0,
   "database_counts_after_ingest": {
-    "runs": 22,
-    "events": 353,
+    "runs": 37,
+    "events": 631,
     "superseded_runs": 10
   },
   "assets": [
@@ -50,6 +50,21 @@
       "matches_commit": true
     },
     {
+      "path": "tiger/chart.js",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/model-five.json",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/comparison-previous.json",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
       "path": "demo-ui/app.js",
       "status": 200,
       "matches_commit": true,
@@ -87,7 +102,7 @@
   "health": {
     "ok": true,
     "contract": "0.1",
-    "commit": "667460f45fdd",
+    "commit": "ed3d3ec93ce7",
     "services": "on",
     "browser_audio": "pcm16-v1",
     "playback": "off"

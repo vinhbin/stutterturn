@@ -1,46 +1,39 @@
-# Longer replay judge guide verification — October 11, 2026
+# Current working judge comparisons - October 11, 2026
 
-Deployed static revision: `5175dcdb807a`. Backend remains `667460f45fdd`.
+Static revision: `7bdb1fc785f4`. Backend: `ed3d3ec93ce7`.
 URL: https://64-177-51-1.sslip.io/judge/#long-replay
 
-## Data
+The main figure uses the working 10.4 s Stock FP32/X1 pair from
+`agent/evidence/2026-10-11-long-replay-working`. Stock reports 0.050 s overlap;
+X1 reports none. Both produced browser speech with no provider errors/timeouts.
+The five-recording figure now includes both models on every source (10 runs),
+with listening presets. All displayed runs rendered source and generated
+speech in Chromium. The original Stock INT8/Patient summary remains secondary.
 
-The two complete run logs in
-[`agent/evidence/2026-10-11-long-replay`](../../../agent/evidence/2026-10-11-long-replay/README.md)
-were committed at `21acc2c` before ingest. Real Tiger Data ingestion reported
-22 runs / 353 events, including 10 superseded runs / 152 superseded events.
-The pair adds 51 events. `comparison.py` queried Tiger Data and verified every
-exported field against the source logs before writing `comparison.json`.
-The original historical `snapshot.json` was not changed.
+Tiger Data holds 37 runs / 631 events, including 10 superseded runs / 152
+superseded events and all retained earlier provider attempts. The two displayed
+query exports match their original saved logs. The historical snapshot and
+previous longer-pair export remain available; no raw log was modified.
 
-The primary figure shows X1 holding at 1.664 s where stock completes, and
-stock's reported 0.200 s overlap. Both later cancellations and the stock
-Gemini timeout remain present. Settings expose the equal silence gate and
-different model/threshold. No general improvement or acoustic timing claim.
+Validation:
+- 47 backend tests passed locally and on Vultr.
+- Six Python evidence checks passed, including both current datasets, fixed
+  historical scope and the retained earlier failure.
+- Seven comparison-browser scenarios passed; existing site checks 52/52 and
+  console checks 20/20 passed. Hosted connection scenarios also passed.
+- Deployed assets match their committed versions after line-ending normalization.
+- Public desktop/mobile pages have no errors, failed resources or page overflow.
+- Both longer replay presets connect and select the correct model/source;
+  page loading sends no run command. Authenticated controls remain protected.
+- Twelve selected replay runs have nonzero source/reply digital audio and no
+  provider failures. Earlier failed attempts are documented in the proof packets.
 
-## Verification
+`verification.json` records deployed asset and browser checks. Screenshots
+cover both current figures at 1440 and 390 pixels. Provider/audio verification
+is in `../gemini-empty-recovery/` and `../five-model-replays/`. This does not
+measure acoustic timing or establish model efficacy or service reliability.
 
-- Four Python evidence tests pass: exact selected runs, metadata mismatch
-  rejection, unchanged five-clip scope, and SQL-export equivalence to logs.
-- Seven intercepted-browser scenarios pass: desktop, mobile, unavailable
-  snapshot, missing provenance, both replay presets, and invalid preset input.
-- Existing site checks: 52/52; console browser checks: 20/20; hosted connection
-  scenarios: healthy, unavailable, authentication, dropped connection all pass.
-- Deployed assets match the committed versions (normalizing line endings).
-- Anonymous desktop (1440 px) and mobile (390 px) landing/judge loads have no
-  script errors, failed resources or page overflow. Screenshots are included.
-- Both authenticated live presets select the longer source and correct model,
-  enable Start, and send zero run commands on page load. No paid runs were
-  started by this verification. Source/reply audio transport is unchanged;
-  this check does not claim new human listening or acoustic measurement.
-- Anonymous `/live/`, `/demo-ui/app.js` and `/v0/health` continue to return 401.
-- Authenticated backend health reports services on and `pcm16-v1` browser audio.
-
-Details: [`verification.json`](verification.json). The exported database snapshot
-is saved evidence; new cloud runs are still ingested explicitly. Listening
-buttons start fresh runs after the visitor clicks Start, not playback of PCM
-from the saved logs.
-
-Deployment backed up replaced static files under
-`/opt/stutterturn/backups/5175dcdb807a/previous`. No service restart, Caddy change,
-provider-setting change, or database credential transfer was needed.
+Replaced static files were backed up under
+`/opt/stutterturn/backups/7bdb1fc785f4/previous`. Backend rollback material is
+under `/opt/stutterturn/backups/ed3d3ec93ce7`. Keys stayed server-side; Tiger
+credentials remained local and did not move to the VPS or browser.
