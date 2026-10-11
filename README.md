@@ -1,89 +1,108 @@
 # StutterTurn
 
-**Let people finish.** StutterTurn's goal is an open turn-taking model that waits through stuttered speech and answers promptly when the speaker finishes.
+**Let people finish.** A research prototype for more patient voice AI: an adapted turn-taking model, a cloud-hosted voice agent, and comparisons you can hear and inspect.
 
-In our exploratory measurement on real recordings, the standard open model's INT8 CPU build (Smart Turn v3.2) declared the turn over during 58% of tested stutter blocks at its first check — 116 of 200 energy-detected gaps; model completion decisions, not observed talk-overs ([method and numbers](benchmark/RESULTS.md)). We are building a matched stock-versus-adapted comparison using real recorded speech, a working web replay agent and evidence covering both premature decisions and response delay. The intended contribution is a reusable open model and benchmark. A trained improvement, drop-in compatibility and novelty remain claims to earn with the artifacts below.
+A pause can be part of a thought. StutterTurn replays real recorded speech through stock and exploratory adapted configurations, showing when the agent waits, responds, cancels a reply, or reports overlapping speech.
 
-| Hacklanta '26 | |
+**Hacklanta '26 | AI/ML | Vinh, Guttuu, Niko, and Kareem**
+
+## Try the demo
+
+- [Project website](https://64-177-51-1.sslip.io/)
+- [Judge guide and model comparisons](https://64-177-51-1.sslip.io/judge/)
+- [Hosted replay console](https://64-177-51-1.sslip.io/live/) - demo login required; credentials supplied separately to judges
+- [Devpost submission draft](docs/devpost.md)
+
+Open the console, sign in, and wait for recordings and models to load. Select a recording, model configuration, and voice, then click **Start** to enable browser audio. Let the recording and generated reply finish before starting another run. Volume, Stop, and Reset control playback. The backend connects automatically; the instance admits one replay at a time.
+
+The demo uses **recorded speech with fresh inference and response generation**. Microphone and telephone input are future work. The judge page shows saved database query results; its replay links let you run the selected configurations again.
+
+## What works now
+
+The backend runs on Vultr, performs ONNX turn-model inference, sends captured audio to Gemini, generates speech with ElevenLabs, and streams audio and events to the browser. The console offers stock models, a longer-wait configuration, and our exploratory X1 candidate.
+
+Our current judge comparisons include a longer 10.4-second recording and five additional recordings, each comparing **Stock FP32 with X1**. All 12 selected runs completed with generated speech rendered in Chromium. Earlier unsuccessful provider attempts remain archived.
+
+### A concrete interruption example
+
+In the selected longer replay, stock decided to respond at **1.664 seconds**. Speech resumed at **3.808 seconds**, and stock reply audio began at **3.958 seconds**, reporting **0.050 seconds of overlap**. X1 held the early pause and reported no overlap. Both configurations later cancelled a premature reply before audio.
+
+Both use a 0.2-second silence gate, with different model weights and thresholds (stock 0.5; X1 0.6). This is a configuration-level observation on one recording, based on server-scheduled audio rather than measured acoustic timing. X1 remains post-hoc, exploratory, and unpromoted; these examples do not establish a general interruption rate or isolated model-weight improvement.
+
+[Longer replay evidence](agent/evidence/2026-10-11-long-replay-working/README.md) | [Five additional model pairs](agent/evidence/2026-10-11-model-five-replay/README.md)
+
+## Sponsor integrations
+
+| Technology | Role in the working application |
 |---|---|
-| Main track | AI/ML |
-| Team | Vinh · Guttuu · Niko · Kareem |
-| Demo / Devpost | [Hosted site](https://64-177-51-1.sslip.io/) and [login-protected cloud replay console](https://64-177-51-1.sslip.io/live/); browser audio enabled. Devpost pending. |
-| Intended core integrations | Gemini agent responses and ElevenLabs voice — both ran in the [saved replay v2](agent/evidence/2026-10-10-replay-v2/) |
-| Other integrations | Vultr hosts the site and now runs the [replay backend](docs/vultr-backend.md), including ONNX inference and Gemini/ElevenLabs requests. Tiger Data generated the [judge chart snapshot](web/tiger/snapshot.json), merged in [PR #26](https://github.com/vinhbin/stutterturn/pull/26); this is a saved database export, not live connection status. Phone transport and Vultr training remain unimplemented. |
+| **Google Gemini API** | Receives captured audio after a completion decision and generates a brief contextual reply. The policy avoids unsolicited comments about how the person speaks. |
+| **ElevenLabs** | Streams generated speech into the browser audio pipeline, including volume, Stop, Reset, and cancellation when the speaker resumes. |
+| **Tiger Data** | Stores run metadata in PostgreSQL and timestamped events in a TimescaleDB hypertable. SQL reconstructs decisions, resumption, cancellation, and response timing for the judge charts. |
+| **Vultr** | Hosts the HTTPS website, Python backend, ONNX inference, provider requests, and authenticated HTTP/WebSocket API. Caddy serves/proxies traffic; systemd manages the backend. |
 
-## Build status
+The Tiger Data evidence snapshot contains **37 runs and 631 events**, including earlier attempts and ten superseded runs excluded from current analysis. Exports are checked against the original logs. Ingestion is explicit; new console runs do not automatically update the saved charts.
 
-**[PLAN.md](PLAN.md#current-status) is the current task-status authority.** Read its deliverable table for owners, acceptance checks and blockers. Issues #1–6 group the phase gates; a merged implementation does not automatically pass a gate.
+[Integration details](docs/sponsors.md) | [Tiger Data queries and provenance](web/tiger/README.md) | [Vultr deployment](docs/vultr-backend.md)
 
-Legend: ✅ published with saved evidence (branch/commit linked where not yet merged) · ⬜ no repo evidence yet
+## How it works
 
-| Capability | Status | Evidence |
-|---|---|---|
-| Exploratory stock baseline on real recordings (INT8 CPU build; energy-derived labels, listen-through pending) | ✅ | [benchmark/RESULTS.md](benchmark/RESULTS.md) |
-| Agent contract and runnable stock/patient **web replay** agent (Gemini reply, ElevenLabs voice) | ✅ | [agent/CONTRACT.md](agent/CONTRACT.md) v0.1 · [replay v2](agent/evidence/2026-10-10-replay-v2/) (supersedes the [first replay](agent/evidence/2026-10-10-first-replay/)) · [PR #11](https://github.com/vinhbin/stutterturn/pull/11), [PR #14](https://github.com/vinhbin/stutterturn/pull/14) |
-| Vultr-hosted inference, provider calls and authenticated replay API | ✅ | [Deployment proof](docs/proofs/vultr-backend/README.md), revision `cad4d50fa292`; stock FP32 and exploratory X1 ran with services on. See the [browser audio increment](docs/proofs/vultr-browser-audio/README.md); candidate promotion remains separate. |
-| Landing page, judge view and run console wired to the real backend | ✅ | [web/](web/README.md) · [saved model-only runs](web/evidence/2026-10-10-ui-integration/) · [PR #12](https://github.com/vinhbin/stutterturn/pull/12) |
-| Stock-weight recovery, synthetic update and ONNX export/reload parity (mechanics only, not adaptation) | ✅ | [docs/proofs/model-mechanics/](docs/proofs/model-mechanics/README.md) |
-| Frozen show-separated split manifests v1 and matched eval-runner spec | ✅ | [benchmark/splits/v1/](benchmark/splits/v1/) · [benchmark/specs/](benchmark/specs/) · [PR #9](https://github.com/vinhbin/stutterturn/pull/9) |
-| Human label listen-through (A/B feasibility batches) | ⬜ | |
-| Training v1/v2/v3 development evaluation; no candidate passed selection | ✅ | [Model results and limits](docs/model-results-2026-10-10.md); [published selection evidence](https://github.com/vinhbin/stutterturn/tree/bd095f9/benchmark/selection); no accepted model or final-test efficacy result |
-| Long-block (3+ s) evaluation | ⬜ | |
-| Gemini end-of-speech rival arm | ⬜ | Separate from Gemini's working reply-generation role |
-| Phone transport (8 kHz) — the current agent replays web audio; no phone path | ⬜ | |
+```text
+Recorded speech -> Silero VAD -> Smart Turn / X1 turn policy
+                                      -> completion decision
+                               Gemini audio-to-reply
+                                      |
+                              ElevenLabs streaming TTS
+                                      |
+                         Authenticated WebSocket -> Web Audio
 
-In the saved replay v2 — which supersedes the first replay after a model-input fix restored the missing pre-roll — stock decided "complete" before the energy-labelled speech resumption in 4 of 5 clips (one decision preceded the labelled gap), versus 0 of 5 for patient. Three replies were cancelled before reported audio; no response-audio overlap was reported in the ten runs. Physical playback was not verified for that packet, and five clips support no interruption rate. Separately, [Guttuu's human listening check](https://github.com/vinhbin/stutterturn/issues/3#issuecomment-6102558836) heard a source and generated reply, verified explicit Stop and restart, and heard only the later reply after an earlier reply was cancelled before playback. Natural resumption during an already audible reply and acoustic timing remain untested. Follow PLAN for remaining acceptance; a merged PR does not pass a gate.
+Run logs -> explicit Tiger Data ingestion -> SQL exports -> judge timelines
+```
 
-## What the first complete demonstration must show
+The agent tracks speech, completion decisions, response generation, cancellation, and audio separately. A premature decision may be cancelled before any agent speech plays, so a model prediction alone is not an audible interruption.
 
-Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech. The [saved replay v2](agent/evidence/2026-10-10-replay-v2/) separates completion decisions, reported audio events and cancellations for five clips under exploratory labels; it does not establish true completed-turn delay or acoustic outcomes. Human-validated labels and more sources are still required before any rate is quoted.
+We adapted Pipecat's Smart Turn v3.2 using PyTorch and real podcast speech referenced by SEP-28k. The source-pinned haan converter supported recovery of the released FP32 weights and export back to ONNX. Reconstruction/export checks matched reference probabilities within approximately 1.2e-7 on synthetic checks.
 
-The candidate arm becomes available only after a real exported model passes its gates and is integrated. We are continuing the original model-improvement goal; stock/patient remains a working backup, and the corrected-benchmark fallback has not been chosen as the final scope. Vinh [conditionally approved six fixed v4 interpolation blends](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097) under [D-012](docs/decision-log.md): Niko must sign off corrected code/protocol first; stop after 45 minutes from the approved execution start or at 20:45 EDT, whichever comes first. No start/result is reported, and no automatic v5 is approved. Every path still needs validated labels and reproducible runs. A UI fixture or a model prediction alone does not prove improvement.
+[Model mechanics](docs/proofs/model-mechanics/README.md) | [Training report](docs/training-report-2026-10-10.md) | [Model results](docs/model-results-2026-10-10.md)
 
-Nobody imitates stuttering. A recorded backup must be labeled as a recording; sample audio and its use require appropriate rights. The [intended strong pitch](docs/pitch-and-qa.md) is a draft, not a capability report. Use only evidence-reviewed wording in the delivered pitch.
+## Run locally
 
-## Evidence and reproducibility
+Follow the [agent setup](agent/README.md) for Python dependencies, pinned models, recordings, and provider configuration. Model/audio assets are downloaded separately; candidate inference requires the candidate ONNX file and matching metadata. Keep provider keys in the ignored local environment file.
 
-- [Judge-facing training report](docs/training-report-2026-10-10.md): what we trained, v1/v2/v3 results, data and leakage qualifications, and answers to judge questions. The approved [single 80/20 W3 experiment](docs/v3-recommendation-2026-10-10.md) finished with `dev_nothing_passes`: all six operating points failed the general-speech unfinished-turn guard. Its selection and training records are published at `bd095f9`. The reserved test stays sealed.
-- [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are the INT8 CPU build's completion predictions under the original harness, **not a validated percentage of callers interrupted**. The [current model results](docs/model-results-2026-10-10.md) report matched stock INT8/FP32 development comparisons and v1's failed amended prescreen plus v2/v3's failed development selections, with proxy-label limits.
-- Exploratory comparisons are saved for the configurations we tested — including silence timeouts of 0.8 s and 1.5 s and a 0.99 confidence threshold. They do not yet establish which configurations meet both our interruption and response-delay targets; no universal "no setting fixes it" claim is made.
-- [D-006 and D-007](docs/decision-log.md) record the methodological corrections. One-second observation/censoring does not establish a three-second fallback; energy-derived cut points do not establish semantic turn ends; repeated harness checks do not prove live-agent behavior.
-- [Required evaluation work](PLAN.md#evaluation-work-required-before-a-comparison-can-pass) includes reviewed endpoints, frozen development/final-test splits, matched model/data/configuration records, both caller groups, audible outcomes, and explicit nonresponse/censoring.
-- The [claims ledger](docs/claims-ledger.md) is the single claim-status source. Headline numbers must link to applicable run evidence; do not promote targets or historical interpretations to measured outcomes.
-
-`benchmark/requirements.txt` is committed, and the [eval-runner spec](benchmark/specs/eval-runner-v1.md) records a verified rerun reproducing the historical 116/200 and 136/200 decisions on the same items. V1 failed its amended development prescreen; v2/v3 failed final development selection. W3 ran under [D-011](docs/decision-log.md), with unchanged checks and a 20:00 EDT stop; its [reported result](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103321119) selects no model. [D-012](docs/decision-log.md) supersedes the 20:00 stop/no-v4 restriction for one conditional interpolation attempt only; numeric gates remain unchanged. The reserved test remains sealed. See [benchmark context](benchmark/README.md).
-
-For the presentation site and run console, from current main:
+Serve the frontend:
 
 ```bash
 python -m http.server 8041 --bind 127.0.0.1 --directory web
 ```
 
-`/` is the landing page, `/judge/` the guided judge view and `/live/` the run console; `/judges/` and `/demo-ui/` remain available. Vultr now serves these routes and a login-protected replay backend. The HTTPS console defaults to the site's backend; sign in, wait for recordings/models to load automatically, then start a fresh run. Retry connection is visible if discovery fails. It displays real inference and response-generation events and plays the recording and generated speech in the browser. Click Start to enable sound; volume, Stop, and Reset control playback. See [cloud setup and evidence](docs/vultr-backend.md). Local laptop playback remains available through `python agent/server.py --play` ([agent setup](agent/README.md)). The separate no-backend preview is synthetic and labeled. The run-control/event schema is [agent/CONTRACT.md](agent/CONTRACT.md) v0.1.
+Run the agent from the configured Python environment:
 
-## Scope and limits
+```bash
+python agent/server.py --play
+```
 
-- The target is turn-taking, not improved speech recognition or a medical/therapeutic outcome.
-- The original exploratory clips are short; longer stutter blocks and 8 kHz phone transfer remain unvalidated here.
-- No measured custom-model improvement, unchanged response delay, universal “no setting fixes it,” or “first” claim is currently accepted. Ambitious intended wording is preserved separately until supported.
-- No person who stutters is on the team; human endpoint review is not a substitute for user research. Do not imply community endorsement or invented testimony.
+The local `--play` path uses laptop speakers. The deployed browser-audio configuration is documented in the [Vultr setup](docs/vultr-backend.md). A separate synthetic preview is labelled and is not evidence of live inference.
 
-## Foundations and disclosure
+## Verification and evidence
 
-- **SEP-28k:** [Apple's stuttering-event dataset](https://github.com/apple/ml-stuttering-events-dataset), with CC BY-NC 4.0 annotations. Audio is fetched through the `miosipof/sep28k_full` mirror, not redistributed here; underlying podcast audio rights remain with the owners. Confirm permissions for the intended demo/release.
-- **Smart Turn v3.2:** [pipecat-ai's open turn-taking model](https://github.com/pipecat-ai/smart-turn), the intended adaptation baseline. Preserve the upstream model/code license and disclose modifications.
-- **Existing accessibility work:** [Apple's atypical-speech research](https://arxiv.org/abs/2302.09044) and [AImpower's speech-recognition work](https://aimpower.org/fair-speech-ai/) are relevant prior art. Neither this list nor an unsuccessful search establishes that our contribution is first.
-- **Before the event:** concept research and planning; the team changed direction to StutterTurn on Saturday morning. **During the event:** AI-assisted benchmark development and subsequent implementation, with provenance in Git history. Accounts, external models, datasets and services are not original team work.
+- **47 backend tests** passed locally and on Vultr, including bounded empty-reply recovery and provider-error/timeout classification.
+- Browser checks cover source/reply rendering, cancellation, stale messages, playback draining, authentication, and model/source presets.
+- The selected longer pair and five additional pairs produced nonzero source and reply digital audio in Chromium. These are digital rendering checks, not acoustic measurements.
+- The deployed backend at `ed3d3ec93ce7` allows 20 seconds for a Gemini reply, with one bounded retry for empty non-blocked responses. Stop and resumption still cancel pending work. Live provider requests can still fail or time out.
 
-## Team and repository
+[Hosted comparison verification](docs/proofs/long-replay-judge/verification.json) | [Provider recovery evidence](docs/proofs/gemini-empty-recovery/README.md) | [Retained earlier attempts](agent/evidence/2026-10-11-provider-attempts/README.md)
 
-| Owner | Current handoff |
-|---|---|
-| Niko | Trainable checkpoint/export, corrected evaluation and immutable evidence — splits v1 and the eval-runner spec are on main |
-| Guttuu | Runnable stock/patient web agent, control/event contract and real audio timings — contract v0.1 and replay v2 (superseding the first replay) are on main |
-| Vinh | A/B human labels, integration decisions, demo UI, site/README upkeep, pitch/video/submission |
-| Kareem | Judges page, README and evidence links; pages and evidence index delivered via [PR #12](https://github.com/vinhbin/stutterturn/pull/12). Current maintenance and task ownership are tracked in [PLAN](PLAN.md#current-status). |
+The [historical Stock INT8/Patient packet](agent/evidence/2026-10-10-replay-v2/) remains separate from current Stock FP32/X1 comparisons. The [original benchmark](benchmark/RESULTS.md) recorded 116/200 first-check completion predictions in automatically detected gaps; this is not a measured percentage of callers interrupted.
 
-[PLAN.md](PLAN.md) contains the executable deliverables; [agent handoff](docs/agent-handoff.md) defines parallel write scopes; [decision log](docs/decision-log.md) preserves scope decisions. `benchmark/` contains current exploratory work plus frozen split manifests and run specs. `agent/` (contract v0.1 and the replay agent) and the `web/` site are on main; `model/` holds its contract and training specs. No fine-tuned model is selected for the demo.
+## Next steps
 
-Artifact licensing, publication, accessible demo links and final submission confirmation remain release checks in PLAN. Do not infer a commercial deployment license from research access.
+Human-reviewed speech boundaries and a frozen confirmation set will support broader evaluation. We will measure premature replies, completed-turn response delay, cancellations, and nonresponses together. The five short X1 replays first completed via the three-second silence fallback, which does not establish prompt response timing at real turn endings.
+
+We also plan to automate cloud-run ingestion, expand recordings and listening checks, and explore microphone and telephone input with people who stutter. StutterTurn targets turn-taking; it is not a medical or therapeutic product.
+
+## Credits and project records
+
+We build on **Smart Turn, Whisper, Silero VAD, haan, and SEP-28k**, and credit their creators and the original podcast speakers. These are upstream models, tools, and recordings. Nobody imitates stuttering in our examples. Annotation, audio, and model release terms are separate; research access does not imply unrestricted commercial rights.
+
+Before the event, we researched concepts and prepared plans. The team changed direction to StutterTurn on Saturday morning; benchmark development and subsequent implementation took place during the event. Claude Code and Codex assisted with implementation, documentation, and review.
+
+[Project plan and ownership](PLAN.md) | [Decision log](docs/decision-log.md) | [Claims ledger](docs/claims-ledger.md) | [Agent contract](agent/CONTRACT.md) | [Benchmark context](benchmark/README.md)
