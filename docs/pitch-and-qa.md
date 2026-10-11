@@ -1,5 +1,7 @@
 # StutterTurn — the pitch, and the hard questions
 
+**For Vinh's approved first-speaker opening, use [the pitch script](pitch-script.md).** It contains the approximately 90-second spoken text, sources, delivery notes, and presentation-method references. The ambitious historical draft below remains evidence-gated.
+
 Team-internal prep. The pitch words first, then an adversarial Q&A: every question we'd ask if we were trying to sink this project, with the honest answer. Questions marked **OPEN** have no good answer yet — they are work items, not talking points.
 
 **This document has two layers, and they are not interchangeable:**

@@ -1,0 +1,11 @@
+selection sel-v4: 120 planned runs
+  ran sel-v4-D1-main (model_calls=1870)
+  ran sel-v4-D1-eow (model_calls=680)
+  ran sel-v4-E1-main-th0.40 (model_calls=0)
+  ran sel-v4-E1-eow-th0.40 (model_calls=0)
+  ran sel-v4-E1-main-th0.50 (model_calls=0)
+  ran sel-v4-E1-eow-th0.50 (model_calls=0)
+  ran sel-v4-E1-main-th0.60 (model_calls=0)
+  ran sel-v4-E1-eow-th0.60 (model_calls=0)
+outcome: dev_nothing_passes; wrote C:\Users\Guttu\stutterturn\benchmark\selection\sel-v4
+new runs 8 (stock-stage new 0), reused 112, model_calls 2550, wall 119.9s

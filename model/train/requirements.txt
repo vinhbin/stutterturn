@@ -1,0 +1,16 @@
+# Training harness for model/specs/training-v1.md. Install in a venv OUTSIDE the repo:
+#   uv venv --python 3.12 <work>/.venv
+#   uv pip install --python <work>/.venv/Scripts/python.exe --torch-backend cu128 -r model/train/requirements.txt
+#   (use --torch-backend cpu without a GPU; on macOS plain torch==2.8.0)
+# haan is not on PyPI: clone https://github.com/Charansripadi/haan at 540f97de03f8eb938b871196752206f6d0698791
+# and pass its path with --haan (BSD-2-Clause; keep its notices).
+torch==2.8.0
+transformers==5.19.0
+onnx==1.19.1
+onnxruntime==1.29.0
+onnxscript==0.7.2
+numpy==2.2.6
+huggingface-hub==2.2.0
+safetensors==0.8.0
+soundfile
+pyarrow

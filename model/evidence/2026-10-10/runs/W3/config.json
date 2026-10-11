@@ -1,0 +1,39 @@
+{
+ "run_id": "W3",
+ "lr": 1e-05,
+ "p_stutter": 0.1,
+ "p_neg": 0.1,
+ "p_pos": 0.1,
+ "p_replay": 0.8,
+ "data_dir": "data-v2",
+ "epochs": 2.0,
+ "batch": 32,
+ "optimizer": "AdamW",
+ "weight_decay": 0.01,
+ "grad_clip": 1.0,
+ "warmup_frac": 0.1,
+ "schedule": "linear warmup then linear decay",
+ "seed": 0,
+ "freeze_but_last2": false,
+ "pos_weight": 1.006957,
+ "replay_pos_frac": 0.497833,
+ "samples_per_epoch": 9410,
+ "steps_per_epoch": 295,
+ "total_steps": 590,
+ "warmup_steps": 59,
+ "checkpoint_steps": [
+  148,
+  295,
+  442,
+  590
+ ],
+ "max_minutes": 60.0,
+ "train_manifest_sha256": "92c11eb3da502162f4321e221c18142098d3c8dc312d917d8478cfb01a8ebcee",
+ "init": "stock-fp32 via haan",
+ "init_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+ "determinism": {
+  "cudnn.deterministic": true,
+  "cudnn.benchmark": false,
+  "note": "CUDA/MPS are not bit-deterministic"
+ }
+}

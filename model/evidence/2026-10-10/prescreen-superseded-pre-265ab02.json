@@ -1,0 +1,211 @@
+{
+ "rule": "lowest in-loop dev stutter premature among checkpoints with d_dev_fluent_premature <= +0.010 and d_guard_recall >= -0.010 vs step 0; ties -> earlier",
+ "ranking": [
+  {
+   "run": "R1",
+   "ckpt": "ckpt-e0.50.pt",
+   "epoch": 0.5,
+   "step": 37,
+   "dev_stutter_premature": 0.0114,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4678,
+   "d_guard_recall": -0.0088,
+   "guard_specificity": 0.8964,
+   "meets_constraints": true
+  },
+  {
+   "run": "R1",
+   "ckpt": "ckpt-e1.00.pt",
+   "epoch": 1.0,
+   "step": 74,
+   "dev_stutter_premature": 0.0085,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4717,
+   "d_guard_recall": -0.0182,
+   "guard_specificity": 0.9268,
+   "meets_constraints": false
+  },
+  {
+   "run": "R1",
+   "ckpt": "ckpt-e1.50.pt",
+   "epoch": 1.5,
+   "step": 111,
+   "dev_stutter_premature": 0.017,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4638,
+   "d_guard_recall": -0.0189,
+   "guard_specificity": 0.9208,
+   "meets_constraints": false
+  },
+  {
+   "run": "R1",
+   "ckpt": "ckpt-e2.00.pt",
+   "epoch": 2.0,
+   "step": 148,
+   "dev_stutter_premature": 0.0142,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4552,
+   "d_guard_recall": -0.0169,
+   "guard_specificity": 0.9195,
+   "meets_constraints": false
+  },
+  {
+   "run": "R2",
+   "ckpt": "ckpt-e0.50.pt",
+   "epoch": 0.5,
+   "step": 37,
+   "dev_stutter_premature": 0.0199,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4454,
+   "d_guard_recall": -0.0068,
+   "guard_specificity": 0.9083,
+   "meets_constraints": true
+  },
+  {
+   "run": "R2",
+   "ckpt": "ckpt-e1.00.pt",
+   "epoch": 1.0,
+   "step": 74,
+   "dev_stutter_premature": 0.017,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4506,
+   "d_guard_recall": -0.0175,
+   "guard_specificity": 0.936,
+   "meets_constraints": false
+  },
+  {
+   "run": "R2",
+   "ckpt": "ckpt-e1.50.pt",
+   "epoch": 1.5,
+   "step": 111,
+   "dev_stutter_premature": 0.0142,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4585,
+   "d_guard_recall": -0.0081,
+   "guard_specificity": 0.9228,
+   "meets_constraints": true
+  },
+  {
+   "run": "R2",
+   "ckpt": "ckpt-e2.00.pt",
+   "epoch": 2.0,
+   "step": 148,
+   "dev_stutter_premature": 0.0142,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4572,
+   "d_guard_recall": -0.0047,
+   "guard_specificity": 0.9208,
+   "meets_constraints": true
+  },
+  {
+   "run": "R3",
+   "ckpt": "ckpt-e0.50.pt",
+   "epoch": 0.5,
+   "step": 59,
+   "dev_stutter_premature": 0.0455,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.3933,
+   "d_guard_recall": 0.0034,
+   "guard_specificity": 0.9288,
+   "meets_constraints": true
+  },
+  {
+   "run": "R3",
+   "ckpt": "ckpt-e1.00.pt",
+   "epoch": 1.0,
+   "step": 118,
+   "dev_stutter_premature": 0.0142,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4552,
+   "d_guard_recall": -0.0499,
+   "guard_specificity": 0.9406,
+   "meets_constraints": false
+  },
+  {
+   "run": "R3",
+   "ckpt": "ckpt-e1.50.pt",
+   "epoch": 1.5,
+   "step": 177,
+   "dev_stutter_premature": 0.0625,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.3861,
+   "d_guard_recall": 0.002,
+   "guard_specificity": 0.9241,
+   "meets_constraints": true
+  },
+  {
+   "run": "R3",
+   "ckpt": "ckpt-e2.00.pt",
+   "epoch": 2.0,
+   "step": 236,
+   "dev_stutter_premature": 0.0426,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4085,
+   "d_guard_recall": 0.002,
+   "guard_specificity": 0.9281,
+   "meets_constraints": true
+  },
+  {
+   "run": "R4",
+   "ckpt": "ckpt-e0.50.pt",
+   "epoch": 0.5,
+   "step": 37,
+   "dev_stutter_premature": 0.0227,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4473,
+   "d_guard_recall": -0.0182,
+   "guard_specificity": 0.9182,
+   "meets_constraints": false
+  },
+  {
+   "run": "R4",
+   "ckpt": "ckpt-e1.00.pt",
+   "epoch": 1.0,
+   "step": 74,
+   "dev_stutter_premature": 0.017,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4486,
+   "d_guard_recall": -0.0276,
+   "guard_specificity": 0.9413,
+   "meets_constraints": false
+  },
+  {
+   "run": "R4",
+   "ckpt": "ckpt-e1.50.pt",
+   "epoch": 1.5,
+   "step": 111,
+   "dev_stutter_premature": 0.017,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4447,
+   "d_guard_recall": -0.0121,
+   "guard_specificity": 0.9202,
+   "meets_constraints": false
+  },
+  {
+   "run": "R4",
+   "ckpt": "ckpt-e2.00.pt",
+   "epoch": 2.0,
+   "step": 148,
+   "dev_stutter_premature": 0.017,
+   "base_dev_stutter_premature": 0.4744,
+   "d_dev_fluent_premature": -0.4388,
+   "d_guard_recall": -0.0128,
+   "guard_specificity": 0.9228,
+   "meets_constraints": false
+  }
+ ],
+ "eligible_order": [
+  "R1/ckpt-e0.50.pt",
+  "R2/ckpt-e1.50.pt",
+  "R2/ckpt-e2.00.pt",
+  "R2/ckpt-e0.50.pt",
+  "R3/ckpt-e2.00.pt",
+  "R3/ckpt-e0.50.pt",
+  "R3/ckpt-e1.50.pt"
+ ],
+ "top2": [
+  "R1/ckpt-e0.50.pt",
+  "R2/ckpt-e1.50.pt"
+ ],
+ "code_commit": "ef26e3792bc9a2b3d6098a0d98ca8edc50cfb527"
+}

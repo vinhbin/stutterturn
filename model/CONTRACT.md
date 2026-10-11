@@ -10,7 +10,7 @@ This file defines what a StutterTurn model artifact is and how the agent calls i
 |---|---|---|---|---|
 | `stock-int8` | `smart-turn-v3.2-cpu.onnx` (pipecat-ai/smart-turn-v3 @ `f766f81`) | `2bb026316b14a660486a75b1733cd3fbab8c2fd0314dc9af7be49f8cca967e4f` | **Verified** hash and inference ([handoff](../docs/model-recovery-handoff.md)) | Stock arm, and the exploratory benchmark's model |
 | `stock-fp32` | `smart-turn-v3.2-gpu.onnx` (same revision; runs on CPU) | `ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be` | **Verified** hash and reconstruction parity ([evidence](../docs/proofs/model-mechanics/evidence.json)) | Starting point for training; a stock arm when compared against an FP32 candidate |
-| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). Four pre-registered attempts (v1, v2, v3 W3, v4 interpolation) all gave `dev_nothing_passes`; model work stopped (no v5). Test stays sealed (D-009) | Candidate arm |
+| `stutterturn-v{N}` | `stutterturn-v{N}.onnx` | Recorded per release in §6 | **Proposed**; no selected candidate (§6). Four pre-registered attempts (v1, v2, v3 W3 under D-011, v4 interpolation under [D-012](../docs/decision-log.md)) all gave `dev_nothing_passes`; model work stopped (no v5). Test stays sealed (D-009) | Candidate arm |
 
 - `synthetic-one-batch.onnx` (`9a00002e…7d3c`) is a mechanical proof output. **It must never be loaded as a candidate or shown in the demo.**
 - Never overwrite a published `v{N}`. Any retraining, even with the same data, produces `v{N+1}`.
@@ -88,7 +88,7 @@ Being agent-ready doesn't mean improved. Improvement is decided only by the PLAN
 | `stutterturn-v3-rW3-c1.00` | `e7c6d2234d9611e0b331483302ecf55fb908676adb531b61cef71648493024e3` | `dev-candidate`, **rejected** by `sel-v3` (M5 guard) | same |
 | `stutterturn-v4-rX4-blend-a0.75-W3ee2.00` | `e771e39fb5de7f9de599f120e66444eb07763dcdfe1026e36e7ffda8e65b2119` | `dev-candidate`, **rejected** by `sel-v4` (M5 guard) | [`sel-v4` decision](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103574001) |
 
-Rejected development candidates aren't releases. Their names are never reused, their weights aren't distributed, and the agent must not load them as a candidate arm. Training v1 exported no candidate: its pre-screen had 0 eligible checkpoints. Full records (decision files, inference runs, guard evaluations, candidate metadata) are preserved in [PR #35](https://github.com/vinhbin/stutterturn/pull/35) under `benchmark/selection/` and `model/evidence/2026-10-10/`.
+Rejected development candidates aren't releases. Their names are never reused, their weights aren't distributed, and the agent must not load them as a candidate arm. Training v1 exported no candidate: its pre-screen had 0 eligible checkpoints. Full records (decision files, inference runs, guard evaluations, candidate metadata and the guard failure analysis) are on `main` via [PR #35](https://github.com/vinhbin/stutterturn/pull/35), under [`benchmark/selection/`](../benchmark/selection/) and [`model/evidence/2026-10-10/`](../model/evidence/2026-10-10/). Threshold rescores are regenerable ([`RESCORES.md`](../benchmark/selection/RESCORES.md)).
 
 ## 7. Per-call log record (Proposed; consumed by E1 and the UI)
 
@@ -104,7 +104,7 @@ Each model call must produce at least these fields. In agent contract v0.1 they 
 
 ## 8. Known limits
 
-- Only synthetic inputs have been used for training/export so far. No stutter adaptation, real-audio accuracy or drop-in agent behaviour has been demonstrated.
+- The initial mechanical proof used synthetic inputs. Subsequent v1/v2/v3 attempts trained on real podcast proxies plus original Smart Turn replay and were evaluated on development/guard data; none passed selection. Human-validated stutter improvement and candidate drop-in agent behaviour remain unproved.
 - Mechanical evidence was produced on Windows with Python 3.12.10, torch 2.8.0+cpu and transformers 5.19.0. Reproduction on other platforms hasn't been checked.
 - Training uses the community **haan** converter pinned at `540f97d` (BSD-2-Clause; keep its notices). Upstream Smart Turn ships no PyTorch checkpoint.
 - English, wideband podcast audio only. Long blocks (> 1.6 s) and 8 kHz telephony are untested.
