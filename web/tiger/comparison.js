@@ -48,6 +48,8 @@
     content.append(node('p', 'Saved Tiger Data query · ' + data.generated_utc + ' · 2 Vultr runs · ' + stock.source_duration_s + ' s source', 'cmp-provenance'));
 
     const figure = node('figure', undefined, 'cmp-figure');
+    figure.tabIndex = 0;
+    figure.setAttribute('aria-label', 'Scrollable comparison timeline; full values follow in the results table and event details');
     figure.append(node('figcaption', 'One source, two decisions. Timelines share the same clock.'));
     const svg = svgNode('svg', {viewBox: '0 0 920 280', 'aria-hidden': 'true', focusable: 'false'});
     const duration = stock.source_duration_s + stock.params.trailing_silence_s;
@@ -78,8 +80,9 @@
       });
     });
     figure.append(svg);
-    figure.append(node('p', '● Reply decision    ┃ Speech detected    Green bar: holding    Blue bar: scheduled reply audio', 'cmp-legend'));
+    figure.append(node('p', '● Reply decision · ┃ Speech detected · Green bar: holding · Blue bar: scheduled reply audio', 'cmp-legend'));
     content.append(figure);
+    content.append(node('p', 'Scroll the timeline horizontally to see all 15 seconds.', 'cmp-scroll-hint'));
 
     const wrap = node('div', undefined, 'snapshot-comparison');
     wrap.tabIndex = 0; wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', 'Stock FP32 versus our model results');
