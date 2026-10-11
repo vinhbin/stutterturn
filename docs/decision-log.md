@@ -2,7 +2,21 @@
 
 Dated entries, newest first. Confirmed team choices vs. proposals are kept distinct. A result claim requires saved test evidence.
 
+## 2026-10-10 D-012 — Continue the original goal with a bounded interpolation attempt
+
+After W3 failed selection, Vinh rejected treating the stock/patient fallback as the final project scope and asked to continue earning the original claim. Following review of [Guttuu's proposal](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103360382) and the recommendation for bounded interpolation plus parallel human labels, he instructed Codex to respond to Guttuu. [The conditional go-ahead was posted at 19:42 EDT](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097).
+
+It authorizes six blends only: the two W3 prescreen checkpoints, e2.00 and e1.00, with pinned stock FP32 parameters at alpha 0.25, 0.50 and 0.75. Keep the frozen selection data, thresholds 0.4/0.5/0.6 and every numerical constraint, including delta M5 >= 0 versus stock (no specificity regression). No new training or expanded grid. Guttuu executes after Niko signs off on the corrected implementation and frozen protocol. Before scores exist, record exact source/configuration/manifest hashes, a correctly described deterministic tie rule, and parity evidence; freeze the procedure for M3s/M3-crop promotion evaluation at the subsequently selected threshold.
+
+The handoff sets **45 minutes from Niko-approved execution start, or 20:45 EDT on October 10, whichever comes first**. Record both timestamps before execution. This replaces D-011's no-v4 rule and 20:00 stop for this attempt only. No automatic v5 or additional sweep follows; report the result and failure analysis before a further decision. Stock/patient remains the backup; this experiment's stopping rule does not abandon the broader improvement goal.
+
+Human A/B labeling proceeds in parallel with a named second-human B cross-check, not agent-generated labels. Supplement the feasibility set with human-reviewed unfinished fluent development examples; compare any eligible candidate with stock FP32, the stock threshold comparator and the patient baseline. Existing matched-input, response-delay, nonresponse and audible acceptance requirements remain. The B reviewer is not yet confirmed.
+
+**D-009 stays in force: reserved final test sealed.** A development pass does not promote the model or establish the audible-interruption claim. Disclose a fourth adaptive attempt on reused development data and the overlap of human feasibility sources with development. This entry records authorization, not executor start, Niko signoff or a passing result.
+
 ## 2026-10-10 D-011 — Resume W3 only, keep the test sealed (approved by Vinh)
+
+Historical W3 authorization. W3 subsequently failed selection; D-012 separately authorizes the bounded next attempt.
 
 At approximately 19:00 EDT, Vinh explicitly approved the single W3 experiment with “ok do it” after the bounded recommendation. [Approval was posted on issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103109431), tagging Guttuu and Niko. This supersedes D-010's training pause and the earlier no-v3 rule for W3 only; **D-009's reserved-test seal is unchanged**.
 

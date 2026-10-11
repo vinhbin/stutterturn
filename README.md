@@ -16,7 +16,7 @@ In our exploratory measurement on real recordings, the standard open model's INT
 
 **[PLAN.md](PLAN.md#current-status) is the current task-status authority.** Read its deliverable table for owners, acceptance checks and blockers. Issues #1–6 group the phase gates; a merged implementation does not automatically pass a gate.
 
-Legend: ✅ on main with saved evidence · ⬜ no repo evidence yet
+Legend: ✅ published with saved evidence (branch/commit linked where not yet merged) · ⬜ no repo evidence yet
 
 | Capability | Status | Evidence |
 |---|---|---|
@@ -26,7 +26,7 @@ Legend: ✅ on main with saved evidence · ⬜ no repo evidence yet
 | Stock-weight recovery, synthetic update and ONNX export/reload parity (mechanics only, not adaptation) | ✅ | [docs/proofs/model-mechanics/](docs/proofs/model-mechanics/README.md) |
 | Frozen show-separated split manifests v1 and matched eval-runner spec | ✅ | [benchmark/splits/v1/](benchmark/splits/v1/) · [benchmark/specs/](benchmark/specs/) · [PR #9](https://github.com/vinhbin/stutterturn/pull/9) |
 | Human label listen-through (A/B feasibility batches) | ⬜ | |
-| Training v1/v2 development evaluation; no candidate passed selection | ✅ | [Model results and limits](docs/model-results-2026-10-10.md); no accepted model or final-test efficacy result |
+| Training v1/v2/v3 development evaluation; no candidate passed selection | ✅ | [Model results and limits](docs/model-results-2026-10-10.md); [published selection evidence](https://github.com/vinhbin/stutterturn/tree/bd095f9/benchmark/selection); no accepted model or final-test efficacy result |
 | Long-block (3+ s) evaluation | ⬜ | |
 | Gemini end-of-speech rival arm | ⬜ | Separate from Gemini's working reply-generation role |
 | Phone transport (8 kHz) — the current agent replays web audio; no phone path | ⬜ | |
@@ -37,20 +37,20 @@ In the saved replay v2 — which supersedes the first replay after a model-input
 
 Replay the **same real, labeled source recording** through stock and the selected patient/adapted configuration. Observe whether the speaker resumes before the agent's first audible response; distinguish this from the model's internal completion decision. Measure true completed-turn delay and nonresponses for both stuttered and fluent speech. The [saved replay v2](agent/evidence/2026-10-10-replay-v2/) separates completion decisions, reported audio events and cancellations for five clips under exploratory labels; it does not establish true completed-turn delay or acoustic outcomes. Human-validated labels and more sources are still required before any rate is quoted.
 
-The candidate arm becomes available only after a real exported model is integrated. If the adaptation gate fails, the deliverable becomes a corrected benchmark and interactive baseline comparison. That fallback still needs validated labels and reproducible runs. A UI fixture or a model prediction alone does not prove either outcome.
+The candidate arm becomes available only after a real exported model passes its gates and is integrated. We are continuing the original model-improvement goal; stock/patient remains a working backup, and the corrected-benchmark fallback has not been chosen as the final scope. Vinh [conditionally approved six fixed v4 interpolation blends](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103422097) under [D-012](docs/decision-log.md): Niko must sign off corrected code/protocol first; stop after 45 minutes from the approved execution start or at 20:45 EDT, whichever comes first. No start/result is reported, and no automatic v5 is approved. Every path still needs validated labels and reproducible runs. A UI fixture or a model prediction alone does not prove improvement.
 
 Nobody imitates stuttering. A recorded backup must be labeled as a recording; sample audio and its use require appropriate rights. The [intended strong pitch](docs/pitch-and-qa.md) is a draft, not a capability report. Use only evidence-reviewed wording in the delivered pitch.
 
 ## Evidence and reproducibility
 
-- [Judge-facing training report](docs/training-report-2026-10-10.md): what we trained, v1/v2 results, data and leakage qualifications, and answers to judge questions. Vinh approved the [single 80/20 W3 experiment](docs/v3-recommendation-2026-10-10.md) under D-011; execution/results still require Guttuu's evidence. The reserved test stays sealed.
-- [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are the INT8 CPU build's completion predictions under the original harness, **not a validated percentage of callers interrupted**. The [current model results](docs/model-results-2026-10-10.md) report matched stock INT8/FP32 development comparisons and the failed v1/v2 candidate selections, with proxy-label limits.
+- [Judge-facing training report](docs/training-report-2026-10-10.md): what we trained, v1/v2/v3 results, data and leakage qualifications, and answers to judge questions. The approved [single 80/20 W3 experiment](docs/v3-recommendation-2026-10-10.md) finished with `dev_nothing_passes`: all six operating points failed the general-speech unfinished-turn guard. Its selection and training records are published at `bd095f9`. The reserved test stays sealed.
+- [Historical benchmark report](benchmark/RESULTS.md) and [scripts](benchmark/scripts/) preserve the exploratory work. The 116/200 first-check outputs are the INT8 CPU build's completion predictions under the original harness, **not a validated percentage of callers interrupted**. The [current model results](docs/model-results-2026-10-10.md) report matched stock INT8/FP32 development comparisons and v1's failed amended prescreen plus v2/v3's failed development selections, with proxy-label limits.
 - Exploratory comparisons are saved for the configurations we tested — including silence timeouts of 0.8 s and 1.5 s and a 0.99 confidence threshold. They do not yet establish which configurations meet both our interruption and response-delay targets; no universal "no setting fixes it" claim is made.
 - [D-006 and D-007](docs/decision-log.md) record the methodological corrections. One-second observation/censoring does not establish a three-second fallback; energy-derived cut points do not establish semantic turn ends; repeated harness checks do not prove live-agent behavior.
 - [Required evaluation work](PLAN.md#evaluation-work-required-before-a-comparison-can-pass) includes reviewed endpoints, frozen development/final-test splits, matched model/data/configuration records, both caller groups, audible outcomes, and explicit nonresponse/censoring.
 - The [claims ledger](docs/claims-ledger.md) is the single claim-status source. Headline numbers must link to applicable run evidence; do not promote targets or historical interpretations to measured outcomes.
 
-`benchmark/requirements.txt` is committed, and the [eval-runner spec](benchmark/specs/eval-runner-v1.md) records a verified rerun reproducing the historical 116/200 and 136/200 decisions on the same items. The v1/v2 candidates were evaluated on development data, but none passed every selection constraint. Vinh approved W3 only under [D-011](docs/decision-log.md), with unchanged checks and a 20:00 EDT stop; the reserved test remains sealed. Approval is not a training result. See [benchmark context](benchmark/README.md).
+`benchmark/requirements.txt` is committed, and the [eval-runner spec](benchmark/specs/eval-runner-v1.md) records a verified rerun reproducing the historical 116/200 and 136/200 decisions on the same items. V1 failed its amended development prescreen; v2/v3 failed final development selection. W3 ran under [D-011](docs/decision-log.md), with unchanged checks and a 20:00 EDT stop; its [reported result](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103321119) selects no model. [D-012](docs/decision-log.md) supersedes the 20:00 stop/no-v4 restriction for one conditional interpolation attempt only; numeric gates remain unchanged. The reserved test remains sealed. See [benchmark context](benchmark/README.md).
 
 For the presentation site and run console, from current main:
 
