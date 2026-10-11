@@ -2,13 +2,13 @@
 
 Updated October 11, 2026. Presenters confirmed by Vinh: **Vinh, Guttuu, Niko and Kareem**. This is the team cut; the approved [Vinh opening](pitch-script.md) is preserved separately.
 
-**Format:** the project's planned three-minute presentation. Target finish: **2:57**, including an 18-second replay and speaker handoffs. Times below are rehearsal targets, not a measured delivery. Only the blockquotes in the live-presentation section are spoken. For the existing teammate recordings, use the separate [demo-video edit map](#demo-video-edit-map) below: its shot order follows the current video plan, and it identifies the short replacement recordings needed before export.
+**Format:** a three-minute team pitch with the **live app demonstration**, not a demo-video narration script. Target finish: **2:57**, including a 40-second slot for two sequential replays and speaker handoffs. Times below are rehearsal targets, not a measured delivery. Only the blockquotes in the spoken-script section are spoken. The [live demo operator cues](#live-demo-operator-cues) match the actual console controls. The opening is shortened here to make room for real execution; the separately approved opening remains unchanged.
 
-**Evidence snapshot:** main `b5a4dde`, the [X1 result](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6104584978), [Niko's verification](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6104602369), and local replay records from October 11 at 00:14-00:15 EDT. **X1 passed exploratory development selection and promotion checks (a)/(b). Audio acceptance (c) and human confirmation (d) remain incomplete.** V1-v4 produced no qualifying candidate; v5 preparation stopped at its failed crop gate, with no v5 training. A/B listening was deferred, not completed; the separate confirmation review remains pending. The main script below discusses **saved stock-FP32/X1 research runs**, not a promoted model or a general improvement claim. A stock/patient fallback is supplied below. Recheck evidence before presenting.
+**Evidence snapshot:** main `b5a4dde`, the [X1 result](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6104584978), [Niko's verification](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6104602369), and local replay records from October 11 at 00:14-00:15 EDT. **X1 passed exploratory development selection and promotion checks (a)/(b). Audio acceptance (c) and human confirmation (d) remain incomplete.** V1-v4 produced no qualifying candidate; v5 preparation stopped at its failed crop gate, with no v5 training. A/B listening was deferred, not completed; the separate confirmation review remains pending. The main live demonstration uses **stock/patient: the same INT8 model with different silence waits**. Niko discusses X1 separately as exploratory research. The [promotion protocol](../benchmark/specs/confirm-eval-v1.md) still requires human confirmation and audio acceptance before X1 becomes an experimental demo configuration. A candidate appearing as available in the UI only confirms technical availability, not completion of those checks. Recheck evidence before presenting.
 
 ## Spoken script and screen cues
 
-### 0:00-0:57 | Vinh: the problem and purpose
+### 0:00-0:46 | Vinh: the problem and purpose
 
 *Screen: landing page. Use the actual app, with no audio playing yet.*
 
@@ -18,27 +18,25 @@ Updated October 11, 2026. Presenters confirmed by Vinh: **Vinh, Guttuu, Niko and
 >
 > That pause can still be part of speaking.
 >
-> These systems already handle important conversations: WellSpan reports over a hundred and sixty thousand patient calls a month through one AI agent.
->
 > In our first offline check of two hundred recordings labeled with stutter blocks, Smart Turn predicted "finished" in a hundred and sixteen detected pauses: fifty-eight percent. Those are model decisions, not measured interruptions, and the boundaries still need human review.
 >
 > We're building StutterTurn to give people time to finish.
 >
 > Guttuu will show you how we test that.
 
-### 0:57-1:42 | Guttuu: the working agent and comparison
+### 0:46-1:50 | Guttuu: the live agent and comparison
 
-*Screen: a verified recording or trace review of the selected first pause in the saved research runs listed below. Label **"Selected first-pause excerpt | Stock FP32 @0.5 / Experimental X1 @0.6 | Human turn-boundary review pending"**. These are different models at different thresholds, with the same configured silence wait. Keep their separate run identities visible. Use the stock/patient fallback if these saved records and their source cannot be presented clearly.*
+*Screen: `/live/`, connected to the actual presentation backend, development preview off. Use one rehearsed recording, first `stock`, then `patient`. Keep the source and configuration visible. These are live executions over a recording, not live microphone input. See the exact control sequence below.*
 
 > I built our replay agent with Gemini replies and ElevenLabs speech.
 >
-> Here are saved runs of stock and our experimental X1 candidate. At the first pause, stock predicts complete while X1 holds.
+> This is a live replay of recorded speech. First stock, then the same model with a longer silence wait. Watch the decision and audio timelines separately.
 
-*[Allow 18 seconds for the selected first-pause comparison, including the following speech resumption. Stop speaking if verified run audio is playing. Retain the full run records and source context for review. An excerpt is not a clean end-to-end result; the qualification below must remain. Do not manufacture reply audio from model-only logs or imitate stuttering.]*
+*[Allow up to 40 seconds for both sequential runs and the configuration switch. Do not narrate over the source or generated speech. Show what actually happens; do not promise a particular interruption, cancellation or reply.]*
 
-> Both predict complete at later pauses. This cropped example still needs human validation.
+> That demonstrates the pipeline. It doesn't establish that our adapted model is better.
 
-### 1:42-2:21 | Niko: training and evaluation
+### 1:50-2:21 | Niko: training and evaluation
 
 *Screen: the cited X1 result and current promotion status. Keep the required description visible: **"Post-hoc exploratory candidate selected after v4 results; fifth adaptive look at dev/guard; not a v4 pass."** Human confirmation and audio acceptance remain pending. Do not label exploratory differences as validated improvements.*
 
@@ -49,8 +47,6 @@ Updated October 11, 2026. Presenters confirmed by Vinh: **Vinh, Guttuu, Niko and
 > We test early decisions and missed completions on development examples. Waiting longer can trade fewer early decisions for slower replies.
 >
 > X1 passed a post-hoc exploratory development check. Human confirmation and audio acceptance are still pending. Our reserved final test remains sealed.
->
-> I also ingested our saved run logs into Tiger Data so the comparison can be inspected.
 
 ### 2:21-2:46 | Kareem: making the work inspectable
 
@@ -70,60 +66,27 @@ Updated October 11, 2026. Presenters confirmed by Vinh: **Vinh, Guttuu, Niko and
 >
 > StutterTurn: let people finish.
 
-## Stock/patient fallback for Guttuu
+## Live demo operator cues
 
-Use this instead of Guttuu's entire section if presenting the established stock/patient agent. Do not combine its configuration description with X1 footage. Current code uses the same INT8 model and threshold in both configurations, with configured silence waits of 0.2 and 1.0 seconds; those settings are not measured response delays.
+Before the presentation, prepare the backend and source on the machine connected to the room speakers. For the documented local setup, serve `web/` on port 8041 and run `agent/server.py --services on --play` in its configured Python environment; see the [agent setup](../agent/README.md#run). Use the local `/live/` page with `http://127.0.0.1:8765` as the backend. Keep credentials in the private backend environment. The browser controls the run but does not itself play source/reply audio.
 
-**Before the replay:** "I built our replay agent. Recorded speech goes through speech detection and Smart Turn; Gemini creates a reply, and ElevenLabs voices it. Here we're comparing the standard model with a longer-wait setting. Watch the decision and audio timelines separately."
-
-**After the replay:** "That's the working pipeline we're testing our adapted model against."
-
-Label saved playback **"Recorded demo"**. If services are off, use **"Model-only replay; no generated reply audio"** and explain the Gemini/ElevenLabs path as a separate implemented capability. An interface preview is not run evidence.
-
-## Demo-video edit map
-
-This is the video adaptation of the same claims, matched to the **existing real teammate recordings**, the ten-beat plan in local `video/_work/PLAN.md`, and its word-timed transcripts in `video/_work/tx/`. Those local production assets are not included in this PR. The live-presentation paragraphs above are not a transcript of the recorded clips; do not use them as subtitles for those recordings.
-
-Keep the current sequence: stock cold open, Vinh's problem and baseline, Guttuu's stock/X1 comparison, Kareem's interpretation, Niko's evidence, Vinh's close. Preserve all four people's own voices and faces. Use the following corrections instead of the production plan's conflicting claims about a verified turn ending or a clean candidate run. A small disclaimer cannot repair contradictory spoken narration.
-
-### Three short replacement recordings
-
-Record each as a short video with the named teammate's own voice and face. These are **new lines to record**, not words already present in their clips. At roughly 135 words per minute, these total about 20 seconds; actual durations must be measured.
-
-| File / speaker | Replacement narration | Replaces |
+| When | Operator action | What the team can say or show |
 |---|---|---|
-| `G1-pickup` / Guttuu | "Here's stock Smart Turn. It predicts complete at the first pause, before speech resumes." | G1's "every agent ships with" and unverified "mid-word" description. |
-| `G2-pickup` / Guttuu | "Same source excerpt. X1 changes the model and threshold. At this first pause, it holds." | G2's "only change was the model" and "the caller finishes." |
-| `K1-pickup` / Kareem | "Both predict complete at later pauses. Human review is pending; this example isn't a full-run success." | K1's "without the dead air" and "Nobody waits longer, nobody gets cut off." |
+| Before judges arrive | Open **Connection & preview**, leave **Development preview** off, enter the backend URL and press **Connect**. Confirm `/v0/health` reports services and playback on. | Connected status plus real sources/configurations. A synthetic preview cannot substitute for this check. |
+| Before the pitch | Choose a short, permitted recording from **Source recording**, such as `HeStutters_4_32.wav` if available. Rehearse the full stock/patient pair and verify source and reply audibility on the room speakers. | Use the same recording for both runs. Source availability comes from the backend; do not invent a selectable file. The proposed 40-second allowance must be timed. |
+| Guttuu's first run | Select **Stock Smart Turn v3.2 (INT8)** (`stock`) and press **Start fresh run**. | Show **Call monitor**, **Turn complete**, **Agent audio (reported)** and the event ledger. A complete decision and a heard reply are separate observations. |
+| Between runs | Let the first run finish. Note its **Run ID** and result before changing configuration. Select **Patient (longer wait, same model)** (`patient`), retain the same source, and press **Start fresh run** again. | The console shows one run at a time and clears its event table on a fresh run. It does not provide a simultaneous comparison or saved-log import. Backend logs retain both run IDs. |
+| Guttuu's second run | Let it finish and show the new configuration/summary. | Stock and patient share the INT8 model and threshold 0.5; configured silence waits are 0.2 and 1.0 seconds. These are settings, not measured reply delays or proof of model adaptation. |
+| Niko's handoff | Switch to the cited X1 research result and status. | Explicitly separate the live stock/patient pipeline from the saved X1 result. Human confirmation and audio acceptance remain pending. |
+| Kareem's handoff | Open `/judge/`, then its evidence links and Tiger chart. | The judge page explains results; `/live/` operates runs. The chart is a saved Tiger Data snapshot. |
 
-If the pickups are unavailable, keep the teammates visible in silent introductory shots with their name/role, then show these statements as **editorial cards**, not quotation marks or speech subtitles. Mute the conflicting original lines. Do not synthesize their voices or splice words into statements they did not record. This fallback does not supply four-person spoken narration; that requirement needs the pickups.
+**Timing:** the engine adds five seconds of trailing silence to each source, plus inference and reply time. Two 10.4-second sources therefore already require about 31 seconds before additional delays. The prior 18-second slot was unsuitable for that full comparison. Use a rehearsed shorter source and the 40-second slot above. Do not truncate a run and then call it a completed conversation or hide a later decision.
 
-### Shots, recordings and captions
+**Current readiness check:** the default local endpoint `http://127.0.0.1:8765/v0/health` was unreachable when this update was checked. This script is matched to the implemented controls; it does not certify that a presentation backend is currently running. An HTTPS hosted page needs a reachable HTTPS/WSS backend; a visitor's localhost does not connect to the team's laptop. Recheck the actual presentation machine before using the live wording.
 
-The current ten-beat table ends at **2:22**, although its heading says approximately 2:40. Treat neither as a measured export. Keep a target below 2:57 and a hard cap of 3:00; retime the edit to the actual recordings, including time to read the status cards.
+**If live execution is unavailable:** do not spend the pitch debugging. Show the published [stock/patient replay evidence](../agent/evidence/2026-10-10-replay-v2/README.md) in a separate browser tab and replace Guttuu's live-demo sentences with: "These are saved stock and longer-wait runs of the same recording. They show model decisions and reported response events; this is not a live execution or a verified acoustic demonstration." The console has no saved-log import feature. If services are off, say "This is a model-only replay; Gemini and ElevenLabs replies are disabled" and do not imply generated audio is playing.
 
-| Existing beat | Narration / source edit | Matching picture and required text |
-|---|---|---|
-| 1: stock cold open | Use verified source/run audio only if its provenance and synchronization are established. Otherwise use a silent event-trace cold open. | Stock `cd9b`, selected first pause and subsequent resumption. **"Saved run trace; selected excerpt"**. Use "Stock predicts complete; speech resumes" rather than "Audible interruption" when acoustic evidence is absent. |
-| 2: Vinh V1 | Keep the existing problem/scale take, approximately 1.6-23.7 s in his source. | Vinh's face, then real product footage. Source the NIDCD and WellSpan figures; the prescription call is an imagined scenario, not a captured StutterTurn customer call. |
-| 3: Vinh V2 | Keep the baseline take and its explicit "not a measured interruption rate" limitation. Remove only the repeated-word stumble, without clipping the final word "rate" (transcript ends near 41.68 s). | **"116/200 = 58% | Historical stock INT8 completion decisions on automatically detected pauses | Human boundary review pending"**. Do not present this as the current FP32/X1 comparison. |
-| 4: Guttuu G1 | Use `G1-pickup`. | Guttuu's face to stock footage. **"Stock Smart Turn v3.2 FP32 | Threshold 0.5 | Silence wait 0.2 s"**. |
-| 5: stock excerpt | Let verified demonstration audio play without narration, or use the trace-only fallback. | Preserve the first decision at 1.664 s and following speech resumption at 3.808 s. Keep run identity visible. A logged software overlap is not an acoustic measurement. |
-| 6: Guttuu G2 | Use `G2-pickup`. | Guttuu's face to candidate footage. **"Experimental X1 | Threshold 0.6 | Silence wait 0.2 s | Not yet promoted"**. |
-| 7: candidate excerpt | Show the matching first-pause interval and resumption. Do not narrate the cropped endpoint as the caller finishing. | Candidate `7091`. **"Selected first-pause example; human turn-boundary review pending"**. Replace "Holds the block, she finishes, then it answers" with **"X1 holds at the first pause"**. |
-| 8: Kareem K1 | Use `K1-pickup`; retain his face and contribution credit. | Show the later decisions or full trace. Remove the production plan's "real end," "0.19 s," and "No added wait" outcome cards. Both runs predict complete at 7.072 and 8.672 s; the 10.4 s crop is not a verified ending. |
-| 9: Niko N1 | Keep his first sentence, approximately 0.32-4.00 s, only over the exact rerunnable result artifacts it describes. Cut the "first public benchmark" sentence at approximately 4.00-9.52 s. His 9.52-11.52 s invitation can remain over the actual rerun instructions. | Show the repository result, then `/judge/` and its **saved Tiger Data snapshot**. Hold **"X1: exploratory development pass; human confirmation and audio acceptance pending"** and **"Post-hoc selection after v4; fifth adaptive look at dev/guard; not a v4 pass"** long enough to read. Do not imply the judge page operates the backend or queries Tiger Data live. |
-| 10: Vinh V3 | Keep the purpose sentence, approximately 41.68-46.00 s: "That's why we're building StutterTurn to give people who stutter time to finish." End before "Open model, open benchmarks" and the unverified any-agent compatibility promise. | Vinh's face to **"StutterTurn: let people finish"**, repository URL and four-person credits. This ending needs no new Vinh recording. |
-
-Source ranges are ASR-assisted edit guides, not frame-accurate cuts or approved subtitles. Listen at each edit boundary; transcribe the actual audible words before burning captions. Existing UI recordings may supply picture, but their audio needs a separate provenance check.
-
-### Audio and final synchronization checks
-
-- The inspected `capture-stock-overlap-20261011T041533Z-stock_fp32-cd9b.mp4` and `capture-candidate-hold-20261011T041446Z-candidate-7091.mp4` each have a video stream and **no audio stream**. They cannot alone substantiate hearing an interruption. Services-on JSON events establish runtime activity, not the sound heard in the final movie.
-- `demo-compare-WWS19-reconstruction.wav` / `.mp4` are separately named reconstruction assets. Their correspondence to these run IDs was not established. Do not silently lay them under the UI and call that an actual synchronized recording. If verified and used, label **"Reconstruction from run logs; not an acoustic capture"** throughout; otherwise use the trace-only version.
-- In every model comparison shot, disclose the two model/threshold configurations, keep **saved/selected excerpt** visible, and preserve the later-pause qualification. The `WomenWhoStutter` source is from a training-side show; it is not unseen-data confirmation.
-- Match the final captions to each person's actual take, keep demonstration sound clear of narration/music, and measure the assembled runtime. Do not speed up the source speech or event timeline to meet the cap. Shorten decorative holds first; retain model identity, result limitations and all four credits.
-- Inspect the exported movie at each beat boundary for picture/voice agreement, legible qualifiers and audio synchronization. **No assembled final video was found or certified by this script update.** This is a concrete edit handoff; the replacement recordings, audio verification and final export review remain to be completed.
+**If X1 is approved for the live demo later:** first verify completion of the promotion protocol and the available artifact/metadata. Then replace the configuration pair with `stock_fp32` at 0.5 versus `candidate` at 0.6, with the same 0.2-second silence wait, and re-rehearse. Replace the comparison sentence with: "We'll replay the same source through stock FP32 and experimental X1. The model and threshold change; the silence wait stays the same." Do not reuse the stock/patient description or predict the run's outcome. The current script does not mark this promotion complete.
 
 ## Who owns which judge questions
 
@@ -147,7 +110,7 @@ These answers are outside the three-minute script. Answer the question directly,
 
 **"What actually happens when you press Run?"**
 
-"The backend replays a source recording, detects speech and asks Smart Turn whether the speaker is finished. It can send the captured audio to Gemini for a response and use ElevenLabs to speak that response. We log completion decisions, generation, playback and cancellation separately. The browser controls the configured backend machine. Our saved comparison is two separate runs of the same excerpt."
+"The backend replays a source recording, detects speech and asks Smart Turn whether the speaker is finished. It can send the captured audio to Gemini for a response and use ElevenLabs to speak that response. We log completion decisions, generation, playback and cancellation separately. The browser controls the configured backend machine. Our live comparison is two sequential runs of the same recording; saved X1 research runs are separate evidence."
 
 **"Why distinguish a decision from an interruption?"**
 
@@ -197,16 +160,12 @@ These answers are outside the three-minute script. Answer the question directly,
 
 ## Before rehearsal
 
-- Choose the saved stock-FP32/X1 research comparison or the stock/patient fallback before rehearsing. Use that version's narration and captions consistently. Discussing saved X1 research records does not promote X1 into an accepted agent configuration; promotion still requires (c) and (d).
-- Guttuu checks the source's permitted use, attribution and context, and verifies any presented source/reply audio on the presentation machine. Reserve 18 seconds only if the actual excerpt fits it. Keep the following speech resumption in frame and preserve the full records. Do not infer a talk-over from a completion decision.
-- Use the real backend, with service credentials configured privately. A model-only run does not demonstrate Gemini or ElevenLabs. The existing synthetic preview is not experiment evidence.
-- Verify the actual configuration metadata. Stock/patient uses INT8 at threshold 0.5 with different wait settings. The cited X1 pair uses stock FP32 at 0.5 versus X1 at 0.6, both with `vad_stop_s=0.2`. Record run IDs and distinguish threshold changes from model-weight changes.
-- Keep **"Recorded demo"** or **"Saved run trace"** visible as appropriate. If a recording is trimmed, label the selected interval. Do not call saved playback live inference or remove later events to imply a clean full run.
-- If neither real execution nor a verified recording is available, replace the demo with a saved event trace and say **"These are saved run events; this view does not demonstrate audible interruption behavior."** Do not play mock events as a result.
-- Niko checks the current result and artifact before anyone changes the candidate-status sentence. X1 selection and checks (a)/(b) passed; (c)/(d) remain incomplete. Its required description is **post-hoc exploratory candidate selected after v4, fifth adaptive look, not a v4 pass**. The matched `turn_onset` benchmark describes first-turn behavior only; the real agent resets its input after completion, so later-turn behavior needs separate evidence.
-- Kareem checks that the chart is labeled as a saved snapshot and the evidence links open. Keep the three-million, WellSpan and 116/200 sources available; do not imply WellSpan's agent was tested by this team.
-- Rehearse aloud once with the actual replay and a stopwatch, then adjust to finish by 2:57. The main live-presentation script is 310 words: about 2:18 of speech at 135 words per minute, plus 18 seconds for the excerpt and 6 seconds for handoffs, leaving about 15 seconds for deliberate pauses. Timing remains an estimate until a human rehearsal. The video uses the separate edit map above and measured source recordings; no voices or video were generated by this update.
-- If a take runs long, cut Niko's final Tiger Data sentence first, then the WellSpan sentence while preserving the opening human scenario and the scoped experimental result. Never cut the later-pause qualification, configuration identity or current-model status to save time.
+- Guttuu starts and checks the presentation backend, private service configuration, allowed source and room speakers. A working static page is not proof of a connected voice backend. Keep preview off and verify `services: on` plus `playback: on` before promising generated speech.
+- Rehearse the same source/configuration pair and transitions used above. Allow each run to finish; retain both run IDs before the console clears the displayed ledger. Have the saved-evidence tab ready if the live connection fails.
+- Niko checks the current candidate status. X1 selection and checks (a)/(b) passed; (c)/(d) remain incomplete. The matched `turn_onset` benchmark describes first-turn behavior only, so later-turn behavior needs separate evidence. Do not silently promote X1 because its artifact is loadable.
+- Kareem checks the judge links and saved-snapshot label. Keep the three-million and 116/200 sources available. WellSpan remains optional context for questions; it is omitted from the live cut to leave room for execution.
+- Rehearse aloud with the actual two runs and a stopwatch. Target 2:57, hard cap 3:00. The live spoken script is 277 words; the 40-second execution slot is an allowance, not a measured runtime. No new model run, paid API request or human listening acceptance was performed by this documentation update.
+- If the full live sequence will not fit, use the explicitly labeled saved-evidence fallback. Cut decorative pauses first; never cut configuration identity, the separation between pipeline and model efficacy, or the current promotion status. Keep all four presenters credited.
 
 The repository supplies the planned time limit; an official judging rubric was not available in the materials checked. This script covers the problem, working behavior, technical work and evidence without inventing rubric requirements.
 
