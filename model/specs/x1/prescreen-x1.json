@@ -1,0 +1,6 @@
+{
+ "rule": "X1 (model/specs/x1-blend-check-v1.md, D-013): frozen single post-hoc candidate chosen after v4 results; not a prescreen outcome",
+ "top2": [
+  "X4/blend-a0.75-W3ee1.00.pt"
+ ]
+}
