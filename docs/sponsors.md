@@ -1,15 +1,15 @@
 # Sponsor prizes and how we use them
 
-From the MLH opening-ceremony deck and mlh.com/events/hacklanta-db/prizes (checked Oct 10), plus MLH coach confirmation on Discord.
+Prize descriptions rechecked October 11 at [MLH](https://www.mlh.com/events/hacklanta-db/prizes). Actual integration status below supersedes the earlier planned uses. Backend deployment proof: [Vultr packet](proofs/vultr-backend/README.md).
 
 ## What we're entering
 
 | Prize | Reward | Our use (load-bearing or honest-minor) | Get started |
 |---|---|---|---|
-| **Best Use of ElevenLabs** | Beats Solo earbuds | The live agent's voice on every call; their platform credited in our published results as best-in-class on short blocks | mlh.link/elevenlabs |
-| **Best Use of Vultr** | Portable screens | The visible fine-tune run + hosted benchmark page. **Free credits: code `MAJORLEAGUEHACKING`** (confirmed by MLH coach Kevin on Discord: "use mlh.link/vultr to get started and the promo code is MAJORLEAGUEHACKING") | mlh.link/vultr |
-| **Best Use of Gemini API** | MLH swag | The agent's brain on every call, and Gemini Live's end-of-speech setting benchmarked as a rival arm (needs an API key) | mlh.link/gemini |
-| **Best Use of Tiger Data** | Stream Deck Mini | Turn events + benchmark runs as time series feeding the live charts on the judges page. Their stated criteria: "most innovative, impactful, and performance-driven use" | mlh.link/tigerdata |
+| **Best Use of ElevenLabs** | Wireless earbuds | Streaming speech in the provider-enabled replay agent. Laptop playback and cloud PCM receipt have separate evidence; cloud browser playback is not implemented. | mlh.link/elevenlabs |
+| **Best Use of Vultr** | M5Stack Official Tab5 | Hosts the HTTPS site and runs ONNX inference, Gemini/ElevenLabs calls, and the authenticated HTTP/WebSocket backend. Two real cloud smoke runs and a browser run verified. No cloud training claim. | mlh.link/vultr |
+| **Best Use of Gemini API** | MLH swag | Receives captured audio and generates replies with a dedicated response policy, including verified requests from Vultr. Gemini Live rival benchmarking remains unrun. | mlh.link/gemini |
+| **Best Use of Tiger Data** | Stream Deck Mini | Run events stored in a TimescaleDB hypertable and queried through SQL views; the judge chart displays a saved database-query snapshot. The new Vultr runs are not yet in that snapshot. | mlh.link/tigerdata |
 | **DEV Writing Challenge** | $100 | Post-event: publish the benchmark story on dev.to/mlh-hackathon (selections monthly: technical substance, originality, storytelling) | dev.to/mlh-hackathon |
 
 Main entry: **AI/ML track** (the progsu main-track rubric is still not in hand — Phase 0 task).

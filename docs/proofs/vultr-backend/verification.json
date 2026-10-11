@@ -1,0 +1,146 @@
+{
+  "base_url": "https://64-177-51-1.sslip.io",
+  "checks": {
+    "unauthenticated_controls_rejected": true,
+    "public_site_preserved": true,
+    "private_assets_not_web_accessible": true,
+    "cross_origin_websocket_rejected": true,
+    "concurrent_run_rejected": true
+  },
+  "runs": [
+    {
+      "run_id": "20261011T044851Z-stock_fp32-8df2",
+      "config": "stock_fp32",
+      "summary": {
+        "first_turn_complete_t": 1.12,
+        "trigger": "smart_turn",
+        "first_agent_audio_t": 6.683,
+        "llm_latency_s": 1.459,
+        "tts_first_audio_s": 0.23,
+        "speaker_resumed_after_decision": true,
+        "cancelled": true,
+        "audible_interruption": false,
+        "overlap_s": null,
+        "no_response": false,
+        "timeouts": [],
+        "reply_text": "What would you like help with?",
+        "services": "on",
+        "chars_used": 30,
+        "turns": 2
+      },
+      "inference_ms": [
+        213.0,
+        186.1,
+        null
+      ]
+    },
+    {
+      "run_id": "20261011T044902Z-candidate-d48b",
+      "config": "candidate",
+      "summary": {
+        "first_turn_complete_t": 4.992,
+        "trigger": "fallback_timeout",
+        "first_agent_audio_t": 7.304,
+        "llm_latency_s": 2.163,
+        "tts_first_audio_s": 0.146,
+        "speaker_resumed_after_decision": false,
+        "cancelled": false,
+        "audible_interruption": false,
+        "overlap_s": null,
+        "no_response": false,
+        "timeouts": [],
+        "reply_text": "What would you like help with?",
+        "services": "on",
+        "chars_used": 60,
+        "turns": 1
+      },
+      "inference_ms": [
+        178.6,
+        175.8,
+        null
+      ]
+    }
+  ],
+  "scope": "Hosted inference and real provider PCM receipt; no browser or speaker playback.",
+  "health": {
+    "ok": true,
+    "contract": "0.1",
+    "commit": "cad4d50fa292",
+    "services": "on",
+    "playback": "off"
+  },
+  "configurations": [
+    {
+      "id": "stock",
+      "label": "Stock Smart Turn v3.2 (INT8)",
+      "detail": "Smart Turn v3.2 CPU INT8 ONNX; model runs after 0.2 s of silence; 3.0 s silence fallback",
+      "available": true,
+      "note": "",
+      "model": "stock-int8",
+      "params": {
+        "vad_stop_s": 0.2,
+        "vad_start_s": 0.2,
+        "threshold": 0.5,
+        "fallback_s": 3.0
+      }
+    },
+    {
+      "id": "stock_fp32",
+      "label": "Stock Smart Turn v3.2 (FP32)",
+      "detail": "Same as stock with the unquantized FP32 export; the comparator for candidates (model/CONTRACT.md 5.4)",
+      "available": true,
+      "note": "",
+      "model": "stock-fp32",
+      "params": {
+        "vad_stop_s": 0.2,
+        "vad_start_s": 0.2,
+        "threshold": 0.5,
+        "fallback_s": 3.0
+      }
+    },
+    {
+      "id": "patient",
+      "label": "Patient (longer wait, same model)",
+      "detail": "Same model and threshold; acts only after 1.0 s of silence (stock: 0.2 s). A waiting configuration, not a trained model",
+      "available": true,
+      "note": "",
+      "model": "stock-int8",
+      "params": {
+        "vad_stop_s": 1.0,
+        "vad_start_s": 0.2,
+        "threshold": 0.5,
+        "fallback_s": 3.0
+      }
+    },
+    {
+      "id": "candidate",
+      "label": "StutterTurn candidate",
+      "detail": "Niko's export from CANDIDATE_MODEL with its metadata JSON; same turn logic as stock",
+      "available": true,
+      "note": "",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "params": {
+        "vad_stop_s": 0.2,
+        "vad_start_s": 0.2,
+        "threshold": 0.6,
+        "fallback_s": 3.0
+      }
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "HeStutters_4_32.wav",
+      "file": "HeStutters_4_32.wav",
+      "duration_s": 3.0,
+      "category": "block",
+      "rights_note": "SEP-28k podcast audio; rights remain with owners; not redistributed"
+    },
+    {
+      "source_id": "demo-long-WomenWhoStutter_19_1238s.wav",
+      "file": "demo-long-WomenWhoStutter_19_1238s.wav",
+      "duration_s": 10.4,
+      "category": "unknown",
+      "rights_note": "SEP-28k podcast audio; rights remain with owners; not redistributed"
+    }
+  ]
+}
