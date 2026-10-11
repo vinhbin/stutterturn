@@ -1,6 +1,6 @@
 # StutterTurn — Devpost submission
 
-Updated October 11, 2026 against the verified Vultr deployment at `cad4d50fa292`, saved model results, and local exploratory candidate runs. Copy the public fields below; omit the team-only notes.
+Updated October 11, 2026 against the Vultr backend at `667460f45fdd`, auto-connecting console at `bccef4bf7bb6`, saved model results, and verified hosted browser playback. Copy the public fields below; omit the team-only notes.
 
 ## Project name
 
