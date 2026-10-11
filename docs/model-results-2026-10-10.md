@@ -61,6 +61,30 @@
 - no stuttered completed turns confirmed by humans;
 - rebuilt final evaluation sealed and unrun; 58 original exploratory block clips fall in the later reserved partition.
 
+## Later attempts: v3 and v4 (both `dev_nothing_passes`)
+
+After `sel-v2`, Vinh approved two more bounded, pre-registered attempts (D-011, then his v4 go-ahead). Both ran inside their stops, with test sealed (D-009) throughout. Each was a further adaptive attempt on the same dev items and guard, so dev has now served **four** attempts. **No candidate was selected; model work stopped, with no v5.**
+
+| Attempt | What changed | Best operating point (nearest miss) | M1 (stock 47.4%) | ΔM5 (must be ≥ 0) |
+|---|---|---|---|---|
+| v2 (`sel-v2`) | added SEP completed proxies | V2/e2.00 @0.6 | 18.5% | −0.6 pt (~9 of 1,516) |
+| v3 (`sel-v3`, [spec](../model/specs/training-v3.md)) | replay share 80% (W3 only) | W3/e1.00 @0.6 | 20.2% | −0.33 pt (~5) |
+| v4 (`sel-v4`, [spec](../model/specs/training-v4.md)) | weight interpolation stock↔W3, 6 blends | 0.75×W3/e2.00 @0.6 | 24.4% | −0.33 pt (~5) |
+
+Every other constraint was met at each nearest miss. The guard rule is a point estimate decided by a handful of rows; it was fixed before the runs and was **not** changed after seeing them. In v4, blends at α ≤ 0.5 were *more* premature than stock on fluent pauses, so interpolation didn't trade off smoothly.
+
+**Failure analysis** (Guttuu; descriptive, dev/guard only; numbers independently reproduced by Niko from the committed guard files). The M5 losses concentrate on **short** Smart Turn unfinished turns. For guard negatives under 3 s, the candidates raise p(complete) by +0.09 to +0.24 on average; for clips of 8 s or longer, by +0.01 or less. Mean change on guard positives is about 0. Vinh's recount adds that all net extra errors in v4 fall below 8 s, in both human and synthetic audio.
+
+**Mechanism, as corrected by Guttuu** ([issue #2](https://github.com/vinhbin/stutterturn/issues/2#issuecomment-6103688105)): weighted by the actual W3 mixture (model input capped at 8 s), training labels are **balanced at every length**, about 50% complete for 0–2 s, 2–4 s and 4–8 s draws. A simple "short ⇒ complete" base-rate cue is therefore **not** supported. What *is* lopsided is the source: about 91% of 0–2 s draws are SEP-28k podcast cuts whose "complete" labels are energy-end proxies. The better-supported hypothesis is a **domain × length confound**: what the model learns about very short inputs comes almost entirely from proxy-labelled podcast audio, and it transfers badly to short Smart Turn unfinished turns. This is still a **hypothesis, not proof**: length, source, content and label quality remain confounded, one checkpoint also lost 12 long negatives, and the bins are small.
+
+**For any future attempt (team decision, nothing scheduled):**
+1. Add left-cropped Smart Turn replay at 1–4 s, with a crop-validity audit before use: a human sample per label and a validity gate, as proposed on issue #2.
+2. Anchor to stock on Smart Turn data.
+3. Use human-confirmed turn ends instead of energy proxies.
+4. Evaluate on data that hasn't guided v1–v4: a fresh Smart Turn guard, and human-labelled items. A/B are reused dev recordings, so they improve label validity but not independence. Any change to the M5 rule would apply only to future candidates.
+
+Records (on `main` via [PR #35](https://github.com/vinhbin/stutterturn/pull/35)): [`benchmark/selection/`](../benchmark/selection/) (`sel-v2`, `sel-v3`, `sel-v4`) and [`model/evidence/2026-10-10/`](../model/evidence/2026-10-10/).
+
 ## Never say (any outcome)
 
 - "Fixes stuttering interruptions", "inclusive model ready", or any test-set or human-validated claim before those exist.
