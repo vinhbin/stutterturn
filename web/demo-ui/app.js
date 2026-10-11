@@ -456,8 +456,11 @@
     if (evt.name === 'cancelled') { message = 'Response cancelled' + (evt.before_audible === true ? ' before reported audio start.' : evt.before_audible === false ? ' after reported audio start.' : '.'); }
     if (evt.name === 'no_response') { message = 'No response reported for this run.'; }
     if (evt.name === 'timeout') { message = 'Service timeout: ' + (evt.service || 'unspecified service') + '.'; }
+    if (evt.name === 'response_retry') { message = 'Gemini returned an empty reply. Retrying once…'; }
+    if (evt.name === 'agent_audio_start' && el['run-alert'].textContent.indexOf('Gemini returned an empty reply') >= 0) { message = 'Gemini reply recovered. Playing generated speech.'; }
+    if (evt.name === 'provider_error') { message = 'Reply unavailable: ' + (evt.service || 'provider') + ' · ' + (evt.error_code || 'request_failed') + '. Start a fresh run to try again.'; }
     if (!message) { return; }
-    el['run-alert'].className = 'run-alert ' + (evt.name === 'overlap' || evt.name === 'timeout' ? 'error' : 'warn');
+    el['run-alert'].className = 'run-alert ' + (['overlap', 'timeout', 'provider_error'].indexOf(evt.name) >= 0 ? 'error' : 'warn');
     el['run-alert'].textContent = (isSynthetic() && evt.name !== 'overlap' ? 'Synthetic event: ' : '') + message;
   }
   function renderSummary(ended) {
@@ -474,6 +477,7 @@
       ['TTS first audio latency', seconds(summary.tts_first_audio_s)], ['Caller resumed after decision', summary.speaker_resumed_after_decision],
       ['Audible interruption (reported; unverified)', summary.audible_interruption], ['Overlap (reported)', seconds(summary.overlap_s)],
       ['Cancelled', summary.cancelled], ['No response', summary.no_response], ['Timeouts', summary.timeouts],
+      ['Provider errors', summary.errors || []],
       ['Services', summary.services === 'off' ? 'OFF — model-only; no response audio' : summary.services]
     ]);
   }

@@ -37,7 +37,8 @@ def local_rows():
                      'timeouts': summary['timeouts'],
                      'first_decision_t': decisions[0]['t'],
                      'first_decision_name': decisions[0]['name'],
-                     'events': [{key: e.get(key) for key in EVENT_KEYS}
+                     'events': [{**{key: e.get(key) for key in EVENT_KEYS},
+                                 'error_detail': e.get('detail') if e.get('name') == 'timeout' else None}
                                 for e in raw if e.get('name') in NAMES]})
     return rows
 

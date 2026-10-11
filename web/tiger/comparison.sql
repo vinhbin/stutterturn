@@ -15,6 +15,7 @@ SELECT r.run_id, r.config, r.source_id, r.source_duration_s,
           'prob', e.prob, 'threshold', e.threshold,
           'before_audible', e.before_audible,
           'service', e.raw->'service', 'overlap_s', e.raw->'overlap_s',
+          'error_detail', CASE WHEN e.name = 'timeout' THEN e.detail ELSE NULL END,
           'timing', e.raw->'timing') ORDER BY e.seq)
         FROM events e WHERE e.run_id = r.run_id AND e.name IN (
           'speech_start', 'speech_stop', 'turn_complete', 'turn_incomplete',

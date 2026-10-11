@@ -110,6 +110,8 @@ One socket can carry several runs one after another; one run at a time.
 | `audible` | `overlap` | Scheduled agent interval overlaps resumed source speech. `overlap_s` given at `agent_audio_end`; late-chunk gaps and device delay limit this estimate |
 | `info` | `no_response` | Source and trailing silence ended with no `turn_complete` |
 | `info` | `timeout` | A service call (Gemini or ElevenLabs) exceeded its limit; names the service |
+| `info` | `response_retry` | An empty Gemini reply is retried once within the original 10 s deadline; carries `attempt` and `finish_reason` |
+| `info` | `provider_error` | Gemini returned no usable reply or its request failed; carries `service`, `error_code` and, when available, `finish_reason`; distinct from a timeout |
 | `info` | `playback_error` | Output problem; `code` is `timeline_capacity`, `malformed_pcm`, `output_stalled`, or `device_cleanup`. Details are diagnostic, not proof of physical silence |
 
 **Measurement note for `agent_audio_start`.** Without `--play`, `t` is first complete PCM receipt and end is receipt plus accepted sample duration; no output device is opened. With `--play`, `t` is the first accepted output sample index divided by 16,000. Both include provider delay, but neither measures when sound reaches a listener. The legacy `audible` kind and summary names remain for v0.1 consumer compatibility.
@@ -176,6 +178,14 @@ Each run writes `agent/runs/<run_id>.jsonl`: the `run_started` line, every event
 ```
 
 Evaluation compares `first_turn_complete_t` and `first_agent_audio_t` against human annotations; the agent does not judge whether a decision was premature. That is E1's job (Niko) using reviewed labels.
+
+Optional `summary.errors` lists provider errors, e.g. `gemini:empty_reply`.
+An empty non-blocked Gemini response gets at most one retry (60 output tokens
+on the first attempt, 256 on the retry; spoken text remains capped at 120
+characters). Both attempts share the existing 10 s deadline. Stop and speech
+resumption cancel that task normally. Provider-blocked responses are not retried.
+Older logs may label `detail: "empty reply"` as `timeout`; preserve those raw
+records and distinguish this legacy classification in displays.
 
 ## Mapping to the demo UI adapter
 
