@@ -1,0 +1,25 @@
+stock-fp32 delayed_onset        chk0 t=2.272 agent[26112,36864) bench[26112,36480) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.5272 p_bench=0.7401
+stock-fp32 delayed_onset        chk1 t=4.608 agent[38912,74240) bench[26112,73856) dstart=-12800 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.152 p_bench=0.0403 [2nd turn: documented divergence]
+  -> delayed_onset: PASS
+stock-fp32 preroll_clipped      chk0 t=2.816 agent[10240,45568) bench[10240,45184) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.152 p_bench=0.0636
+  -> preroll_clipped: PASS
+stock-fp32 sub_threshold_pause  chk0 t=3.616 agent[14848,58368) bench[14848,57984) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0091 p_bench=0.0073
+stock-fp32 sub_threshold_pause  chk1 t=5.248 agent[14848,84480) bench[14848,84096) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0086 p_bench=0.0076
+  -> sub_threshold_pause: PASS
+stock-fp32 second_turn          chk0 t=3.104 agent[14848,50176) bench[14848,49792) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.152 p_bench=0.0636
+stock-fp32 second_turn          chk1 t=7.104 agent[101376,114176) bench[14848,113792) dstart=-86528 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.04 p_bench=0.0170 [2nd turn: documented divergence]
+stock-fp32 second_turn          chk2 t=8.768 agent[101376,140800) bench[14848,140416) dstart=-86528 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.2661 p_bench=0.0091 [2nd turn: documented divergence]
+  -> second_turn: PASS
+stock-int8 delayed_onset        chk0 t=2.272 agent[26112,36864) bench[26112,36480) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.9647 p_bench=0.9685
+stock-int8 delayed_onset        chk1 t=4.608 agent[38912,74240) bench[26112,73856) dstart=-12800 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0692 p_bench=0.0477 [2nd turn: documented divergence]
+  -> delayed_onset: PASS
+stock-int8 preroll_clipped      chk0 t=2.816 agent[10240,45568) bench[10240,45184) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0692 p_bench=0.0411
+  -> preroll_clipped: PASS
+stock-int8 sub_threshold_pause  chk0 t=3.616 agent[14848,58368) bench[14848,57984) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0353 p_bench=0.0164
+stock-int8 sub_threshold_pause  chk1 t=5.248 agent[14848,84480) bench[14848,84096) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0191 p_bench=0.0115
+  -> sub_threshold_pause: PASS
+stock-int8 second_turn          chk0 t=3.104 agent[14848,50176) bench[14848,49792) dstart=0 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.0692 p_bench=0.0411
+stock-int8 second_turn          chk1 t=7.104 agent[101376,114176) bench[14848,113792) dstart=-86528 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.384 p_bench=0.0477 [2nd turn: documented divergence]
+stock-int8 second_turn          chk2 t=8.768 agent[101376,140800) bench[14848,140416) dstart=-86528 dend=-384 dfeat=0.0e+00 dp=0.0e+00 p_agent=0.9076 p_bench=0.0164 [2nd turn: documented divergence]
+  -> second_turn: PASS
+PASS: 8 case runs
