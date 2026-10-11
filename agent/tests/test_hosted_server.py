@@ -11,13 +11,20 @@ from aiohttp.test_utils import AioHTTPTestCase
 
 
 class FakeRun:
-    def __init__(self, config, source, services=None, listener=None, play=False):
+    def __init__(self, config, source, services=None, listener=None, play=False, playback_factory=None):
         self.run_id = "test-run"
         self.listener = listener
         self.done = asyncio.Event()
+        self.playback_factory = playback_factory
 
     async def run(self):
         self.listener({"type": "run_started", "run_id": self.run_id})
+        if self.playback_factory:
+            import numpy as np
+            player = self.playback_factory(np.zeros(16, dtype=np.float32))
+            player.start()
+            player.send_source()
+            player.close()
         await self.done.wait()
 
     def stop(self):
@@ -39,7 +46,8 @@ class HostedServerTests(AioHTTPTestCase):
         self.assertTrue(callable(getattr(module, "create_app", None)),
                         "server needs a configurable hosted application factory")
         return module.create_app(services=None, play=False, max_runs=1,
-                                 allowed_origin="https://demo.example")
+                                 allowed_origin="https://demo.example",
+                                 browser_audio=getattr(self, "enable_audio", False))
 
     async def test_rejects_cross_origin_websocket(self):
         response = await self.client.get("/v0/ws", headers={"Origin": "https://evil.example"})
@@ -75,6 +83,32 @@ class HostedServerTests(AioHTTPTestCase):
         finally:
             await first.close()
             await second.close()
+
+
+class BrowserAudioServerTests(HostedServerTests):
+    enable_audio = True
+
+    async def test_audio_is_opt_in_and_separately_sequenced(self):
+        response = await self.client.get('/v0/health')
+        self.assertEqual((await response.json())['browser_audio'], 'pcm16-v1')
+        async with self.client.ws_connect('/v0/ws') as ws:
+            await ws.send_json({'type': 'start', 'config': 'stock', 'source': 'allowed.wav',
+                                'browser_audio': True})
+            self.assertEqual((await ws.receive_json())['type'], 'run_started')
+            source = await ws.receive_json()
+            self.assertEqual((source['type'], source['action'], source['audio_seq']),
+                             ('browser_audio', 'source', 0))
+            self.assertEqual(source['run_id'], 'test-run')
+            self.assertNotIn('seq', source)
+            finish = await ws.receive_json()
+            self.assertEqual((finish['action'], finish['audio_seq']), ('finish', 1))
+
+    async def test_legacy_client_receives_no_audio(self):
+        async with self.client.ws_connect('/v0/ws') as ws:
+            await ws.send_json({'type': 'start', 'config': 'stock', 'source': 'allowed.wav'})
+            self.assertEqual((await ws.receive_json())['type'], 'run_started')
+            with self.assertRaises(asyncio.TimeoutError):
+                await asyncio.wait_for(ws.receive_json(), .05)
 
 
 if __name__ == "__main__":

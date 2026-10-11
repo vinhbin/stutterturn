@@ -198,3 +198,32 @@ Evaluation compares `first_turn_complete_t` and `first_agent_audio_t` against hu
 - Hardware listening/stop/flush acceptance for the lifecycle increment above remains outstanding.
 - Microphone (live caller) mode: out of scope for 0.1. Demo uses recorded sources, labelled as recordings.
 - Phone transport: not attempted; web only.
+
+
+## Optional browser audio (pcm16-v1)
+
+With `--browser-audio`, health advertises `browser_audio: "pcm16-v1"`. The client
+explicitly includes `browser_audio: true` in `start`; legacy clients receive only
+normal events. `run_started.playback.transport` confirms the negotiated mode.
+No server audio device opens. Use authentication at the reverse proxy for hosting.
+
+Following `run_started`, the same socket carries messages with `v: "0.1"`,
+`type: "browser_audio"`, `run_id`, independent contiguous `audio_seq` starting at
+zero, and `sample_rate: 16000`. These packets are never written to JSONL logs.
+Actions: `source` (one PCM buffer), `agent` (PCM chunk plus generation), `cancel`
+(generation and cut sample), `stop` (silence all), `finish` (drain existing buffers).
+PCM is base64 little-endian signed 16-bit mono; sample offsets are absolute on the
+source timeline. Source including trailing silence is limited to 90 seconds;
+pending agent audio is limited to 8000 samples, with producer backpressure.
+
+Start resumes Web Audio inside the user gesture. The browser schedules the source
+250 ms after receipt and uses that shared origin for replies and cancellation.
+Late agent chunks skip already elapsed samples; they do not shift the timeline.
+Stop, Reset, errors and disconnect silence source and reply immediately. Normal
+completion waits for browser buffers to drain before showing the final summary.
+
+`timing.basis: "browser_schedule"` means the server's monotonic sample schedule,
+not hardware callback consumption or measured acoustic output. Network delay,
+browser buffering and device latency remain separate. Source playback can work
+with services off; generated speech still needs services on. Microphone input is
+not part of this extension.

@@ -1,4 +1,4 @@
-/* Agent contract v0.1 transport. This UI plays no audio. */
+/* Agent contract v0.1 transport, with negotiated browser audio. */
 'use strict';
 
 var DEMO_ARMS = [
@@ -119,6 +119,9 @@ function LiveAdapter(options) {
   this.sourceLabel = 'Backend-reported events — playback unverified; this UI plays no audio';
   this.connected = false;
   this.onConnectionChange = options.onConnectionChange || null;
+  this.onAudioStatus = options.onAudioStatus || function () {};
+  this._audio = null;
+  this.volume = 1;
   this._fetch = options.fetch || (window.fetch && window.fetch.bind(window));
   this._WebSocket = options.WebSocket || window.WebSocket;
   this._connectTimeout = options.connectTimeoutMs || 5000;
@@ -178,6 +181,9 @@ LiveAdapter.prototype.connect = function () {
     self.sourceLabel = health.mock === true
       ? 'DEVELOPMENT MOCK — synthetic transport events; no audio; not evidence'
       : 'Backend-reported events — playback unverified; this UI plays no audio';
+    if (health.browser_audio === 'pcm16-v1' && self.mode !== 'mock') {
+      self.sourceLabel = 'Browser audio — recording and generated speech; timing is a server sample schedule';
+    }
     return self._openSocket();
   }).then(function () {
     if (controller.signal.aborted) { throw abortError(); }
@@ -230,6 +236,7 @@ LiveAdapter.prototype._connectionChanged = function (reason) {
   }
 };
 LiveAdapter.prototype._closeSocket = function (reason) {
+  if (this._audio) { this._audio.stop(); }
   var socket = this._socket;
   this._socket = null; this.connected = false; this._opening = null;
   if (this._openingReject) {
@@ -248,20 +255,33 @@ LiveAdapter.prototype.start = function (configId, handlers, sourceId) {
   var source = this._sources.find(function (value) { return value.file === sourceId; });
   if (!config || !config.available) { return Promise.reject(new Error('Selected configuration is unavailable')); }
   if (!source) { return Promise.reject(new Error('Choose a recording from the backend source list')); }
+  var wantsAudio = this.mode !== 'mock' && this._health.browser_audio === 'pcm16-v1';
+  var prepared;
+  try {
+    if (wantsAudio) {
+      if (!this._audio) { this._audio = new window.StutterTurnBrowserAudio({ onStatus: this.onAudioStatus }); }
+      this._audio.setVolume(this.volume);
+      // Resume while still inside the Start click's user gesture.
+      prepared = this._audio.prepare();
+    }
+  } catch (error) { return Promise.reject(error); }
   return new Promise(function (resolve, reject) {
-    var run = { config: configId, source: source, handlers: handlers, resolve: resolve, reject: reject,
+    var run = { audio: wantsAudio, audioSeq: -1, config: configId, source: source, handlers: handlers, resolve: resolve, reject: reject,
       pending: true, id: null, seq: -1 };
     self._run = run;
     run.timer = setTimeout(function () {
       if (self._run === run) { self._failRun(new Error('Run start acknowledgement timed out')); self._closeSocket(); }
     }, self._startTimeout);
-    self._openSocket().then(function () {
+    Promise.all([prepared, self._openSocket()]).then(function () {
       if (self._run !== run) { return; }
-      self._socket.send(JSON.stringify({ type: 'start', config: configId, source: sourceId }));
+      var request = { type: 'start', config: configId, source: sourceId };
+      if (wantsAudio) { request.browser_audio = true; }
+      self._socket.send(JSON.stringify(request));
     }).catch(function (error) { if (self._run === run) { self._failRun(error); self._closeSocket(); } });
   });
 };
 LiveAdapter.prototype._failRun = function (error) {
+  if (this._audio) { this._audio.stop(); }
   var run = this._run; this._run = null;
   if (!run) { return; }
   if (run.id) { this._retiredRuns.add(run.id); }
@@ -284,14 +304,24 @@ LiveAdapter.prototype._message = function (data) {
       if (message.seq !== -1 || !nonempty(message.message)) { throw new Error('Invalid backend error message'); }
       throw new Error(message.message);
     }
+    if (message.type === 'browser_audio') {
+      if (!run.audio || run.pending || run.ending || message.run_id !== run.id || message.audio_seq !== run.audioSeq + 1) {
+        throw new Error('Invalid browser audio sequence or identity');
+      }
+      this._audio.receive(message); run.audioSeq = message.audio_seq; return;
+    }
     if (!Number.isInteger(message.seq) || message.seq !== run.seq + 1) { throw new Error('Invalid run event sequence; stream may be incomplete or out of order'); }
     if (run.pending) {
       if (message.type !== 'run_started' || !nonempty(message.run_id)) { throw new Error('Expected run_started contract acknowledgement'); }
       if (message.config !== run.config) { throw new Error('Acknowledged configuration does not match requested configuration'); }
       if (!isObject(message.source) || (message.source.source_id !== run.source.source_id && message.source.source_id !== run.source.file) ||
           !validTime(message.source.duration_s) || !validTime(message.source.source_offset_s)) { throw new Error('Acknowledged source does not match requested recording'); }
+      if (run.audio) {
+        if (!isObject(message.playback) || message.playback.transport !== 'pcm16-v1') { throw new Error('Backend did not acknowledge browser playback'); }
+        this._audio.begin(message.run_id);
+      }
       run.id = message.run_id; run.seq = message.seq; run.pending = false; clearTimeout(run.timer);
-      run.resolve({ runId: message.run_id, runIdNote: this.mode === 'mock' ? 'MOCK run — no audio; not evidence' : 'Backend run — playback unverified',
+      run.resolve({ runId: message.run_id, runIdNote: this.mode === 'mock' ? 'MOCK run — no audio; not evidence' : (run.audio ? 'Browser audio; server-scheduled timing' : 'Backend run — playback unverified'),
         sourceRecording: message.source.source_id + ' (' + message.source.duration_s + ' s; offset ' + message.source.source_offset_s + ' s)', metadata: message });
       return;
     }
@@ -305,13 +335,23 @@ LiveAdapter.prototype._message = function (data) {
       if (run.handlers.onEvent) { run.handlers.onEvent(message); }
     } else if (message.type === 'run_ended') {
       if (!nonempty(message.reason) || !isObject(message.summary)) { throw new Error('Invalid run summary'); }
-      this._retiredRuns.add(run.id);
-      this._run = null;
-      if (run.handlers.onEnd) { run.handlers.onEnd(message); }
+      var self = this;
+      run.seq = message.seq; run.ending = true;
+      function ended() {
+        if (self._run !== run) { return; }
+        self._retiredRuns.add(run.id); self._run = null;
+        if (run.handlers.onEnd) { run.handlers.onEnd(message); }
+      }
+      if (run.audio && message.reason === 'completed') {
+        this._audio.drain().then(ended).catch(function (error) {
+          if (self._run === run) { self._failRun(error); self._closeSocket(); }
+        });
+      } else { if (this._audio) { this._audio.stop(); } ended(); }
     } else { throw new Error('Unexpected backend message type'); }
   } catch (error) { this._failRun(error); this._closeSocket(); }
 };
 LiveAdapter.prototype.stop = function () {
+  if (this._audio && this._audio.nodes.size) { this._audio.stop(); }
   var run = this._run;
   if (!run) { return; }
   this._run = null; clearTimeout(run.timer);
@@ -323,9 +363,13 @@ LiveAdapter.prototype.stop = function () {
   // An unacknowledged run has no ID. Closing the socket isolates its late ack.
   this._closeSocket('stopped');
 };
+LiveAdapter.prototype.setVolume = function (value) {
+  this.volume = value; if (this._audio) { this._audio.setVolume(value); }
+};
 LiveAdapter.prototype.disconnect = function () {
   if (this._controller) { this._controller.abort(); this._controller = null; }
   this._connectPromise = null; this.stop(); this._closeSocket(); this._ready = false;
   this._configurations = []; this._sources = [];
+  if (this._audio) { this._audio.context.close(); this._audio = null; }
 };
 window.StutterTurnAdapters = { blocked: BlockedAdapter, preview: PreviewAdapter, live: LiveAdapter };

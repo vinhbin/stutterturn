@@ -36,6 +36,7 @@ def jres(data, status=200):
 async def health(request):
     return jres({"ok": True, "contract": engine.CONTRACT_VERSION, "commit": engine._commit(),
                  "services": "on" if request.app["services"] else "off",
+                 "browser_audio": "pcm16-v1" if request.app["browser_audio"] else None,
                  "playback": "on" if request.app["play"] else "off"})
 
 
@@ -71,7 +72,7 @@ async def ws_handler(request):
         raise web.HTTPForbidden(text="Origin not allowed")
     ws = web.WebSocketResponse(heartbeat=20, max_msg_size=4096)
     await ws.prepare(request)
-    queue = asyncio.Queue()
+    queue = asyncio.Queue(maxsize=128)
     current = {"run": None, "task": None}
 
     async def pump():
@@ -119,9 +120,24 @@ async def ws_handler(request):
                     error("source must be one of the advertised recordings")
                     continue
                 try:
+                    extra = {}
+                    if msg.get("browser_audio") is True:
+                        if not request.app["browser_audio"]:
+                            raise ValueError("Browser audio is not enabled on this backend")
+                        from browser_playback import BrowserPlayer
+                        audio_seq = 0
+
+                        def send_audio(packet):
+                            nonlocal audio_seq
+                            queue.put_nowait({"v": engine.CONTRACT_VERSION, "type": "browser_audio",
+                                              "run_id": current["run"].run_id,
+                                              "audio_seq": audio_seq, **packet})
+                            audio_seq += 1
+
+                        extra["playback_factory"] = lambda source: BrowserPlayer(source, send_audio)
                     run = engine.Run(msg.get("config", ""), msg.get("source", ""),
                                      services=request.app["services"], listener=queue.put_nowait,
-                                     play=request.app["play"])
+                                     play=request.app["play"], **extra)
                 except Exception as e:
                     error(f"cannot start: {e}")
                     continue
@@ -151,7 +167,7 @@ async def options(request):
     return web.Response(headers=CORS)
 
 
-def create_app(services=None, play=False, max_runs=1, allowed_origin=None):
+def create_app(services=None, play=False, max_runs=1, allowed_origin=None, browser_audio=False):
     if max_runs < 1:
         raise ValueError("max_runs must be positive")
     app = web.Application()
@@ -160,6 +176,7 @@ def create_app(services=None, play=False, max_runs=1, allowed_origin=None):
     app["max_runs"] = max_runs
     app["runtime"] = {"active_runs": 0}
     app["allowed_origin"] = allowed_origin
+    app["browser_audio"] = browser_audio
     app.router.add_get("/v0/health", health)
     app.router.add_get("/v0/configurations", configurations)
     app.router.add_get("/v0/sources", sources)
@@ -177,9 +194,10 @@ def main():
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--max-runs", type=int, default=1, help="global concurrent replay limit")
     ap.add_argument("--allowed-origin", help="reject browser WebSockets from other origins")
+    ap.add_argument("--browser-audio", action="store_true", help="offer authenticated PCM browser playback")
     a = ap.parse_args()
     app = create_app(engine.Services() if a.services == "on" else None,
-                     a.play, a.max_runs, a.allowed_origin)
+                     a.play, a.max_runs, a.allowed_origin, a.browser_audio)
     print(f"agent server: http://127.0.0.1:{a.port}  services={a.services}", flush=True)
     web.run_app(app, host="127.0.0.1", port=a.port, print=None)
 

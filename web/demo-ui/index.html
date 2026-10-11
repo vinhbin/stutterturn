@@ -55,7 +55,14 @@
         <div><dt>Agent audio <span>(reported)</span></dt><dd id="first-audible">—</dd></div>
         <div><dt>Decision → audio</dt><dd id="decision-gap">—</dd></div>
       </dl>
-      <p class="note audio-note" id="audio-note">Audio timestamps are backend-reported; speaker playback is unverified. No audio plays in this console.</p>
+      <div class="audio-controls">
+        <label for="audio-volume">Volume</label>
+        <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="1">
+        <p id="audio-status" role="status" aria-atomic="true">Click Start to enable sound.</p>
+      </div>
+      <p class="note"><strong>Agent reply:</strong> <span id="reply-text">No reply yet.</span></p>
+      <p class="note">The source recording has no verified transcript. Generated reply text appears above.</p>
+      <p class="note audio-note" id="audio-note">Audio timestamps are backend-reported; speaker playback is unverified. Click Start to enable audio on a compatible backend.</p>
     </section>
 
     <aside id="run-setup" class="control-desk" tabindex="-1" aria-label="Run setup and controls">
@@ -86,7 +93,7 @@
     <div class="support-grid">
       <details class="run-details"><summary>Model &amp; run metadata</summary><dl id="metadata-body" class="run-meta metadata"></dl></details>
       <details class="provenance-details"><summary>Recording &amp; integration notes</summary>
-        <p class="provenance" id="source-label">No source recording loaded. No audio plays in this console.</p>
+        <p class="provenance" id="source-label">No source recording loaded. Click Start to enable audio on a compatible backend.</p>
         <ul class="integration-list">
           <li>Agent: <span id="agent-contract-status">Agent contract v0.1; connect to inspect the backend. Real audio playback acceptance pending.</span></li>
           <li>Model: <span id="model-contract-status">Candidate availability comes from the backend.</span></li>
@@ -124,7 +131,8 @@
     </details>
   </footer>
 </main>
-<script src="adapter.js"></script>
-<script src="app.js"></script>
+<script src="browser-audio.js?v=audio1"></script>
+<script src="adapter.js?v=audio1"></script>
+<script src="app.js?v=audio1"></script>
 </body>
 </html>

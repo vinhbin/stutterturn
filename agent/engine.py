@@ -308,7 +308,7 @@ class CreditCapReached(Exception):
 # ---------------------------------------------------------------- run
 
 class Run:
-    def __init__(self, config, source, services=None, listener=None, play=False):
+    def __init__(self, config, source, services=None, listener=None, play=False, playback_factory=None):
         if config not in CONFIGS:
             raise ValueError(f"unknown config {config!r}")
         self.config = config
@@ -347,6 +347,7 @@ class Run:
         self._accepted_audio_end = None
         self.agent_audible = False
         self.play = play                # laptop-speaker playback (agent/playback.py)
+        self.playback_factory = playback_factory
         self.player = None
         self._generation = 0
         self._player_generation = None
@@ -493,7 +494,7 @@ class Run:
                             self.s["tts_first_audio_s"] = round(time.monotonic() - t_tts, 3)
                             self.event(t, "audible", "agent_audio_start", detail=text,
                                        timing={"v": "playback-v1", "basis":
-                                               "scheduled_output_samples" if self.player else
+                                               self._playback_basis() if self.player else
                                                "pcm_receipt", "generation": generation})
                             self.state(t, "agent")
                         self._accepted_audio_end = ((idx + len(piece)) / SR if self.player else
@@ -547,6 +548,9 @@ class Run:
                            "accepted_cut_sample": cut_sample,
                            "acoustic_stop_t": None})
 
+    def _playback_basis(self):
+        return "browser_schedule" if getattr(self.player, "transport", None) else "scheduled_output_samples"
+
     def _cut_end(self, t):
         accepted_end = (self.player.agent_next / SR if self.player is not None
                         and self.player.agent_next is not None else self._accepted_audio_end)
@@ -558,7 +562,7 @@ class Run:
         if self.agent_audible and self.agent_audio_end is not None and t >= self.agent_audio_end:
             self.agent_audible = False
             self.event(self.agent_audio_end, "audible", "agent_audio_end",
-                       timing={"v": "playback-v1", "basis": "scheduled_output_samples"
+                       timing={"v": "playback-v1", "basis": self._playback_basis()
                                if self.player else "pcm_receipt_plus_duration"})
             self.state(self.agent_audio_end, "silence")
 
@@ -625,9 +629,9 @@ class Run:
         fallback_n = int(np.ceil(cfg["fallback_s"] / FRAME_S - 1e-9))
 
         self.t0 = time.monotonic()
-        if self.play and not self.stopped:
+        if (self.play or self.playback_factory) and not self.stopped:
             from playback import Player
-            self.player = Player(stream)
+            self.player = self.playback_factory(stream) if self.playback_factory else Player(stream)
             self.t0 = time.monotonic()
             self.player.start()
             start_elapsed = time.monotonic() - self.t0
@@ -646,8 +650,11 @@ class Run:
                                .replace("+00:00", "Z"),
                     "services": "on" if self.services else "off",
                     "playback": {**self.player.info(), "stream_start_call_s": round(start_elapsed, 6),
-                                 "pending_policy": "await_device_consumption"}
+                                 "pending_policy": "await_server_schedule" if self.playback_factory else "await_device_consumption"}
                                 if self.player else None})
+
+        if self.playback_factory and self.player:
+            self.player.send_source()
 
         in_speech = False
         speech_run = silence_run = 0

@@ -233,15 +233,15 @@ try {
     assert(await page.locator('#replay-evidence').isVisible(), 'preserved evidence fragment has no destination');
     assert(await page.locator('#console-frame').count() === 0, 'legacy alias retained the previous embedded console');
   });
-  await test('judge chart renders all recorded runs with offline provenance and reported-audio limits', async () => {
+  await test('judge chart renders saved database-query runs with snapshot provenance and reported-audio limits', async () => {
     const chart = page.locator('#tiger-chart');
     assert(await chart.count() === 1, 'judge route has no run-log chart');
     await chart.locator('.tgr-figure').first().waitFor();
     assert(await chart.locator('.tgr-lane').count() === 10, 'timeline omitted recorded runs');
     assert(await chart.locator('.tgr-gap-row').count() === 10, 'audio-gap chart omitted recorded runs');
-    assert(await chart.locator('.tgr-head .tgr-badge-live').count() === 0, 'offline snapshot claims database provenance');
+    assert(await chart.locator('.tgr-head .tgr-badge-live').count() === 1, 'database-query snapshot lost its provenance');
     for (const figure of await chart.locator('.tgr-figure').all()) {
-      assert(/local snapshot/i.test(await figure.innerText()), 'figure lacks offline provenance');
+      assert(/snapshot.*Tiger\s?Data|Tiger\s?Data.*snapshot/i.test(await figure.innerText()), 'figure lacks saved database provenance');
     }
     const text = await chart.innerText();
     assert(/reported.*audio|audio.*reported/i.test(text) && /speaker playback.*unverified/i.test(text),

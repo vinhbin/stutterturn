@@ -13,7 +13,7 @@ Environment=PYTHONUNBUFFERED=1
 Environment=OMP_NUM_THREADS=1
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=HF_HOME=/opt/stutterturn/shared/cache
-ExecStart=/opt/stutterturn/venv/bin/python agent/server.py --services on --port 8765 --max-runs 1 --allowed-origin https://64-177-51-1.sslip.io
+ExecStart=/opt/stutterturn/venv/bin/python agent/server.py --services on --browser-audio --port 8765 --max-runs 1 --allowed-origin https://64-177-51-1.sslip.io
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

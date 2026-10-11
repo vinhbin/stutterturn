@@ -11,7 +11,7 @@
     'run-source', 'start-note', 'source-label', 'current-state', 'state-strip',
     'first-decision', 'first-audible', 'decision-gap', 'event-body', 'event-scroll',
     'event-caption', 'preview-toggle', 'metadata-body', 'summary-body',
-    'summary-note', 'run-alert', 'audio-note', 'agent-contract-status',
+    'summary-note', 'run-alert', 'audio-note', 'audio-status', 'audio-volume', 'reply-text', 'agent-contract-status',
     'model-contract-status', 'tally', 'tally-note', 'tally-config', 'run-clock', 'timeline-mode', 'timeline-scroll-hint'
   ].forEach(function (id) { el[id] = $(id); });
 
@@ -21,7 +21,7 @@
     runPhase: 'idle', run: null, connecting: false, connectToken: null
   };
   var EMPTY = '—';
-  var DEFAULT_SOURCE = 'No source recording loaded. Source identity and provenance must come from the backend. No audio plays in this console.';
+  var DEFAULT_SOURCE = 'No source recording loaded. Source identity and provenance must come from the backend.';
 
   function isSynthetic() {
     return state.adapter.mode === 'preview' || state.adapter.mode === 'mock' || !!(state.health && state.health.mock);
@@ -75,14 +75,16 @@
     el['preview-toggle'].checked = preview;
     el['connection-chip'].className = 'chip ' + (isSynthetic() ? 'chip-preview' : isConnected() ? 'chip-live' : 'chip-blocked');
     el['connection-chip'].textContent = state.connecting ? 'CONNECTING…' : preview ? 'DEVELOPMENT PREVIEW — NOT LIVE' :
-      mock ? (isConnected() ? 'MOCK BACKEND — SYNTHETIC' : 'MOCK BACKEND — DISCONNECTED') : isConnected() ? 'BACKEND CONNECTED — PLAYBACK UNVERIFIED' : state.discovered ? 'BACKEND DISCONNECTED' : 'LIVE INTEGRATION: BLOCKED';
+      mock ? (isConnected() ? 'MOCK BACKEND — SYNTHETIC' : 'MOCK BACKEND — DISCONNECTED') : isConnected() ? (state.health && state.health.browser_audio === 'pcm16-v1' ? 'BACKEND CONNECTED — BROWSER AUDIO' : 'BACKEND CONNECTED — PLAYBACK UNVERIFIED') : state.discovered ? 'BACKEND DISCONNECTED' : 'LIVE INTEGRATION: BLOCKED';
     el['run-source'].textContent = state.adapter.sourceLabel || 'Backend not connected';
     el['audio-note'].textContent = isSynthetic()
       ? 'Synthetic timing only. No audio or benchmark evidence.'
-      : 'Backend-reported audio receipt. Speaker playback is unverified; no audio plays here.';
+      : state.health && state.health.browser_audio === 'pcm16-v1'
+          ? 'Browser sound enabled on Start. Timing uses a server sample schedule plus a 250 ms browser buffer; it is not measured speaker output.'
+          : 'Backend-reported audio receipt. This backend does not provide browser audio.';
     el['timeline-mode'].textContent = isSynthetic() ? 'SYNTHETIC · NO AUDIO' : state.run ? 'REPORTED EVENTS' : 'Awaiting events';
     el['agent-contract-status'].textContent = isConnected()
-      ? (mock ? 'Mock transport connected; real replay acceptance pending.' : 'Transport connected; real audio playback acceptance pending.')
+      ? (mock ? 'Mock transport connected; real replay acceptance pending.' : (state.health && state.health.browser_audio === 'pcm16-v1' ? 'Browser audio transport connected. Timings are server schedules.' : 'Transport connected; browser audio unavailable.'))
       : 'Agent contract v0.1; backend disconnected. Real audio playback acceptance pending.';
     var candidate = state.configs.find(function (cfg) { return cfg.id === 'candidate' || cfg.id === 'stutterturn'; });
     el['model-contract-status'].textContent = preview ? 'Preview labels only; no model artifact is exercised.' :
@@ -409,7 +411,7 @@
       }
     }
     if (evt.name === 'speaker_resumed' && !run.hadOverlap) { setTally('speaking', 'speaking', 'Caller resumed after a completion decision.'); }
-    if (evt.name === 'agent_audio_start' && !run.hadOverlap) { setTally('agent', 'agent', isSynthetic() ? 'Synthetic audio-start marker. No audio is playing.' : 'Audio start reported. Speaker playback remains unverified.'); }
+    if (evt.name === 'agent_audio_start' && !run.hadOverlap) { setTally('agent', 'agent', isSynthetic() ? 'Synthetic audio-start marker. No audio is playing.' : 'Generated reply started on the server timeline.'); }
     if (evt.name === 'overlap') {
       run.hadOverlap = true;
       setTally('overlap', 'interrupted', isSynthetic() ? 'SYNTHETIC OVERLAP · no audio, not evidence.' : 'OVERLAP REPORTED · audible playback unverified.');
@@ -466,6 +468,7 @@
   }
   function clearRun() {
     state.run = null; clearEvents();
+    el['reply-text'].textContent = 'No reply yet.';
     el['run-id'].textContent = EMPTY; el['run-config'].textContent = EMPTY;
     el['event-caption'].textContent = 'Events for the current run. A fresh run clears this table.';
     el['source-label'].textContent = DEFAULT_SOURCE;
@@ -487,7 +490,9 @@
     if (state.connecting || isConnected() || isActive()) { return; }
     disconnectCurrent();
     var adapter;
-    try { adapter = new window.StutterTurnAdapters.live({ baseUrl: el['backend-url'].value.trim() }); }
+    try { adapter = new window.StutterTurnAdapters.live({ baseUrl: el['backend-url'].value.trim(),
+      onAudioStatus: function (message) { el['audio-status'].textContent = message; } });
+      adapter.setVolume(Number(el['audio-volume'].value)); }
     catch (error) { setAdapter('blocked'); setStatus('error', 'Connection error: ' + valueText(error.message || error)); return; }
     state.adapter = adapter;
     adapter.onConnectionChange = function (connection) {
@@ -518,6 +523,7 @@
       setStatus('error', 'Cannot start: connect a backend and select an available configuration and source, or enable development preview.'); return;
     }
     stopAdapter(); clearEvents(); refreshChrome();
+    el['reply-text'].textContent = 'No reply yet.';
     var token = {};
     var run = { token: token, configId: cfg.id, configLabel: cfg.label,
       firstDecision: null, firstAudible: null, trigger: null, id: null, idNote: '',
@@ -539,6 +545,7 @@
       onEvent: guard(function (evt) {
         appendEventRow(run, evt);
         recordTimelineEvent(run, evt);
+        if (evt.name === 'agent_audio_start' && evt.detail) { el['reply-text'].textContent = evt.detail; }
         if (evt.name === 'turn_complete' && run.firstDecision === null && typeof evt.t === 'number') {
           run.firstDecision = evt.t; run.trigger = evt.trigger || null;
         }
@@ -553,7 +560,7 @@
           setTally('overlap', 'interrupted', (isSynthetic() ? 'SYNTHETIC OVERLAP · no audio, not evidence.' : 'OVERLAP REPORTED · playback unverified.') +
             (run.lastState ? ' Final state: ' + run.lastState + '.' : ' Run ended.'));
         } else { setTally('none', 'run ended', 'Final report below. ' + (isSynthetic() ? 'Synthetic fixture; no audio.' : 'Speaker playback remains unverified.')); }
-        setStatus(isSynthetic() ? 'warn' : 'ok', isSynthetic() ? 'Synthetic run ended. No audio or benchmark evidence.' : 'Run ended. Final values below are backend-reported; audio playback is unverified.');
+        setStatus(isSynthetic() ? 'warn' : 'ok', isSynthetic() ? 'Synthetic run ended. No audio or benchmark evidence.' : 'Run ended. Final values below are server-reported timings, not measured speaker output.');
       }),
       onError: guard(function (message) {
         stopAdapter(); setRunPhase('error'); refreshChrome();
@@ -597,6 +604,9 @@
     stopAdapter(); clearRun(); refreshChrome(); refreshControls();
   }
 
+  el['audio-volume'].addEventListener('input', function () {
+    if (state.adapter.setVolume) { state.adapter.setVolume(Number(el['audio-volume'].value)); }
+  });
   el['btn-connect'].addEventListener('click', connectBackend);
   el['btn-disconnect'].addEventListener('click', function () { setAdapter('blocked'); });
   el['source-select'].addEventListener('change', renderSourceNote);

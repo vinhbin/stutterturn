@@ -223,6 +223,7 @@ class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
                 services = FakeServices([b"\x00\x40" * 256])
                 services.hold = asyncio.Event()
                 run, messages = self.make_run(services)
+                run.now = lambda: 0.0  # Fixed arrival; fake device time advances below.
                 await self.start_reply(run)
                 task = run.reply_task
                 run.player.stream.pull(8000)
