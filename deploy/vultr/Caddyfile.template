@@ -1,6 +1,9 @@
 # Caddy 2.6 uses basicauth (renamed basic_auth in 2.8).
 64-177-51-1.sslip.io {
-  @private path /v0 /v0/* /live /live/* /demo-ui /demo-ui/*
+  @private {
+    path /v0 /v0/* /live /live/* /demo-ui /demo-ui/*
+    not path /demo-ui/fonts/archivo-latin.woff2 /demo-ui/fonts/jetbrains-mono-latin.woff2
+  }
   basicauth @private {
     demo __PASSWORD_HASH__
   }
