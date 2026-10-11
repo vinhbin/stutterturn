@@ -48,6 +48,7 @@
 .architecture-note { color: var(--muted); font-size: 13px; margin-top: 16px; }
 .scope-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
 .scope-columns > div { border-top: 1px solid var(--rule); padding-top: 20px; }
+.scope-columns > div:only-child { grid-column: 1 / -1; }
 .scope-columns h3 { font-size: 20px; font-weight: 590; }
 .scope-columns ul { padding-left: 20px; color: var(--muted); margin: 16px 0 0; }
 .scope-columns li { margin-top: 10px; padding-left: 4px; }

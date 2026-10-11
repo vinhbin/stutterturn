@@ -202,8 +202,8 @@ try {
     }
     assert(await page.locator('.architecture-flow > li').count() === 4, 'recorded-input system flow is incomplete');
     const scope = await page.locator('.scope-columns').innerText();
-    for (const limit of [/human-reviewed/i, /candidate/i, /completed-turn response delay/i, /speaker playback/i]) {
-      assert(limit.test(scope), 'guide omits remaining proof for ' + limit);
+    for (const capability of [/Vultr/i, /candidate/i, /ElevenLabs/i, /Tiger Data/i]) {
+      assert(capability.test(scope), 'guide omits built capability ' + capability);
     }
     const brokenAnchors = await page.locator('a[href^="#"]').evaluateAll(links => links
       .filter(link => !document.getElementById(decodeURIComponent(link.hash.slice(1))))
