@@ -1,5 +1,8 @@
 # StutterTurn: four-person team pitch
 
+> **Current plan (Oct 11, early morning):** the live demo is now **Stock FP32 vs. the X1 candidate** on the hosted Vultr console, not stock/patient. Rehearse from [the team prep packet](pitch-and-qa.md) (Part 1 script, Part 2 coordinator sheet). This file is kept for its sources and history.
+
+
 Updated October 11, 2026. Presenters confirmed by Vinh: **Vinh, Guttuu, Niko and Kareem**. This is the team cut; the approved [Vinh opening](pitch-script.md) is preserved separately.
 
 **Format:** a three-minute team pitch with the **live app demonstration**, not a demo-video narration script. Target finish: **2:57**, including a 40-second slot for two sequential replays and speaker handoffs. Times below are rehearsal targets, not a measured delivery. Only the blockquotes in the spoken-script section are spoken. The [live demo operator cues](#live-demo-operator-cues) match the actual console controls. The opening is shortened here to make room for real execution; the separately approved opening remains unchanged.

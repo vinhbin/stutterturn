@@ -31,11 +31,11 @@ Only the quoted lines are spoken. Times are rehearsal targets; time it aloud wit
 > Guttuu will show you how we test that.
 
 ### 0:46–1:50 · Guttuu — the live agent
-*Screen: `/live/`, connected, development preview OFF. Same recording for both runs: first `stock`, then `patient`.*
+*Screen: hosted `/live/`, signed in, development preview OFF. Same recording for both runs: first **Stock Smart Turn v3.2 (FP32)**, then **StutterTurn candidate** (X1).*
 
 > I built our replay agent with Gemini replies and ElevenLabs speech.
 >
-> This is a live replay of recorded speech. First stock, then the same model with a longer silence wait. Watch the decision and audio timelines separately.
+> This is a live replay of a real recording. First the stock model, then our experimental candidate, X1. The model and its threshold change; the silence wait stays the same. Watch the decision row.
 
 *[Up to 40 seconds for both runs. Don't talk over the audio. Show what actually happens. Never promise an interruption.]*
 
@@ -74,32 +74,49 @@ Only the quoted lines are spoken. Times are rehearsal targets; time it aloud wit
 
 **Coordinator:** Vinh (runs the pre-flight; calls the fallback). **Operator during the pitch:** Guttuu (drives `/live/` in his slot). **Backups:** Niko (X1 tab), Kareem (`/judge/` tab).
 
-## Pre-flight (start 30 minutes before judges; same laptop as the room speakers)
+**The live demo is the base model vs. our candidate:** Stock Smart Turn v3.2 (FP32) first, then StutterTurn candidate (X1), on the same recording. Patient is cut for time. This replaces the stock/patient plan in `docs/team-pitch-script.md`.
+
+**Primary path: the hosted console on Vultr.** Both the site and the voice backend run on our Vultr server. The console streams the recording and the agent's reply to your browser, so sound comes out of whatever laptop is presenting. You don't need a local backend. The local setup below is backup #1, and saved evidence is backup #2.
+
+## Pre-flight (start 30 minutes before judges)
 
 | # | Do this | Check |
 |---|---|---|
-| 1 | Make sure nothing else holds port 8765. Last night a stale server from an earlier session sat on it and served old code. | `netstat -ano \| findstr 8765` shows nothing before you start |
-| 2 | Start the backend: `agent\.venv\Scripts\python.exe agent\server.py --services on --play` | `http://127.0.0.1:8765/v0/health` shows `services: on`, `playback: on`, and the current commit |
-| 3 | Serve the site: `agent\.venv\Scripts\python.exe -m http.server 8041 --bind 127.0.0.1 --directory web` | `http://127.0.0.1:8041/live/` loads |
-| 4 | In `/live/`, open **Connection & preview**: backend `http://127.0.0.1:8765`, **Connect**, development preview **off** | Chip reads BACKEND CONNECTED, real sources and configs listed |
-| 5 | Pick source `HeStutters_4_32.wav`. Rehearse **stock → patient** once each. | Source **and** reply audible on the room speakers; write both run IDs down |
-| 6 | Open backup tabs: replay-v2 evidence, the X1 result comment, `/judge/` (hosted: https://64-177-51-1.sslip.io/judge/) | All load while logged out |
-| 7 | Close every unrelated app and notification. Laptop on power. Volume set. | — |
+| 1 | Open https://64-177-51-1.sslip.io/live/ and sign in with the **demo credentials** (Vinh shares them privately; never write them in a doc or the repo). | Console loads behind the login |
+| 2 | Click anywhere on the page once (browsers only allow audio after a click), then set the laptop's volume and connect to the room speakers. | — |
+| 3 | Pick source `demo-long-WomenWhoStutter_19_1238s.wav` (the clip from our video; about 15 s per run). If it isn't listed, use `HeStutters_4_32.wav` (about 8 s per run). Rehearse **Stock FP32 → candidate** once each. | You **hear** both the recording and the reply; write both run IDs down |
+| 4 | Only one run can play at a time on the server. Make sure no teammate is running a test during the pitch. | — |
+| 5 | Open backup tabs: replay-v2 evidence, the X1 result comment, and the hosted `/judge/` (https://64-177-51-1.sslip.io/judge/). | All load |
+| 6 | Close every unrelated app and notification. Laptop on power. Volume set. | — |
+
+**Backup #1, local backend** (only if the hosted console fails; same laptop as the speakers):
+1. Check nothing holds port 8765: `netstat -ano | findstr 8765`
+2. Start the backend: `agent\.venv\Scripts\python.exe agent\server.py --services on --play`. Confirm `/v0/health` shows services and playback on.
+3. Start the site: `agent\.venv\Scripts\python.exe -m http.server 8041 --bind 127.0.0.1 --directory web`
+4. Open `http://127.0.0.1:8041/live/`, then **Connection & preview** → `http://127.0.0.1:8765` → **Connect**, with preview off.
+
+**If the hosted agent misbehaves** (for example a Gemini timeout or no reply), restart it over SSH: `ssh root@64.177.51.1`, then `systemctl restart stutterturn-agent`. Do this before or after the pitch, never during it. A restart also resets the per-process ElevenLabs character cap.
 
 ## During the pitch
 
 | Clock | Speaker | Operator does | If it goes wrong |
 |---|---|---|---|
 | 0:00 | Vinh | Landing page up | — |
-| 0:46 | Guttuu | Switch to `/live/`. **Stock Smart Turn v3.2 (INT8)** → **Start fresh run** | Gemini timeout → keep talking; finish on the decision row. Restart the server after the pitch, not during. |
-| ~1:10 | Guttuu | When the run ends, note the run ID. Select **Patient (longer wait, same model)**, same source → **Start fresh run** | No audio → it's the output device, not the model. Say "model-only replay" and point at the timeline. |
+| 0:46 | Guttuu | Switch to `/live/`. **Stock Smart Turn v3.2 (FP32)** → **Start fresh run** | Gemini timeout → keep talking; finish on the decision row. Restart the server after the pitch, not during. |
+| ~1:05 | Guttuu | When the run ends, note the run ID. Select **StutterTurn candidate**, same source → **Start fresh run** | No audio → check the laptop's output device and that you clicked the page first. Otherwise point at the timeline. |
 | 1:50 | Niko | Switch to the X1 tab | — |
 | 2:21 | Kareem | Switch to `/judge/` → evidence links → Tiger chart | Hosted page down → local `http://127.0.0.1:8041/judge/` |
 | 2:46 | Vinh | Landing page. Hands off. | — |
 
-**Fallback line if the backend is down** (Guttuu says it instead of the live lines): *"These are saved stock and longer-wait runs of the same recording. They show model decisions and reported response events; this is not a live execution or a verified acoustic demonstration."* Then show replay v2. Do not debug in front of judges.
+**Fallback line if the backend is down** (Guttuu says it instead of the live lines): *"These are saved runs of the same recording through the stock model and our candidate. They show model decisions and reported response events; this is not a live execution."* Then show the saved long-replay comparison on the hosted `/judge/` page. Do not debug in front of judges.
 
-**What patient will probably show** (so nobody is surprised): it waits 1 s before checking. At a real stop the model may still say "not done," so the agent holds until the 3 s fallback. Expect several seconds of silence before the reply. That's the "waiting costs everyone" trade-off. Say so if asked.
+**What to expect on the long clip** (from our saved runs; don't promise it out loud, it can vary):
+- **Stock:** decides "COMPLETE" at about 1.7 s, mid-block, around 0.9 confidence. The reply usually gets cancelled when she resumes, so you may not *hear* a cut-off. The decision row shows it either way.
+- **Candidate:** "WAIT" at the same moment (0.54, below its 0.6 cutoff). It makes a later early call at about 7.1 s that gets cancelled before any audio, then decides at about 8.7 s and speaks around 10.7 s.
+
+Say "watch the decision row," not "listen for the interruption."
+
+**Framing rule for this demo:** X1 is an exploratory candidate. Its audio acceptance and human confirmation checks aren't finished. The demo shows one clip; it is not proof the model is better. Guttuu's closing line ("It doesn't establish that our adapted model is better") stays in.
 
 ---
 
@@ -223,7 +240,7 @@ Run their own turn-taking stack against the benchmark, and (once released) load 
 3. After 0.2 s of silence (1.0 s for patient), Smart Turn decides finished or not.
 4. If it decides finished, Gemini writes a reply and ElevenLabs speaks it.
 
-Every event (decision, generation, playback, cancellation) is logged separately as JSONL and streamed to the browser over a WebSocket.
+Every event (decision, generation, playback, cancellation) is logged separately as JSONL and streamed to the browser over a WebSocket. On the hosted version, all of this runs on our Vultr server, and the recording plus the agent's reply are streamed to your browser and played there.
 
 **Q: Why is there still a ~2 s pause before the agent answers?**
 Two steps. The model decides in about 0.2 s; on the demo clip, speech ends at 8.48 s and the decision lands at 8.67 s. The remaining ~2 s is Gemini writing the reply and ElevenLabs voicing it. Every configuration pays that.
@@ -252,7 +269,14 @@ ElevenLabs is the agent's voice: every live reply is synthesized with `eleven_fl
 Gemini (`gemini-3.8-flash`, thinking off) writes the agent's replies. Our reply prompt tells it never to comment on how the caller speaks. We didn't train Gemini.
 
 **Q: How did you use Vultr?**
-Vultr hosts our public site: a Vultr VM in Atlanta (Ubuntu 24.04, Caddy, HTTPS) serving the landing page, judge guide, and console at https://64-177-51-1.sslip.io. The voice backend runs on the presenter's laptop, so the hosted console can't start runs for visitors; that's by design.
+Vultr hosts the whole product on one Ubuntu 24.04 server in Atlanta (1 CPU, 1 GB RAM, no GPU) at https://64-177-51-1.sslip.io:
+- **Frontend:** the landing page, judge guide, and run console, served over HTTPS by Caddy.
+- **Backend:** the voice agent (Silero VAD, Smart Turn and X1 in ONNX on CPU, Gemini, ElevenLabs), running as a systemd service.
+
+The console streams the recording and the reply to your browser. Model calls took about 176–213 ms on that CPU in our deployment check, and 30 of 30 backend tests passed on the server.
+
+**Q: Can anyone on the internet use your hosted agent and run up your API bill?**
+No. The landing page and judge guide are public, but the run console, run endpoints, and WebSocket require a login (HTTPS basic authentication). The Python server only listens on the machine itself, behind Caddy. It allows one run at a time, rejects connections from other websites, and keeps the API keys on the server, never in the browser or the repo.
 
 **Q: How did you use Tiger Data?**
 As the database for run logs. See 3G.
