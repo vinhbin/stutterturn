@@ -1,0 +1,91 @@
+{
+  "url": "https://64-177-51-1.sslip.io/live/",
+  "source": "demo-long-WomenWhoStutter_19_1238s.wav",
+  "browser": "Chromium",
+  "real_runs": [
+    {
+      "config": "stock_fp32",
+      "id": "20261011T061006Z-stock_fp32-8d16",
+      "peaks": {
+        "source": 0.42340087890625,
+        "agent": 0.59576416015625,
+        "mixed": 0.59576416015625
+      },
+      "latest": 0,
+      "state": "running",
+      "stats": {
+        "sourceSamples": 246400,
+        "agentSamples": 31037,
+        "lateSamples": 0,
+        "cancellations": 4
+      },
+      "pendingNodes": 0,
+      "status": "Audio finished.",
+      "reply": "No problem, feel free"
+    },
+    {
+      "config": "candidate",
+      "id": "20261011T061024Z-candidate-f484",
+      "peaks": {
+        "source": 0.42340087890625,
+        "agent": 0.499176025390625,
+        "mixed": 0.499176025390625
+      },
+      "latest": 0,
+      "state": "running",
+      "stats": {
+        "sourceSamples": 246400,
+        "agentSamples": 22291,
+        "lateSamples": 0,
+        "cancellations": 2
+      },
+      "pendingNodes": 0,
+      "status": "Audio finished.",
+      "reply": "What would you like help with?"
+    }
+  ],
+  "summaries": [
+    {
+      "first_turn_complete_t": 1.664,
+      "trigger": "smart_turn",
+      "first_agent_audio_t": 3.9575,
+      "llm_latency_s": 1.375,
+      "tts_first_audio_s": 0.167,
+      "speaker_resumed_after_decision": true,
+      "cancelled": true,
+      "audible_interruption": true,
+      "overlap_s": 0.05,
+      "no_response": false,
+      "timeouts": [],
+      "errors": [],
+      "reply_text": "No problem, feel free",
+      "services": "on",
+      "chars_used": 51,
+      "turns": 3,
+      "playback_late_chunks": 0,
+      "playback_device_errors": []
+    },
+    {
+      "first_turn_complete_t": 7.072,
+      "trigger": "smart_turn",
+      "first_agent_audio_t": 10.9006875,
+      "llm_latency_s": 1.89,
+      "tts_first_audio_s": 0.161,
+      "speaker_resumed_after_decision": true,
+      "cancelled": true,
+      "audible_interruption": false,
+      "overlap_s": null,
+      "no_response": false,
+      "timeouts": [],
+      "errors": [],
+      "reply_text": "What would you like help with?",
+      "services": "on",
+      "chars_used": 81,
+      "turns": 2,
+      "playback_late_chunks": 0,
+      "playback_device_errors": []
+    }
+  ],
+  "page_errors": [],
+  "limit": "Digital Web Audio rendering; no human listening or acoustic timing measurement."
+}

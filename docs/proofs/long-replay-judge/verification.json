@@ -1,0 +1,110 @@
+{
+  "checked_utc": "2026-10-11T06:24:13.764736+00:00",
+  "static_commit": "7bdb1fc785f4fb99698f3bf26e66f4f2ed423648",
+  "url": "https://64-177-51-1.sslip.io/judge/#long-replay",
+  "paid_runs_started": 0,
+  "database_counts_after_ingest": {
+    "runs": 37,
+    "events": 631,
+    "superseded_runs": 10
+  },
+  "assets": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "judge/index.html",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "site.js",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/comparison.js",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/comparison.css",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/comparison.json",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/comparison.sql",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/README.md",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/chart.js",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/model-five.json",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "tiger/comparison-previous.json",
+      "status": 200,
+      "matches_commit": true
+    },
+    {
+      "path": "demo-ui/app.js",
+      "status": 200,
+      "matches_commit": true,
+      "authenticated": true
+    }
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "errors": [],
+      "failed_resources": [],
+      "horizontal_overflow": false
+    },
+    {
+      "width": 390,
+      "errors": [],
+      "failed_resources": [],
+      "horizontal_overflow": false
+    }
+  ],
+  "presets": [
+    {
+      "config": "candidate",
+      "source": "demo-long-WomenWhoStutter_19_1238s.wav",
+      "start_enabled": true,
+      "commands_sent": 0
+    },
+    {
+      "config": "stock_fp32",
+      "source": "demo-long-WomenWhoStutter_19_1238s.wav",
+      "start_enabled": true,
+      "commands_sent": 0
+    }
+  ],
+  "health": {
+    "ok": true,
+    "contract": "0.1",
+    "commit": "ed3d3ec93ce7",
+    "services": "on",
+    "browser_audio": "pcm16-v1",
+    "playback": "off"
+  }
+}

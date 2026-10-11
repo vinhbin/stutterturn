@@ -1,0 +1,49 @@
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:158: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["services"] = services
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:159: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["play"] = play
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:160: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["max_runs"] = max_runs
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:161: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["runtime"] = {"active_runs": 0}
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:162: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["allowed_origin"] = allowed_origin
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:158: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["services"] = services
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:159: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["play"] = play
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:160: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["max_runs"] = max_runs
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:161: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["runtime"] = {"active_runs": 0}
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:162: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["allowed_origin"] = allowed_origin
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:158: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["services"] = services
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:159: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["play"] = play
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:160: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["max_runs"] = max_runs
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:161: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["runtime"] = {"active_runs": 0}
+/opt/stutterturn/releases/cad4d50fa292/agent/server.py:162: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["allowed_origin"] = allowed_origin
+----------------------------------------------------------------------
+Ran 30 tests in 0.618s
+
+OK

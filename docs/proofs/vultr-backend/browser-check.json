@@ -1,0 +1,11 @@
+{
+  "url": "https://64-177-51-1.sslip.io/live/",
+  "browser": "Chromium",
+  "tls_verification": true,
+  "same_origin_backend_default": true,
+  "authenticated_connection": true,
+  "run_id": "20261011T045130Z-stock_fp32-e5d2 (Backend run \u2014 playback unverified)",
+  "status": "Run ended. Final values below are backend-reported; audio playback is unverified.",
+  "summary_note": "Backend-reported summary; playback unverified. End reason: completed. Log: agent/runs/20261011T045130Z-stock_fp32-e5d2.jsonl",
+  "page_errors": []
+}

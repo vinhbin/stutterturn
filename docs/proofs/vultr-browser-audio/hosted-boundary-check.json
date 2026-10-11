@@ -1,0 +1,25 @@
+{
+  "/ anonymous": 200,
+  "/judge/ anonymous": 200,
+  "/live/ anonymous": 401,
+  "/demo-ui/browser-audio.js anonymous": 401,
+  "/v0/health anonymous": 401,
+  "/demo-ui/browser-audio.js?v=audio1 authenticated": 200,
+  "health": {
+    "ok": true,
+    "contract": "0.1",
+    "commit": "667460f45fdd",
+    "services": "on",
+    "browser_audio": "pcm16-v1",
+    "playback": "off"
+  },
+  "/v0/health authenticated": 200,
+  "/agent/.env anonymous": 404,
+  "/benchmark/audio/HeStutters_4_32.wav anonymous": 404,
+  "service": [
+    "NRestarts=0",
+    "MemoryCurrent=289263616",
+    "ActiveState=active",
+    "SubState=running"
+  ]
+}

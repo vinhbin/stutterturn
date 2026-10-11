@@ -1,0 +1,91 @@
+{
+  "url": "https://64-177-51-1.sslip.io/live/",
+  "source": "HeStutters_5_123.wav",
+  "browser": "Chromium",
+  "real_runs": [
+    {
+      "config": "stock_fp32",
+      "id": "20261011T061941Z-stock_fp32-65fb",
+      "peaks": {
+        "source": 0.999969482421875,
+        "agent": 0.68829345703125,
+        "mixed": 0.999969482421875
+      },
+      "latest": 0,
+      "state": "running",
+      "stats": {
+        "sourceSamples": 128000,
+        "agentSamples": 23777,
+        "lateSamples": 0,
+        "cancellations": 2
+      },
+      "pendingNodes": 0,
+      "status": "Audio finished.",
+      "reply": "What would you like help with?"
+    },
+    {
+      "config": "candidate",
+      "id": "20261011T061951Z-candidate-eb9a",
+      "peaks": {
+        "source": 0.999969482421875,
+        "agent": 0.7166748046875,
+        "mixed": 0.999969482421875
+      },
+      "latest": 0,
+      "state": "running",
+      "stats": {
+        "sourceSamples": 128000,
+        "agentSamples": 22291,
+        "lateSamples": 0,
+        "cancellations": 0
+      },
+      "pendingNodes": 0,
+      "status": "Audio finished.",
+      "reply": "What would you like help with?"
+    }
+  ],
+  "summaries": [
+    {
+      "first_turn_complete_t": 0.768,
+      "trigger": "smart_turn",
+      "first_agent_audio_t": 6.4175,
+      "llm_latency_s": 1.186,
+      "tts_first_audio_s": 0.189,
+      "speaker_resumed_after_decision": true,
+      "cancelled": true,
+      "audible_interruption": false,
+      "overlap_s": null,
+      "no_response": false,
+      "timeouts": [],
+      "errors": [],
+      "reply_text": "What would you like help with?",
+      "services": "on",
+      "chars_used": 30,
+      "turns": 2,
+      "playback_late_chunks": 0,
+      "playback_device_errors": []
+    },
+    {
+      "first_turn_complete_t": 5.024,
+      "trigger": "fallback_timeout",
+      "first_agent_audio_t": 6.5075,
+      "llm_latency_s": 1.328,
+      "tts_first_audio_s": 0.136,
+      "speaker_resumed_after_decision": false,
+      "cancelled": false,
+      "audible_interruption": false,
+      "overlap_s": null,
+      "no_response": false,
+      "timeouts": [],
+      "errors": [],
+      "reply_text": "What would you like help with?",
+      "services": "on",
+      "chars_used": 60,
+      "turns": 1,
+      "playback_late_chunks": 0,
+      "playback_device_errors": []
+    }
+  ],
+  "page_errors": [],
+  "limit": "Digital Web Audio rendering; no human listening or acoustic timing measurement."
+}

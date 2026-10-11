@@ -1,0 +1,19 @@
+{
+  "copy_revision": "ac47da396cae",
+  "anonymous_http_status": {
+    "/": 200,
+    "/judge/": 200,
+    "/demo-ui/fonts/archivo-latin.woff2": 200,
+    "/demo-ui/fonts/jetbrains-mono-latin.woff2": 200,
+    "/demo-ui/": 401,
+    "/demo-ui/app.js": 401,
+    "/demo-ui/browser-audio.js": 401,
+    "/live/": 401,
+    "/v0/health": 401,
+    "/v0/ws": 401,
+    "/agent/.env": 404
+  },
+  "public_browser_failed_resources": [],
+  "site_checks_passed": 52,
+  "note": "Historical five-clip statistics unchanged; current cloud/audio/candidate and sponsor descriptions corrected."
+}

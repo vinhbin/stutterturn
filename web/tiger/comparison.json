@@ -1,0 +1,449 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-11T06:21:01+00:00",
+  "offline_fallback": false,
+  "source_note": "Saved Tiger Data query over two pinned Vultr runs; not live database status.",
+  "query_sha256": "f859ce7d302b889a7ef78f42ea1c2fc0cda33152ab34e7a8f8e4639b4ad5eec3",
+  "log_sha256": {
+    "20261011T061006Z-stock_fp32-8d16": "43bc508aeac175f0ab2e3a50d828bd0a3244d75f6f8540f9e09896b01bc211da",
+    "20261011T061024Z-candidate-f484": "58a05d855011535e0303a2d73699c04b4ee71e6f8c8667663f6aa623464bd1af"
+  },
+  "runs": [
+    {
+      "run_id": "20261011T061006Z-stock_fp32-8d16",
+      "config": "stock_fp32",
+      "source_id": "demo-long-WomenWhoStutter_19_1238s.wav",
+      "source_duration_s": 10.4,
+      "commit_sha": "700d34762c1b",
+      "model": "stock-fp32",
+      "model_sha256": "ab8dc64b88713f90b571c15b714bd1330e6c883cad8763dacf65c9376dc539be",
+      "params": {
+        "frame_s": 0.032,
+        "threshold": 0.5,
+        "fallback_s": 3.0,
+        "pre_roll_s": 0.192,
+        "vad_stop_s": 0.2,
+        "time_origin": "source_audio_start",
+        "vad_start_s": 0.2,
+        "trailing_silence_s": 5.0
+      },
+      "reason": "completed",
+      "reported_overlap_s": 0.05,
+      "timeouts": [],
+      "first_decision_t": 1.664,
+      "first_decision_name": "turn_complete",
+      "events": [
+        {
+          "t": 0.352,
+          "seq": 1,
+          "name": "speech_start",
+          "prob": 0.998,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 1.472,
+          "seq": 3,
+          "name": "speech_stop",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 1.664,
+          "seq": 5,
+          "name": "turn_complete",
+          "prob": 0.9016,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": 0.5,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 3.958,
+          "seq": 7,
+          "name": "agent_audio_start",
+          "prob": null,
+          "timing": {
+            "v": "playback-v1",
+            "basis": "browser_schedule",
+            "generation": 1
+          },
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 3.808,
+          "seq": 9,
+          "name": "speech_start",
+          "prob": 0.83,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 3.808,
+          "seq": 11,
+          "name": "speaker_resumed",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 4.008,
+          "seq": 13,
+          "name": "agent_audio_end",
+          "prob": null,
+          "timing": {
+            "v": "playback-v1",
+            "basis": "software_cut",
+            "acoustic_stop_t": null,
+            "accepted_cut_sample": 64128,
+            "requested_cut_sample": 64128
+          },
+          "service": null,
+          "overlap_s": 0.05,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 4.008,
+          "seq": 14,
+          "name": "cancelled",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": false
+        },
+        {
+          "t": 6.88,
+          "seq": 15,
+          "name": "speech_stop",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.072,
+          "seq": 17,
+          "name": "turn_complete",
+          "prob": 0.9624,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": 0.5,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.68,
+          "seq": 19,
+          "name": "speech_start",
+          "prob": 0.999,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.68,
+          "seq": 21,
+          "name": "speaker_resumed",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.68,
+          "seq": 22,
+          "name": "cancelled",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": true
+        },
+        {
+          "t": 8.48,
+          "seq": 23,
+          "name": "speech_stop",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 8.672,
+          "seq": 25,
+          "name": "turn_complete",
+          "prob": 0.9889,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": 0.5,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 10.396,
+          "seq": 27,
+          "name": "agent_audio_start",
+          "prob": null,
+          "timing": {
+            "v": "playback-v1",
+            "basis": "browser_schedule",
+            "generation": 5
+          },
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 11.882,
+          "seq": 29,
+          "name": "agent_audio_end",
+          "prob": null,
+          "timing": {
+            "v": "playback-v1",
+            "basis": "browser_schedule"
+          },
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        }
+      ]
+    },
+    {
+      "run_id": "20261011T061024Z-candidate-f484",
+      "config": "candidate",
+      "source_id": "demo-long-WomenWhoStutter_19_1238s.wav",
+      "source_duration_s": 10.4,
+      "commit_sha": "700d34762c1b",
+      "model": "stutterturn-x1-blend-a0.75-W3e1.00-th0.60",
+      "model_sha256": "d1a503fee1eca1e6d6ffe78e918d8ed312922eddb5f3dd19cc5315c1b824c025",
+      "params": {
+        "frame_s": 0.032,
+        "threshold": 0.6,
+        "fallback_s": 3.0,
+        "pre_roll_s": 0.192,
+        "vad_stop_s": 0.2,
+        "time_origin": "source_audio_start",
+        "vad_start_s": 0.2,
+        "trailing_silence_s": 5.0
+      },
+      "reason": "completed",
+      "reported_overlap_s": null,
+      "timeouts": [],
+      "first_decision_t": 1.664,
+      "first_decision_name": "turn_incomplete",
+      "events": [
+        {
+          "t": 0.352,
+          "seq": 1,
+          "name": "speech_start",
+          "prob": 0.998,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 1.472,
+          "seq": 3,
+          "name": "speech_stop",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 1.664,
+          "seq": 5,
+          "name": "turn_incomplete",
+          "prob": 0.5432,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": 0.6,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 3.808,
+          "seq": 7,
+          "name": "speech_start",
+          "prob": 0.83,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 6.88,
+          "seq": 9,
+          "name": "speech_stop",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.072,
+          "seq": 11,
+          "name": "turn_complete",
+          "prob": 0.97,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": 0.6,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.68,
+          "seq": 13,
+          "name": "speech_start",
+          "prob": 0.999,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.68,
+          "seq": 15,
+          "name": "speaker_resumed",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 7.68,
+          "seq": 16,
+          "name": "cancelled",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": true
+        },
+        {
+          "t": 8.48,
+          "seq": 17,
+          "name": "speech_stop",
+          "prob": null,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 8.672,
+          "seq": 19,
+          "name": "turn_complete",
+          "prob": 0.8301,
+          "timing": null,
+          "service": null,
+          "overlap_s": null,
+          "threshold": 0.6,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 10.901,
+          "seq": 21,
+          "name": "agent_audio_start",
+          "prob": null,
+          "timing": {
+            "v": "playback-v1",
+            "basis": "browser_schedule",
+            "generation": 3
+          },
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        },
+        {
+          "t": 12.294,
+          "seq": 23,
+          "name": "agent_audio_end",
+          "prob": null,
+          "timing": {
+            "v": "playback-v1",
+            "basis": "browser_schedule"
+          },
+          "service": null,
+          "overlap_s": null,
+          "threshold": null,
+          "error_detail": null,
+          "before_audible": null
+        }
+      ]
+    }
+  ]
+}

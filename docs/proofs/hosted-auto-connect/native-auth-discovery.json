@@ -1,0 +1,26 @@
+{
+  "auth_challenges": [
+    "https://64-177-51-1.sslip.io/live/"
+  ],
+  "api_responses": [
+    [
+      "https://64-177-51-1.sslip.io/v0/health",
+      200
+    ],
+    [
+      "https://64-177-51-1.sslip.io/v0/configurations",
+      200
+    ],
+    [
+      "https://64-177-51-1.sslip.io/v0/sources",
+      200
+    ]
+  ],
+  "status": "Connected. Choose a recording and model, then Start to hear the replay.",
+  "source_count": 2,
+  "backend": "https://64-177-51-1.sslip.io",
+  "models_enabled": 4,
+  "selected_model": "candidate",
+  "url_hidden": true,
+  "automatic_connection": true
+}

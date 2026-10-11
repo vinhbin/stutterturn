@@ -1,0 +1,24 @@
+# Caddy 2.6 uses basicauth (renamed basic_auth in 2.8).
+64-177-51-1.sslip.io {
+  @private {
+    path /v0 /v0/* /live /live/* /demo-ui /demo-ui/*
+    not path /demo-ui/fonts/archivo-latin.woff2 /demo-ui/fonts/jetbrains-mono-latin.woff2
+  }
+  basicauth @private {
+    demo __PASSWORD_HASH__
+  }
+  handle /v0/* {
+    reverse_proxy 127.0.0.1:8765 {
+      header_up -Authorization
+      header_down -Access-Control-Allow-Origin
+      header_down -Access-Control-Allow-Headers
+    }
+  }
+  handle {
+    root * /var/www/stutterturn
+    file_server
+  }
+}
+:80 {
+  redir https://64-177-51-1.sslip.io{uri} permanent
+}

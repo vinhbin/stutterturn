@@ -26,7 +26,7 @@ class FakeServices:
         self.callbacks = []
         self.hold = None
 
-    async def reply_text(self, _audio):
+    async def reply_text(self, _audio, on_retry=None):
         return "A deterministic reply."
 
     async def stream_tts(self, _text, on_chunk):
@@ -45,6 +45,31 @@ class FakeServices:
 
 
 class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
+    async def test_genuine_gemini_deadline_stays_a_timeout(self):
+        services = FakeServices()
+        async def timeout(_audio, on_retry=None):
+            raise asyncio.TimeoutError()
+        services.reply_text = timeout
+        run, messages = self.make_run(services, playback=False)
+        run._start_reply(0, [np.zeros(512)])
+        await run.reply_task
+        self.assertEqual(run.s['timeouts'], ['gemini'])
+        self.assertEqual(run.s['errors'], [])
+        self.assertFalse(services.callbacks)
+
+    async def test_empty_gemini_reply_records_error_without_audio_or_timeout(self):
+        services = FakeServices()
+        async def empty(_audio, on_retry=None):
+            raise engine.GeminiReplyError('empty_reply', 'STOP')
+        services.reply_text = empty
+        run, messages = self.make_run(services, playback=False)
+        run._start_reply(0, [np.zeros(512)])
+        await run.reply_task
+        self.assertEqual(run.s['timeouts'], [])
+        self.assertEqual(run.s['errors'], ['gemini:empty_reply'])
+        self.assertFalse(services.callbacks)
+        self.assertTrue(any(m.get('name') == 'provider_error' and m.get('service') == 'gemini' for m in messages))
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -127,6 +152,8 @@ class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
         services = FakeServices([b"\x00\x40" * 256])
         services.hold = asyncio.Event()
         run, messages = self.make_run(services)
+        # The expected sample interval assumes the first chunk arrives at t=0.
+        run.now = lambda: 0.0
         real_wait_for = asyncio.wait_for
 
         async def fast_timeout(awaitable, timeout):
@@ -221,6 +248,7 @@ class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
                 services = FakeServices([b"\x00\x40" * 256])
                 services.hold = asyncio.Event()
                 run, messages = self.make_run(services)
+                run.now = lambda: 0.0  # Fixed arrival; fake device time advances below.
                 await self.start_reply(run)
                 task = run.reply_task
                 run.player.stream.pull(8000)
@@ -422,7 +450,7 @@ class RunLifecycleTests(unittest.IsolatedAsyncioTestCase):
         real_wait_for = asyncio.wait_for
 
         async def shorten_outer_deadline(awaitable, timeout):
-            return await real_wait_for(awaitable, .02 if timeout == 15 else timeout)
+            return await real_wait_for(awaitable, .02 if timeout == engine.REPLY_DRAIN_TIMEOUT_S else timeout)
 
         with patch.object(engine.SmartTurn, "load", return_value=model), \
                 patch.object(engine, "SileroVAD", return_value=lambda _: next(probabilities)), \

@@ -23,6 +23,8 @@ SR = 16000
 FRAME = 512                  # Silero v5 needs 512 samples at 16 kHz -> 32 ms frames
 FRAME_S = FRAME / SR         # 0.032
 TRAILING_SILENCE_S = 5.0     # fed after the source ends
+GEMINI_REPLY_TIMEOUT_S = 20
+REPLY_DRAIN_TIMEOUT_S = 30
 CONTRACT_VERSION = "0.1"
 SPEECH_PROB = 0.5
 PRE_ROLL_S = 0.2
@@ -100,7 +102,7 @@ def _commit():
                                capture_output=True, text=True, check=True).stdout.strip()
         return sha + ("-dirty" if dirty else "")
     except Exception:
-        return "unknown"
+        return os.getenv("STUTTERTURN_REVISION", "unknown")
 
 
 class ModelUnavailable(Exception):
@@ -236,6 +238,15 @@ def load_source(name):
 
 # ---------------------------------------------------------------- services
 
+class GeminiReplyError(Exception):
+    """A completed Gemini request with no usable spoken reply, not a timeout."""
+
+    def __init__(self, code, finish_reason="UNKNOWN"):
+        self.code = code
+        self.finish_reason = finish_reason
+        super().__init__(code)
+
+
 class Services:
     """Gemini reply + ElevenLabs streaming TTS. One instance per process."""
 
@@ -253,18 +264,34 @@ class Services:
         self.max_chars = int(os.getenv("ELEVENLABS_MAX_CHARS", "3000"))
         self.chars_used = 0
 
-    async def reply_text(self, audio):
+    async def reply_text(self, audio, on_retry=None):
         from google.genai import types
         wav = io.BytesIO()
         sf.write(wav, audio, SR, format="WAV", subtype="PCM_16")
-        resp = await self.genai_client.aio.models.generate_content(
-            model=self.gemini_model,
-            contents=[types.Part.from_bytes(data=wav.getvalue(), mime_type="audio/wav")],
-            config=types.GenerateContentConfig(
-                system_instruction=PROMPT,
-                max_output_tokens=60, temperature=0.4,
-                thinking_config=types.ThinkingConfig(thinking_budget=0)))
-        return (resp.text or "").strip()[:120]
+        for attempt, token_limit in enumerate((60, 256), start=1):
+            resp = await self.genai_client.aio.models.generate_content(
+                model=self.gemini_model,
+                contents=[types.Part.from_bytes(data=wav.getvalue(), mime_type="audio/wav")],
+                config=types.GenerateContentConfig(
+                    system_instruction=PROMPT,
+                    max_output_tokens=token_limit, temperature=0.4,
+                    thinking_config=types.ThinkingConfig(thinking_budget=0)))
+            candidates = getattr(resp, "candidates", None) or []
+            reason = getattr(candidates[0], "finish_reason", None) if candidates else None
+            reason = getattr(reason, "value", reason) or "UNKNOWN"
+            block = getattr(getattr(resp, "prompt_feedback", None), "block_reason", None)
+            block = getattr(block, "value", block)
+            # Retain provider blocks; never retry them with changed safety settings.
+            if block and block != "BLOCK_REASON_UNSPECIFIED":
+                raise GeminiReplyError("blocked_reply", str(block))
+            if reason not in ("UNKNOWN", "STOP", "MAX_TOKENS", "FINISH_REASON_UNSPECIFIED"):
+                raise GeminiReplyError("blocked_reply", str(reason))
+            text = (resp.text or "").strip()[:120]
+            if text:
+                return text
+            if attempt == 1 and on_retry:
+                on_retry({"attempt": 2, "finish_reason": str(reason)})
+        raise GeminiReplyError("empty_reply", str(reason))
 
     async def _voice(self, session):
         if not self.voice_id:
@@ -308,7 +335,7 @@ class CreditCapReached(Exception):
 # ---------------------------------------------------------------- run
 
 class Run:
-    def __init__(self, config, source, services=None, listener=None, play=False):
+    def __init__(self, config, source, services=None, listener=None, play=False, playback_factory=None):
         if config not in CONFIGS:
             raise ValueError(f"unknown config {config!r}")
         self.config = config
@@ -339,7 +366,7 @@ class Run:
                   "llm_latency_s": None, "tts_first_audio_s": None,
                   "speaker_resumed_after_decision": False, "cancelled": False,
                   "audible_interruption": False, "overlap_s": None, "no_response": False,
-                  "timeouts": [], "reply_text": None}
+                  "timeouts": [], "errors": [], "reply_text": None}
         self.turns = 0
         self.reply_task = None
         self.agent_audio_start = None   # t
@@ -347,6 +374,7 @@ class Run:
         self._accepted_audio_end = None
         self.agent_audible = False
         self.play = play                # laptop-speaker playback (agent/playback.py)
+        self.playback_factory = playback_factory
         self.player = None
         self._generation = 0
         self._player_generation = None
@@ -439,21 +467,39 @@ class Run:
         accepted_samples = 0
         try:
             t_req = time.monotonic()
+            def on_retry(info):
+                if current():
+                    self.event(self.now(), "info", "response_retry", service="gemini",
+                               detail="Empty reply; retrying once within the bounded reply deadline", **info)
             try:
-                text = await asyncio.wait_for(self.services.reply_text(audio), timeout=10)
+                text = await asyncio.wait_for(self.services.reply_text(audio, on_retry=on_retry), timeout=GEMINI_REPLY_TIMEOUT_S)
             except asyncio.TimeoutError:
                 if not current():
                     return
                 self.event(self.now(), "info", "timeout", service="gemini")
                 self.s["timeouts"].append("gemini")
                 return
+            except GeminiReplyError as e:
+                if current():
+                    self.s["llm_latency_s"] = round(time.monotonic() - t_req, 3)
+                    self.event(self.now(), "info", "provider_error", service="gemini",
+                               error_code=e.code, finish_reason=e.finish_reason, detail=e.code)
+                    self.s["errors"].append("gemini:" + e.code)
+                return
+            except Exception as e:
+                if current():
+                    self.event(self.now(), "info", "provider_error", service="gemini",
+                               error_code="request_failed", detail=type(e).__name__)
+                    self.s["errors"].append("gemini:request_failed")
+                return
             if not current():
                 return
             self.s["llm_latency_s"] = round(time.monotonic() - t_req, 3)
             self.s["reply_text"] = text
             if not text:
-                self.event(self.now(), "info", "timeout", service="gemini", detail="empty reply")
-                self.s["timeouts"].append("gemini")
+                self.event(self.now(), "info", "provider_error", service="gemini",
+                           error_code="empty_reply", detail="empty_reply")
+                self.s["errors"].append("gemini:empty_reply")
                 return
             t_tts = time.monotonic()
 
@@ -493,7 +539,7 @@ class Run:
                             self.s["tts_first_audio_s"] = round(time.monotonic() - t_tts, 3)
                             self.event(t, "audible", "agent_audio_start", detail=text,
                                        timing={"v": "playback-v1", "basis":
-                                               "scheduled_output_samples" if self.player else
+                                               self._playback_basis() if self.player else
                                                "pcm_receipt", "generation": generation})
                             self.state(t, "agent")
                         self._accepted_audio_end = ((idx + len(piece)) / SR if self.player else
@@ -547,6 +593,9 @@ class Run:
                            "accepted_cut_sample": cut_sample,
                            "acoustic_stop_t": None})
 
+    def _playback_basis(self):
+        return "browser_schedule" if getattr(self.player, "transport", None) else "scheduled_output_samples"
+
     def _cut_end(self, t):
         accepted_end = (self.player.agent_next / SR if self.player is not None
                         and self.player.agent_next is not None else self._accepted_audio_end)
@@ -558,7 +607,7 @@ class Run:
         if self.agent_audible and self.agent_audio_end is not None and t >= self.agent_audio_end:
             self.agent_audible = False
             self.event(self.agent_audio_end, "audible", "agent_audio_end",
-                       timing={"v": "playback-v1", "basis": "scheduled_output_samples"
+                       timing={"v": "playback-v1", "basis": self._playback_basis()
                                if self.player else "pcm_receipt_plus_duration"})
             self.state(self.agent_audio_end, "silence")
 
@@ -625,9 +674,9 @@ class Run:
         fallback_n = int(np.ceil(cfg["fallback_s"] / FRAME_S - 1e-9))
 
         self.t0 = time.monotonic()
-        if self.play and not self.stopped:
+        if (self.play or self.playback_factory) and not self.stopped:
             from playback import Player
-            self.player = Player(stream)
+            self.player = self.playback_factory(stream) if self.playback_factory else Player(stream)
             self.t0 = time.monotonic()
             self.player.start()
             start_elapsed = time.monotonic() - self.t0
@@ -646,8 +695,11 @@ class Run:
                                .replace("+00:00", "Z"),
                     "services": "on" if self.services else "off",
                     "playback": {**self.player.info(), "stream_start_call_s": round(start_elapsed, 6),
-                                 "pending_policy": "await_device_consumption"}
+                                 "pending_policy": "await_server_schedule" if self.playback_factory else "await_device_consumption"}
                                 if self.player else None})
+
+        if self.playback_factory and self.player:
+            self.player.send_source()
 
         in_speech = False
         speech_run = silence_run = 0
@@ -754,7 +806,7 @@ class Run:
                 self.reply_task.cancel()
             try:
                 await self._until_stopped(asyncio.wait_for(asyncio.shield(self.reply_task),
-                                                          timeout=15))
+                                                          timeout=REPLY_DRAIN_TIMEOUT_S))
             except asyncio.TimeoutError:
                 self.reply_task.cancel()
                 await asyncio.gather(self.reply_task, return_exceptions=True)

@@ -202,8 +202,8 @@ try {
     }
     assert(await page.locator('.architecture-flow > li').count() === 4, 'recorded-input system flow is incomplete');
     const scope = await page.locator('.scope-columns').innerText();
-    for (const limit of [/human-reviewed/i, /candidate/i, /completed-turn response delay/i, /speaker playback/i]) {
-      assert(limit.test(scope), 'guide omits remaining proof for ' + limit);
+    for (const capability of [/Vultr/i, /candidate/i, /ElevenLabs/i, /Tiger Data/i]) {
+      assert(capability.test(scope), 'guide omits built capability ' + capability);
     }
     const brokenAnchors = await page.locator('a[href^="#"]').evaluateAll(links => links
       .filter(link => !document.getElementById(decodeURIComponent(link.hash.slice(1))))
@@ -221,7 +221,7 @@ try {
     assert(/Stock.*0\.2 s.*4 of 5/s.test(await rows.nth(0).innerText()), 'stock snapshot changed without revising its evidence check');
     assert(/Patient.*1\.0 s.*0 of 5/s.test(await rows.nth(1).innerText()), 'patient snapshot changed without revising its evidence check');
     assert(/not current backend status/i.test(text), 'recorded result is presented as current backend status');
-    assert(/not been human-reviewed/i.test(text) && /speaker playback is unverified/i.test(text) && /browser plays no audio/i.test(text),
+    assert(/not been human-reviewed/i.test(text) && /speaker playback is unverified/i.test(text) && /saved chart plays no audio/i.test(text),
       'snapshot omits label or playback limitations');
     const evidence = snapshot.locator('a[href="https://github.com/vinhbin/stutterturn/tree/9805a06/agent/evidence/2026-10-10-replay-v2"]');
     assert(await evidence.isVisible(), 'snapshot does not link directly to the pinned v2 evidence');
@@ -233,31 +233,36 @@ try {
     assert(await page.locator('#replay-evidence').isVisible(), 'preserved evidence fragment has no destination');
     assert(await page.locator('#console-frame').count() === 0, 'legacy alias retained the previous embedded console');
   });
-  await test('judge chart renders all recorded runs with offline provenance and reported-audio limits', async () => {
+  await test('judge chart renders saved database-query runs with snapshot provenance and reported-audio limits', async () => {
     const chart = page.locator('#tiger-chart');
     assert(await chart.count() === 1, 'judge route has no run-log chart');
     await chart.locator('.tgr-figure').first().waitFor();
     assert(await chart.locator('.tgr-lane').count() === 10, 'timeline omitted recorded runs');
     assert(await chart.locator('.tgr-gap-row').count() === 10, 'audio-gap chart omitted recorded runs');
-    assert(await chart.locator('.tgr-head .tgr-badge-live').count() === 0, 'offline snapshot claims database provenance');
+    assert(await chart.locator('.tgr-head .tgr-badge-live').count() === 1, 'database-query snapshot lost its provenance');
     for (const figure of await chart.locator('.tgr-figure').all()) {
-      assert(/local snapshot/i.test(await figure.innerText()), 'figure lacks offline provenance');
+      assert(/snapshot.*Tiger\s?Data|Tiger\s?Data.*snapshot/i.test(await figure.innerText()), 'figure lacks saved database provenance');
     }
     const text = await chart.innerText();
     assert(/reported.*audio|audio.*reported/i.test(text) && /speaker playback.*unverified/i.test(text),
       'chart overstates audio events as verified playback');
     assert(/not.*live.*status/i.test(await page.locator('#run-log-evidence').innerText()),
       'saved chart is not distinguished from live status');
-    assert(/0\.512 s/.test(text) && /9\.406 s/.test(text), 'per-run values do not match pinned evidence');
+    const pinned = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'model-five.json'), 'utf8'));
+    for (const c of pinned.clips) for (const r of Object.values(c.configs)) {
+      assert(text.includes(r.first_complete_t.toFixed(3) + ' s'), 'per-run values do not match pinned evidence');
+    }
+    assert(await chart.locator('.tgr-lane-tag').filter({ hasText: 'Our X1' }).count() === 10, 'our model is missing from five-clip charts');
     const clip = chart.locator('.tgr-figure').first().locator('.tgr-clip').filter({ hasText: 'HeStutters_4_32.wav' });
     const modelMarks = clip.locator('.tgr-track .tgr-mark-complete');
-    assert(await modelMarks.count() === 1, 'later fallback is incorrectly marked as a model decision');
+    const expectedMarks = Object.values(pinned.clips.find(c => c.source_id === 'HeStutters_4_32.wav').configs).filter(r => r.trigger === 'smart_turn').length;
+    assert(await modelMarks.count() === expectedMarks, 'fallback is incorrectly marked as a model decision');
   });
   for (const scenario of ['unavailable', 'missing provenance', 'database snapshot']) {
     await test('judge chart handles ' + scenario + ' without inventing live database status', async () => {
-      const data = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'snapshot.json'), 'utf8'));
+      const data = JSON.parse(fs.readFileSync(path.join(webRoot, 'tiger', 'model-five.json'), 'utf8'));
       const chartPage = await reduced.newPage();
-      await chartPage.route('**/tiger/snapshot.json', route => {
+      await chartPage.route('**/tiger/model-five.json', route => {
         if (scenario === 'unavailable') return route.fulfill({ status: 404, body: '' });
         if (scenario === 'missing provenance') delete data.offline_fallback;
         else {
@@ -345,7 +350,7 @@ try {
     assert(await fallback.locator('#guide-title').isVisible(), 'no-JS guide title hidden');
     assert(await fallback.locator('.evaluation-steps > li').count() === 4, 'no-JS evaluation steps missing');
     assert(await fallback.locator('#replay-evidence').isVisible(), 'no-JS evidence summary hidden');
-    assert(await fallback.locator('#tiger-chart a[href="../tiger/snapshot.json"]').isVisible(),
+    assert(await fallback.locator('#tiger-chart a[href="../tiger/model-five.json"]').isVisible(),
       'no-JS chart fallback provides no direct evidence data');
     assert(await fallback.locator('#console-frame, #btn-start').count() === 0, 'no-JS guide contains run controls');
     await (await routeLink(fallback.locator('.guide-next'), '/live/')).click();
